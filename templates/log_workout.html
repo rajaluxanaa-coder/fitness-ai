@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Workout - FitAI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            color: #6b46c1;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 2rem;
+        }
+        
+        .workout-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .workout-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(107, 70, 193, 0.3);
+        }
+        
+        .workout-icon {
+            font-size: 2.5rem;
+            color: #6b46c1;
+            margin-bottom: 0.5rem;
+        }
+        
+        .workout-name {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #1f2937;
+        }
+        
+        .workout-desc {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #4b5563;
+            font-weight: 600;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #6b46c1;
+        }
+        
+        .btn-primary {
+            background: #6b46c1;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background: #553c9a;
+        }
+        
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #1f2937;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            margin-top: 1rem;
+            display: inline-block;
+            text-decoration: none;
+        }
+        
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+        
+        .quick-add {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .animate {
+            animation: slideIn 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container animate">
+        <h1>
+            <i class="fas fa-dumbbell" style="color: #6b46c1;"></i>
+            Log Your Workout
+        </h1>
+        
+        <!-- Quick Add Templates -->
+        <div class="quick-add">
+            <div class="workout-card" onclick="selectTemplate('Upper Body', 300, 'Push-ups, Rows, Press')">
+                <div class="workout-icon">💪</div>
+                <div class="workout-name">Upper Body</div>
+                <div class="workout-desc">~300 cal • 30 min</div>
+            </div>
+            
+            <div class="workout-card" onclick="selectTemplate('Lower Body', 350, 'Squats, Lunges, Deadlifts')">
+                <div class="workout-icon">🦵</div>
+                <div class="workout-name">Lower Body</div>
+                <div class="workout-desc">~350 cal • 35 min</div>
+            </div>
+            
+            <div class="workout-card" onclick="selectTemplate('Cardio', 400, 'Running, Jumping Jacks')">
+                <div class="workout-icon">🏃</div>
+                <div class="workout-name">Cardio</div>
+                <div class="workout-desc">~400 cal • 30 min</div>
+            </div>
+            
+            <div class="workout-card" onclick="selectTemplate('Full Body', 450, 'Burpees, Thrusters')">
+                <div class="workout-icon">⚡</div>
+                <div class="workout-name">Full Body</div>
+                <div class="workout-desc">~450 cal • 40 min</div>
+            </div>
+        </div>
+        
+        <form id="workoutForm" onsubmit="logWorkout(event)">
+            <div class="form-group">
+                <label><i class="fas fa-calendar"></i> Date</label>
+                <input type="date" id="workoutDate" value="{{ now.date() }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-tag"></i> Workout Type</label>
+                <select id="workoutType" required>
+                    <option value="">Select workout type</option>
+                    <option value="Upper Body">Upper Body</option>
+                    <option value="Lower Body">Lower Body</option>
+                    <option value="Cardio">Cardio</option>
+                    <option value="Full Body">Full Body</option>
+                    <option value="Core">Core/Abs</option>
+                    <option value="Yoga">Yoga/Stretching</option>
+                    <option value="HIIT">HIIT</option>
+                    <option value="Strength">Strength Training</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-clock"></i> Duration (minutes)</label>
+                <input type="number" id="duration" min="5" max="180" value="30" required>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-fire"></i> Calories Burned</label>
+                <input type="number" id="calories" min="0" value="300" required>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-list"></i> Exercises Done</label>
+                <textarea id="exercises" rows="3" placeholder="List your exercises..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-smile"></i> How did it feel?</label>
+                <select id="mood">
+                    <option value="great">💪 Great - Pushed hard!</option>
+                    <option value="good">👍 Good - Solid workout</option>
+                    <option value="okay">😐 Okay - Did my best</option>
+                    <option value="tired">😴 Tired - Low energy</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="btn-primary">
+                <i class="fas fa-save"></i> Log Workout
+            </button>
+        </form>
+        
+        <div style="text-align: center; margin-top: 1.5rem;">
+            <a href="/profile" class="btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Profile
+            </a>
+        </div>
+    </div>
+    
+    <script>
+        function selectTemplate(type, calories, exercises) {
+            document.getElementById('workoutType').value = type;
+            document.getElementById('calories').value = calories;
+            document.getElementById('exercises').value = exercises;
+        }
+        
+        async function logWorkout(event) {
+            event.preventDefault();
+            
+            const workout = {
+                type: document.getElementById('workoutType').value,
+                duration: document.getElementById('duration').value,
+                calories: document.getElementById('calories').value,
+                exercises: document.getElementById('exercises').value,
+                mood: document.getElementById('mood').value,
+                date: document.getElementById('workoutDate').value
+            };
+            
+            const response = await fetch('/log-workout', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(workout)
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                alert('✅ Workout logged successfully!');
+                window.location.href = '/progress';
+            }
+        }
+    </script>
+</body>
+</html>

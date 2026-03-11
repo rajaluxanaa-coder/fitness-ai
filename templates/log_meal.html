@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Meal - FitAI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: white;
+            color: #11998e;
+        }
+        
+        .stats-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .stats-title {
+            color: #4b5563;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .progress-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+        
+        .progress-item {
+            text-align: center;
+        }
+        
+        .progress-label {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .progress-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #11998e;
+        }
+        
+        .progress-bar-bg {
+            width: 100%;
+            height: 10px;
+            background: #e5e7eb;
+            border-radius: 5px;
+            margin: 0.5rem 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #11998e, #38ef7d);
+            border-radius: 5px;
+            transition: width 0.3s;
+        }
+        
+        .quick-meals {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .meal-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .meal-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(17, 153, 142, 0.3);
+        }
+        
+        .meal-emoji {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .meal-name {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+        }
+        
+        .meal-calories {
+            color: #11998e;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .form-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .form-title {
+            color: #11998e;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.3rem;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #4b5563;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        label i {
+            color: #11998e;
+            margin-right: 0.5rem;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #11998e;
+            box-shadow: 0 0 0 3px rgba(17, 153, 142, 0.1);
+        }
+        
+        .macro-inputs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+        }
+        
+        .macro-input {
+            text-align: center;
+        }
+        
+        .macro-unit {
+            color: #6b7280;
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(17, 153, 142, 0.3);
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .animate {
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @media (max-width: 640px) {
+            .quick-meals {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+            .macro-inputs {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <i class="fas fa-utensils"></i>
+                Log Your Meal
+            </h1>
+            <a href="/profile" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+        </div>
+        
+        <!-- Daily Progress Card -->
+        <div class="stats-card animate">
+            <div class="stats-title">
+                <i class="fas fa-chart-line"></i> Today's Progress
+            </div>
+            <div class="progress-grid">
+                <div class="progress-item">
+                    <div class="progress-label">Calories</div>
+                    <div class="progress-value" id="caloriesProgress">0</div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" id="caloriesBar" style="width: 0%"></div>
+                    </div>
+                    <div style="color: #6b7280; font-size: 0.8rem;">Goal: 2000</div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-label">Protein</div>
+                    <div class="progress-value" id="proteinProgress">0g</div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" id="proteinBar" style="width: 0%"></div>
+                    </div>
+                    <div style="color: #6b7280; font-size: 0.8rem;">Goal: 100g</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Meal Templates -->
+        <h3 style="color: white; margin-bottom: 1rem;">
+            <i class="fas fa-bolt"></i> Quick Add
+        </h3>
+        <div class="quick-meals">
+            <div class="meal-card" onclick="selectMeal('breakfast', 'Oatmeal', 300, 12, 45, 6)">
+                <div class="meal-emoji">🥣</div>
+                <div class="meal-name">Oatmeal</div>
+                <div class="meal-calories">300 cal</div>
+            </div>
+            <div class="meal-card" onclick="selectMeal('lunch', 'Grilled Chicken', 350, 35, 20, 8)">
+                <div class="meal-emoji">🍗</div>
+                <div class="meal-name">Chicken</div>
+                <div class="meal-calories">350 cal</div>
+            </div>
+            <div class="meal-card" onclick="selectMeal('dinner', 'Salmon', 400, 30, 15, 22)">
+                <div class="meal-emoji">🐟</div>
+                <div class="meal-name">Salmon</div>
+                <div class="meal-calories">400 cal</div>
+            </div>
+            <div class="meal-card" onclick="selectMeal('snack', 'Greek Yogurt', 150, 15, 8, 5)">
+                <div class="meal-emoji">🥛</div>
+                <div class="meal-name">Yogurt</div>
+                <div class="meal-calories">150 cal</div>
+            </div>
+        </div>
+        
+        <!-- Main Form -->
+        <div class="form-card animate">
+            <h2 class="form-title">
+                <i class="fas fa-pen"></i> Meal Details
+            </h2>
+            
+            <form id="mealForm" onsubmit="logMeal(event)">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar"></i> Date</label>
+                        <input type="date" id="mealDate" value="{{ now.date() }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-clock"></i> Meal Type</label>
+                        <select id="mealType" required>
+                            <option value="breakfast">🍳 Breakfast</option>
+                            <option value="lunch">🍱 Lunch</option>
+                            <option value="dinner">🍽️ Dinner</option>
+                            <option value="snack">🥨 Snack</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label><i class="fas fa-utensils"></i> Food Name</label>
+                        <input type="text" id="foodName" placeholder="e.g., Grilled Chicken Salad" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-fire"></i> Calories</label>
+                        <input type="number" id="calories" min="0" placeholder="e.g., 350" required>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label><i class="fas fa-chart-pie"></i> Macros (Optional)</label>
+                        <div class="macro-inputs">
+                            <div class="macro-input">
+                                <input type="number" id="protein" min="0" placeholder="Protein">
+                                <div class="macro-unit">g</div>
+                            </div>
+                            <div class="macro-input">
+                                <input type="number" id="carbs" min="0" placeholder="Carbs">
+                                <div class="macro-unit">g</div>
+                            </div>
+                            <div class="macro-input">
+                                <input type="number" id="fats" min="0" placeholder="Fats">
+                                <div class="macro-unit">g</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-save"></i> Log Meal
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        let dailyTotals = { calories: 0, protein: 0 };
+        
+        async function loadDailyTotals() {
+            const response = await fetch('/get-daily-totals');
+            const data = await response.json();
+            dailyTotals = data;
+            updateProgressBars();
+        }
+        
+        function updateProgressBars() {
+            const calorieGoal = 2000;
+            const proteinGoal = 100;
+            
+            document.getElementById('caloriesProgress').innerText = dailyTotals.calories;
+            document.getElementById('caloriesBar').style.width = (dailyTotals.calories / calorieGoal * 100) + '%';
+            document.getElementById('proteinProgress').innerText = dailyTotals.protein + 'g';
+            document.getElementById('proteinBar').style.width = (dailyTotals.protein / proteinGoal * 100) + '%';
+        }
+        
+        function selectMeal(type, name, calories, protein, carbs, fats) {
+            document.getElementById('mealType').value = type;
+            document.getElementById('foodName').value = name;
+            document.getElementById('calories').value = calories;
+            document.getElementById('protein').value = protein;
+            document.getElementById('carbs').value = carbs;
+            document.getElementById('fats').value = fats;
+        }
+        
+        async function logMeal(event) {
+            event.preventDefault();
+            
+            const meal = {
+                meal_type: document.getElementById('mealType').value,
+                food_name: document.getElementById('foodName').value,
+                calories: parseInt(document.getElementById('calories').value),
+                protein: parseFloat(document.getElementById('protein').value) || 0,
+                carbs: parseFloat(document.getElementById('carbs').value) || 0,
+                fats: parseFloat(document.getElementById('fats').value) || 0,
+                date: document.getElementById('mealDate').value
+            };
+            
+            const response = await fetch('/log-meal', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(meal)
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                alert('✅ Meal logged successfully!');
+                window.location.href = '/progress';
+            }
+        }
+        
+        loadDailyTotals();
+    </script>
+</body>
+</html>

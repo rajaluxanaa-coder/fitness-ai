@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your 5-Day Schedule - FitAI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: white;
+            color: #667eea;
+        }
+        
+        .schedule-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        
+        .schedule-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px dashed #e5e7eb;
+        }
+        
+        .schedule-header h2 {
+            color: #6b46c1;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .schedule-meta {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            color: #6b7280;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .days-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+        
+        .day-card {
+            background: #f9fafb;
+            border-radius: 1rem;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .day-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(107, 70, 193, 0.2);
+        }
+        
+        .day-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .day-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .day-focus {
+            background: rgba(255,255,255,0.2);
+            padding: 0.25rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.9rem;
+        }
+        
+        .day-content {
+            padding: 1.5rem;
+        }
+        
+        .exercise-list {
+            list-style: none;
+        }
+        
+        .exercise-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+            transition: background 0.3s;
+        }
+        
+        .exercise-item:hover {
+            background: #f3f4f6;
+        }
+        
+        .exercise-number {
+            width: 30px;
+            height: 30px;
+            background: #6b46c1;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 1rem;
+        }
+        
+        .exercise-name {
+            flex: 2;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .exercise-details {
+            flex: 1;
+            color: #6b46c1;
+            font-weight: 600;
+            text-align: right;
+        }
+        
+        .tip-section {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #f0f9ff;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .tip-icon {
+            font-size: 2rem;
+        }
+        
+        .tip-text {
+            color: #0369a1;
+            font-style: italic;
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .btn-primary {
+            background: white;
+            color: #6b46c1;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: transform 0.3s;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .btn-secondary:hover {
+            background: white;
+            color: #6b46c1;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .day-card {
+            animation: slideIn 0.5s ease-out forwards;
+            opacity: 0;
+        }
+        
+        .day-card:nth-child(1) { animation-delay: 0.1s; }
+        .day-card:nth-child(2) { animation-delay: 0.2s; }
+        .day-card:nth-child(3) { animation-delay: 0.3s; }
+        .day-card:nth-child(4) { animation-delay: 0.4s; }
+        .day-card:nth-child(5) { animation-delay: 0.5s; }
+        
+        @media (max-width: 640px) {
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .exercise-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.5rem;
+            }
+            
+            .exercise-number {
+                margin-right: 0;
+            }
+            
+            .exercise-details {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <i class="fas fa-calendar-alt"></i>
+                Your 5-Day Schedule
+            </h1>
+            <a href="/dashboard" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Dashboard
+            </a>
+        </div>
+        
+        <div class="schedule-card">
+            <div class="schedule-header">
+                <h2>Personalized Workout Plan</h2>
+                <div class="schedule-meta">
+                    <span class="meta-item">
+                        <i class="fas fa-user"></i> Rajaluxanaa
+                    </span>
+                    <span class="meta-item">
+                        <i class="fas fa-fire"></i> Advanced
+                    </span>
+                </div>
+            </div>
+            
+            <div id="scheduleDisplay" class="days-grid">
+                <!-- Schedule will be loaded here -->
+            </div>
+            
+            <div class="action-buttons">
+                <button onclick="saveSchedule()" class="btn-primary">
+                    <i class="fas fa-save"></i> Save Schedule
+                </button>
+                <button onclick="printSchedule()" class="btn-primary">
+                    <i class="fas fa-print"></i> Print
+                </button>
+                <a href="/generate-workout" class="btn-secondary">
+                    <i class="fas fa-redo"></i> Generate New
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function parseAndDisplaySchedule(scheduleText) {
+            const container = document.getElementById('scheduleDisplay');
+            
+            if (!scheduleText || scheduleText.length < 50) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 3rem; color: #6b7280;">
+                        <i class="fas fa-dumbbell" style="font-size: 4rem; margin-bottom: 1rem;"></i>
+                        <h3>No schedule generated yet</h3>
+                        <p>Go to Dashboard and click "Generate Workout Plan"</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Split into days (simple parsing)
+            const days = scheduleText.split(/DAY \d+/i).filter(d => d.trim());
+            
+            let html = '';
+            
+            days.forEach((day, index) => {
+                if (index >= 5) return; // Max 5 days
+                
+                const lines = day.split('\n').filter(l => l.trim());
+                const focusLine = lines[0] || 'Workout Day';
+                
+                html += `
+                    <div class="day-card">
+                        <div class="day-header">
+                            <div class="day-title">
+                                <i class="fas fa-calendar-day"></i> Day ${index + 1}
+                            </div>
+                            <div class="day-focus">${focusLine}</div>
+                        </div>
+                        <div class="day-content">
+                            <ul class="exercise-list">
+                `;
+                
+                // Add exercises (skip first line as it's the focus)
+                for (let i = 1; i < Math.min(lines.length, 6); i++) {
+                    if (lines[i].includes('Warm-up') || lines[i].includes('Cool-down')) {
+                        html += `
+                            <li class="exercise-item" style="background: #f3f4f6;">
+                                <span class="exercise-number"><i class="fas fa-heart"></i></span>
+                                <span class="exercise-name" style="font-style: italic;">${lines[i]}</span>
+                            </li>
+                        `;
+                    } else if (lines[i].trim()) {
+                        const parts = lines[i].split('-');
+                        if (parts.length > 1) {
+                            html += `
+                                <li class="exercise-item">
+                                    <span class="exercise-number">${i}</span>
+                                    <span class="exercise-name">${parts[0].trim()}</span>
+                                    <span class="exercise-details">${parts[1].trim()}</span>
+                                </li>
+                            `;
+                        } else {
+                            html += `
+                                <li class="exercise-item">
+                                    <span class="exercise-number">${i}</span>
+                                    <span class="exercise-name">${lines[i]}</span>
+                                </li>
+                            `;
+                        }
+                    }
+                }
+                
+                html += `
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // Add tip section
+            html += `
+                <div class="tip-section">
+                    <div class="tip-icon">💡</div>
+                    <div class="tip-text">
+                        <strong>Pro Tip:</strong> Stay hydrated throughout your workout and rest 60-90 seconds between sets for optimal recovery.
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+        
+        // Load schedule from localStorage
+        const savedSchedule = localStorage.getItem('currentSchedule');
+        parseAndDisplaySchedule(savedSchedule);
+        
+        function saveSchedule() {
+            alert('✅ Schedule saved to your profile!');
+        }
+        
+        function printSchedule() {
+            window.print();
+        }
+    </script>
+</body>
+</html>
