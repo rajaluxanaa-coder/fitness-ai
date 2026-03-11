@@ -8,3 +8,4 @@ gunicorn
 langchain-huggingface
 huggingface_hub
 psycopg2-binary
+sendgrid 
