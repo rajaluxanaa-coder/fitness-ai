@@ -164,8 +164,11 @@ def index():
     return render_template('index.html')
 
 
+
+
 import sendgrid
 from sendgrid.helpers.mail import Mail
+import os
 
 @app.route('/send-otp', methods=['POST'])
 def send_otp():
@@ -174,12 +177,18 @@ def send_otp():
         otp = str(random.randint(100000, 999999))
         otp_storage[email] = otp
         
-        # Try Gmail SMTP first (faster, if it works)
-        try:
-            msg = Message('FitAI - Your Verification Code', 
-                         sender=app.config['MAIL_USERNAME'], 
-                         recipients=[email])
-            msg.body = f'''Welcome to FitAI!
+        # Get SendGrid API key
+        sg_api_key = os.getenv('SENDGRID_API_KEY')
+        if not sg_api_key:
+            print("❌ SendGrid API key not found")
+            return jsonify({'success': False, 'message': 'Email service not configured'})
+        
+        # Create email message
+        message = Mail(
+            from_email=os.getenv('EMAIL_USER', 'noreply@fitness-ai.com'),
+            to_emails=email,
+            subject='FitAI - Your Verification Code',
+            plain_text_content=f'''Welcome to FitAI!
 
 Your verification code is: {otp}
 
@@ -187,48 +196,28 @@ This code will expire in 10 minutes.
 
 Thanks,
 FitAI Team'''
-            
-            mail.send(msg)
-            print(f"✅ OTP sent via Gmail to {email}: {otp}")
+        )
+        
+        # Send via SendGrid
+        sg = sendgrid.SendGridAPIClient(api_key=sg_api_key)
+        response = sg.send(message)
+        
+        if response.status_code == 202:
+            print(f"✅ OTP sent via SendGrid to {email}: {otp}")
             return jsonify({'success': True, 'message': 'OTP sent successfully'})
-            
-        except Exception as gmail_error:
-            print(f"Gmail failed: {gmail_error}, trying SendGrid...")
-            
-            # Fallback to SendGrid
-            sg_api_key = os.getenv('SENDGRID_API_KEY')
-            if not sg_api_key:
-                return jsonify({'success': False, 'message': 'SendGrid API key not configured'})
-            
-            # Create email message using SendGrid
-            message = Mail(
-                from_email=app.config['MAIL_USERNAME'],  # Your verified sender email
-                to_emails=email,
-                subject='FitAI - Your Verification Code',
-                plain_text_content=f'''Welcome to FitAI!
-
-Your verification code is: {otp}
-
-This code will expire in 10 minutes.
-
-Thanks,
-FitAI Team'''
-            )
-            
-            # Send via SendGrid
-            sg = sendgrid.SendGridAPIClient(api_key=sg_api_key)
-            response = sg.send(message)
-            
-            if response.status_code == 202:  # 202 = accepted for delivery [citation:6]
-                print(f"✅ OTP sent via SendGrid to {email}: {otp}")
-                return jsonify({'success': True, 'message': 'OTP sent successfully'})
-            else:
-                print(f"❌ SendGrid error: {response.status_code}")
-                return jsonify({'success': False, 'message': 'Failed to send OTP'})
+        else:
+            print(f"❌ SendGrid error: {response.status_code}")
+            return jsonify({'success': False, 'message': 'Failed to send OTP'})
         
     except Exception as e:
         print(f"Error sending email: {str(e)}")
         return jsonify({'success': False, 'message': str(e)})
+
+
+        
+
+
+            
 
 
 
