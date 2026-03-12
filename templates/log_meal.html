@@ -243,9 +243,30 @@
             gap: 0.5rem;
         }
         
-        .btn-primary:hover {
+        .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(17, 153, 142, 0.3);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #1f2937;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            margin-top: 1rem;
+            display: inline-block;
+            text-decoration: none;
+        }
+        
+        .btn-secondary:hover {
+            background: #d1d5db;
         }
         
         @keyframes slideIn {
@@ -261,6 +282,15 @@
         
         .animate {
             animation: slideIn 0.5s ease-out;
+        }
+        
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
         
         @media (max-width: 640px) {
@@ -321,22 +351,22 @@
             <i class="fas fa-bolt"></i> Quick Add
         </h3>
         <div class="quick-meals">
-            <div class="meal-card" onclick="selectMeal('breakfast', 'Oatmeal', 300, 12, 45, 6)">
+            <div class="meal-card" data-type="breakfast" data-name="Oatmeal" data-calories="300" data-protein="12" data-carbs="45" data-fats="6">
                 <div class="meal-emoji">🥣</div>
                 <div class="meal-name">Oatmeal</div>
                 <div class="meal-calories">300 cal</div>
             </div>
-            <div class="meal-card" onclick="selectMeal('lunch', 'Grilled Chicken', 350, 35, 20, 8)">
+            <div class="meal-card" data-type="lunch" data-name="Grilled Chicken" data-calories="350" data-protein="35" data-carbs="20" data-fats="8">
                 <div class="meal-emoji">🍗</div>
                 <div class="meal-name">Chicken</div>
                 <div class="meal-calories">350 cal</div>
             </div>
-            <div class="meal-card" onclick="selectMeal('dinner', 'Salmon', 400, 30, 15, 22)">
+            <div class="meal-card" data-type="dinner" data-name="Salmon" data-calories="400" data-protein="30" data-carbs="15" data-fats="22">
                 <div class="meal-emoji">🐟</div>
                 <div class="meal-name">Salmon</div>
                 <div class="meal-calories">400 cal</div>
             </div>
-            <div class="meal-card" onclick="selectMeal('snack', 'Greek Yogurt', 150, 15, 8, 5)">
+            <div class="meal-card" data-type="snack" data-name="Greek Yogurt" data-calories="150" data-protein="15" data-carbs="8" data-fats="5">
                 <div class="meal-emoji">🥛</div>
                 <div class="meal-name">Yogurt</div>
                 <div class="meal-calories">150 cal</div>
@@ -380,22 +410,22 @@
                         <label><i class="fas fa-chart-pie"></i> Macros (Optional)</label>
                         <div class="macro-inputs">
                             <div class="macro-input">
-                                <input type="number" id="protein" min="0" placeholder="Protein">
+                                <input type="number" id="protein" min="0" placeholder="Protein (g)">
                                 <div class="macro-unit">g</div>
                             </div>
                             <div class="macro-input">
-                                <input type="number" id="carbs" min="0" placeholder="Carbs">
+                                <input type="number" id="carbs" min="0" placeholder="Carbs (g)">
                                 <div class="macro-unit">g</div>
                             </div>
                             <div class="macro-input">
-                                <input type="number" id="fats" min="0" placeholder="Fats">
+                                <input type="number" id="fats" min="0" placeholder="Fats (g)">
                                 <div class="macro-unit">g</div>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <button type="submit" class="btn-primary">
+                <button type="submit" class="btn-primary" id="submitBtn">
                     <i class="fas fa-save"></i> Log Meal
                 </button>
             </form>
@@ -403,23 +433,33 @@
     </div>
     
     <script>
+        // Daily totals for progress bars
         let dailyTotals = { calories: 0, protein: 0 };
         
         async function loadDailyTotals() {
-            const response = await fetch('/get-daily-totals');
-            const data = await response.json();
-            dailyTotals = data;
-            updateProgressBars();
+            try {
+                const response = await fetch('/get-daily-totals');
+                const data = await response.json();
+                dailyTotals = data;
+                updateProgressBars();
+            } catch (error) {
+                console.error('Error loading daily totals:', error);
+            }
         }
         
         function updateProgressBars() {
             const calorieGoal = 2000;
             const proteinGoal = 100;
             
-            document.getElementById('caloriesProgress').innerText = dailyTotals.calories;
-            document.getElementById('caloriesBar').style.width = (dailyTotals.calories / calorieGoal * 100) + '%';
-            document.getElementById('proteinProgress').innerText = dailyTotals.protein + 'g';
-            document.getElementById('proteinBar').style.width = (dailyTotals.protein / proteinGoal * 100) + '%';
+            const caloriesEl = document.getElementById('caloriesProgress');
+            const proteinEl = document.getElementById('proteinProgress');
+            const caloriesBar = document.getElementById('caloriesBar');
+            const proteinBar = document.getElementById('proteinBar');
+            
+            if (caloriesEl) caloriesEl.innerText = dailyTotals.calories;
+            if (caloriesBar) caloriesBar.style.width = Math.min(100, (dailyTotals.calories / calorieGoal * 100)) + '%';
+            if (proteinEl) proteinEl.innerText = dailyTotals.protein + 'g';
+            if (proteinBar) proteinBar.style.width = Math.min(100, (dailyTotals.protein / proteinGoal * 100)) + '%';
         }
         
         function selectMeal(type, name, calories, protein, carbs, fats) {
@@ -431,6 +471,7 @@
             document.getElementById('fats').value = fats;
         }
         
+        // Log Meal Function
         async function logMeal(event) {
             event.preventDefault();
             
@@ -444,21 +485,66 @@
                 date: document.getElementById('mealDate').value
             };
             
-            const response = await fetch('/log-meal', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(meal)
-            });
+            // Validate
+            if (!meal.meal_type || !meal.food_name || !meal.calories) {
+                alert('Please fill in all required fields');
+                return;
+            }
             
-            const data = await response.json();
+            // Show loading state
+            const btn = document.getElementById('submitBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging...';
+            btn.disabled = true;
             
-            if (data.success) {
-                alert('✅ Meal logged successfully!');
-                window.location.href = '/progress';
+            try {
+                const response = await fetch('/log-meal', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(meal)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('✅ Meal logged successfully!');
+                    window.location.href = '/progress';
+                } else {
+                    alert('❌ Failed to log meal. Please try again.');
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error logging meal. Please try again.');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
             }
         }
         
-        loadDailyTotals();
+        // Quick meal templates - attach click handlers
+        document.addEventListener('DOMContentLoaded', function() {
+            const mealCards = document.querySelectorAll('.meal-card');
+            mealCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const type = this.dataset.type || 'breakfast';
+                    const name = this.dataset.name || 'Oatmeal';
+                    const calories = parseInt(this.dataset.calories) || 300;
+                    const protein = parseInt(this.dataset.protein) || 10;
+                    const carbs = parseInt(this.dataset.carbs) || 30;
+                    const fats = parseInt(this.dataset.fats) || 5;
+                    
+                    selectMeal(type, name, calories, protein, carbs, fats);
+                    
+                    // Highlight selected card
+                    mealCards.forEach(c => c.style.border = 'none');
+                    this.style.border = '2px solid #11998e';
+                });
+            });
+            
+            // Load daily totals
+            loadDailyTotals();
+        });
     </script>
 </body>
 </html>

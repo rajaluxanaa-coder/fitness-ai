@@ -184,10 +184,39 @@
         </div>
         
         <form id="workoutForm" onsubmit="logWorkout(event)">
-            <div class="form-group">
-                <label><i class="fas fa-calendar"></i> Date</label>
-                <input type="date" id="workoutDate" value="{{ now.date() }}" required>
-            </div>
+    <!-- form fields -->
+    <button type="submit" class="btn-primary">
+        <i class="fas fa-save"></i> Log Workout
+    </button>
+</form>
+
+<script>
+async function logWorkout(event) {
+    event.preventDefault();
+    
+    const workout = {
+        type: document.getElementById('workoutType').value,
+        duration: document.getElementById('duration').value,
+        calories: document.getElementById('calories').value,
+        exercises: document.getElementById('exercises').value,
+        mood: document.getElementById('mood').value,
+        date: document.getElementById('workoutDate').value
+    };
+    
+    const response = await fetch('/log-workout', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(workout)
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+        alert('✅ Workout logged successfully!');
+        window.location.href = '/progress';
+    }
+}
+</script>
             
             <div class="form-group">
                 <label><i class="fas fa-tag"></i> Workout Type</label>

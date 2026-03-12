@@ -697,24 +697,63 @@ def save_settings():
 
 @app.route('/get-weather')
 def get_weather():
-    # Use free OpenWeatherMap API
-    import requests
-    city = request.args.get('city', 'Chennai')
-    api_key = os.getenv('WEATHER_API_KEY')  # Get free key from openweathermap.org
-    
-    if not api_key:
-        # Mock weather for demo
+    try:
+        import requests
+        city = request.args.get('city', 'Chennai')
+        api_key = os.getenv('WEATHER_API_KEY')
+        
+        if not api_key:
+            # Return mock data if no API key
+            return jsonify({
+                'temp': 32,
+                'condition': 'Sunny',
+                'humidity': 65,
+                'icon': '☀️'
+            })
+        
+        # OpenWeatherMap API
+        url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&units=metric&appid={api_key}"
+        response = requests.get(url, timeout=5)
+        
+        if response.status_code == 200:
+            data = response.json()
+            return jsonify({
+                'temp': round(data['main']['temp']),
+                'condition': data['weather'][0]['main'],
+                'humidity': data['main']['humidity'],
+                'icon': get_weather_icon(data['weather'][0]['main'])
+            })
+        else:
+            # Fallback to mock data
+            return jsonify({
+                'temp': 32,
+                'condition': 'Sunny',
+                'humidity': 65,
+                'icon': '☀️'
+            })
+    except Exception as e:
+        print(f"Weather API error: {str(e)}")
         return jsonify({
             'temp': 32,
             'condition': 'Sunny',
             'humidity': 65,
             'icon': '☀️'
         })
-    
-    response = requests.get(
-        f'http://api.openweathermap.org/data/2.5/weather?q={city}&units=metric&appid={api_key}'
-    )
-    return jsonify(response.json())
+
+def get_weather_icon(condition):
+    icons = {
+        'Clear': '☀️',
+        'Clouds': '☁️',
+        'Rain': '🌧️',
+        'Drizzle': '🌦️',
+        'Thunderstorm': '⛈️',
+        'Snow': '❄️',
+        'Mist': '🌫️',
+        'Smoke': '🌫️',
+        'Haze': '🌫️',
+        'Fog': '🌫️'
+    }
+    return icons.get(condition, '☀️')
 
 @app.route('/get-nutrition-tip')
 def get_nutrition_tip():
@@ -808,13 +847,18 @@ def progress_page():
 def get_progress_data():
     user_id = session['user_id']
     
-    # Get all workouts
+    # Get workouts
     workouts = WorkoutLog.query.filter_by(user_id=user_id).order_by(WorkoutLog.date).all()
+    
+    # Get meals
+    meals = MealLog.query.filter_by(user_id=user_id).order_by(MealLog.date).all()
     
     # Calculate stats
     totalWorkouts = len(workouts)
-    totalCalories = sum(w.calories_burned for w in workouts)
+    totalCaloriesBurned = sum(w.calories_burned for w in workouts)
     totalMinutes = sum(w.duration for w in workouts)
+    totalMeals = len(meals)
+    totalCaloriesConsumed = sum(m.calories for m in meals)
     
     # Calculate streak
     from datetime import datetime, timedelta
@@ -827,47 +871,68 @@ def get_progress_data():
         else:
             break
     
-    # Weekly data (last 7 days)
+    # Weekly data
     weekLabels = []
     weeklyWorkouts = []
     weeklyCalories = []
+    weeklyMeals = []
     
     for i in range(6, -1, -1):
         day = today - timedelta(days=i)
         weekLabels.append(day.strftime('%a'))
         day_workouts = [w for w in workouts if w.date == day]
+        day_meals = [m for m in meals if m.date == day]
         weeklyWorkouts.append(len(day_workouts))
         weeklyCalories.append(sum(w.calories_burned for w in day_workouts))
+        weeklyMeals.append(len(day_meals))
     
-    # Workout types for pie chart
+    # Workout types
     workout_types = {}
     for w in workouts:
         workout_types[w.workout_type] = workout_types.get(w.workout_type, 0) + 1
     
-    # Recent activity for timeline
-    recent = sorted(workouts, key=lambda x: x.date, reverse=True)[:5]
-    recentActivity = []
-    for w in recent:
-        recentActivity.append({
+    # Recent activity
+    recent = []
+    for w in sorted(workouts, key=lambda x: x.date, reverse=True)[:3]:
+        recent.append({
             'icon': 'fa-dumbbell',
             'date': w.date.strftime('%b %d'),
             'title': w.workout_type,
             'calories': w.calories_burned,
-            'duration': w.duration
+            'duration': w.duration,
+            'type': 'workout'
         })
+    for m in sorted(meals, key=lambda x: x.date, reverse=True)[:3]:
+        recent.append({
+            'icon': 'fa-utensils',
+            'date': m.date.strftime('%b %d'),
+            'title': m.food_name,
+            'calories': m.calories,
+            'type': 'meal'
+        })
+    
+    # Sort by date
+    recent.sort(key=lambda x: x['date'], reverse=True)
     
     return jsonify({
         'totalWorkouts': totalWorkouts,
-        'totalCalories': totalCalories,
+        'totalCaloriesBurned': totalCaloriesBurned,
         'totalMinutes': totalMinutes,
+        'totalMeals': totalMeals,
+        'totalCaloriesConsumed': totalCaloriesConsumed,
         'streak': streak,
         'weekLabels': weekLabels,
         'weeklyWorkouts': weeklyWorkouts,
         'weeklyCalories': weeklyCalories,
+        'weeklyMeals': weeklyMeals,
         'workoutTypes': list(workout_types.keys()),
         'workoutCounts': list(workout_types.values()),
-        'recentActivity': recentActivity
+        'recentActivity': recent[:5]  # Last 5 activities
     })
+   
+      
+    
+       
 
 @app.route('/get-daily-totals')
 def get_daily_totals():
@@ -883,7 +948,10 @@ def get_daily_totals():
         'protein': total_protein
     })
 
-
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('index'))
 
 
 
