@@ -274,69 +274,70 @@
     <script>
         // Function to fill template values
         function selectTemplate(type, calories, exercises, duration) {
-            document.getElementById('workoutType').value = type;
-            document.getElementById('calories').value = calories;
-            document.getElementById('exercises').value = exercises;
-            document.getElementById('duration').value = duration;
-            
-            // Highlight selected card
-            document.querySelectorAll('.workout-card').forEach(card => {
-                card.style.border = 'none';
-            });
-            event.currentTarget.style.border = '2px solid #6b46c1';
-        }
+    document.getElementById('workoutType').value = type;
+    document.getElementById('calories').value = calories;
+    document.getElementById('exercises').value = exercises;
+    document.getElementById('duration').value = duration;
+    
+    // Highlight selected card
+    document.querySelectorAll('.workout-card').forEach(card => {
+        card.style.border = 'none';
+    });
+    event.currentTarget.style.border = '2px solid #6b46c1';
+}
         
         // Main log workout function
-        async function logWorkout(event) {
-            event.preventDefault();
-            
-            // Get form values
-            const workout = {
-                workout_type: document.getElementById('workoutType').value,
-                duration: parseInt(document.getElementById('duration').value),
-                calories_burned: parseInt(document.getElementById('calories').value),
-                exercises: document.getElementById('exercises').value,
-                mood: document.getElementById('mood').value,
-                date: document.getElementById('workoutDate').value
-            };
-            
-            // Validate
-            if (!workout.workout_type) {
-                alert('Please select a workout type');
-                return;
-            }
-            
-            // Show loading state
-            const btn = document.getElementById('submitBtn');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging...';
-            btn.disabled = true;
-            
-            try {
-                const response = await fetch('/log-workout', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(workout)
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    alert('✅ Workout logged successfully!');
-                    window.location.href = '/progress';
-                } else {
-                    alert('❌ Failed to log workout. Please try again.');
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('❌ Error logging workout. Please try again.');
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
-        }
+        // Main log workout function
+async function logWorkout(event) {
+    event.preventDefault();
+    
+    // Get form values - using the correct field names that backend expects
+    const workout = {
+        workout_type: document.getElementById('workoutType').value,  // Changed from 'type' to 'workout_type'
+        duration: parseInt(document.getElementById('duration').value),
+        calories_burned: parseInt(document.getElementById('calories').value),  // Changed from 'calories' to 'calories_burned'
+        exercises: document.getElementById('exercises').value,
+        mood: document.getElementById('mood').value,
+        date: document.getElementById('workoutDate').value
+    };
+    
+    // Validate
+    if (!workout.workout_type) {
+        alert('Please select a workout type');
+        return;
+    }
+    
+    // Show loading state
+    const btn = document.getElementById('submitBtn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging...';
+    btn.disabled = true;
+    
+    try {
+        const response = await fetch('/log-workout', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(workout)
+        });
         
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('✅ Workout logged successfully!');
+            window.location.href = '/progress';
+        } else {
+            alert('❌ Failed to log workout. Please try again.');
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error logging workout. Please try again.');
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}
+
         // Set today's date as default
         document.addEventListener('DOMContentLoaded', function() {
             const today = new Date().toISOString().split('T')[0];
