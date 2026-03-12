@@ -948,10 +948,6 @@ def get_daily_totals():
         'protein': total_protein
     })
 
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('index'))
 
 
 
