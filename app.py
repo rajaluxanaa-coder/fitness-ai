@@ -843,6 +843,10 @@ def progress_page():
         return redirect(url_for('index'))
     return render_template('progress.html')
 
+
+
+
+
 @app.route('/get-progress-data')
 def get_progress_data():
     user_id = session['user_id']
@@ -850,15 +854,10 @@ def get_progress_data():
     # Get workouts
     workouts = WorkoutLog.query.filter_by(user_id=user_id).order_by(WorkoutLog.date).all()
     
-    # Get meals
-    meals = MealLog.query.filter_by(user_id=user_id).order_by(MealLog.date).all()
-    
     # Calculate stats
     totalWorkouts = len(workouts)
     totalCaloriesBurned = sum(w.calories_burned for w in workouts)
     totalMinutes = sum(w.duration for w in workouts)
-    totalMeals = len(meals)
-    totalCaloriesConsumed = sum(m.calories for m in meals)
     
     # Calculate streak
     from datetime import datetime, timedelta
@@ -875,60 +874,42 @@ def get_progress_data():
     weekLabels = []
     weeklyWorkouts = []
     weeklyCalories = []
-    weeklyMeals = []
     
     for i in range(6, -1, -1):
         day = today - timedelta(days=i)
         weekLabels.append(day.strftime('%a'))
         day_workouts = [w for w in workouts if w.date == day]
-        day_meals = [m for m in meals if m.date == day]
         weeklyWorkouts.append(len(day_workouts))
         weeklyCalories.append(sum(w.calories_burned for w in day_workouts))
-        weeklyMeals.append(len(day_meals))
-    
-    # Workout types
-    workout_types = {}
-    for w in workouts:
-        workout_types[w.workout_type] = workout_types.get(w.workout_type, 0) + 1
     
     # Recent activity
     recent = []
-    for w in sorted(workouts, key=lambda x: x.date, reverse=True)[:3]:
+    for w in sorted(workouts, key=lambda x: x.date, reverse=True)[:5]:
         recent.append({
             'icon': 'fa-dumbbell',
             'date': w.date.strftime('%b %d'),
             'title': w.workout_type,
             'calories': w.calories_burned,
-            'duration': w.duration,
-            'type': 'workout'
+            'duration': w.duration
         })
-    for m in sorted(meals, key=lambda x: x.date, reverse=True)[:3]:
-        recent.append({
-            'icon': 'fa-utensils',
-            'date': m.date.strftime('%b %d'),
-            'title': m.food_name,
-            'calories': m.calories,
-            'type': 'meal'
-        })
-    
-    # Sort by date
-    recent.sort(key=lambda x: x['date'], reverse=True)
     
     return jsonify({
         'totalWorkouts': totalWorkouts,
         'totalCaloriesBurned': totalCaloriesBurned,
         'totalMinutes': totalMinutes,
-        'totalMeals': totalMeals,
-        'totalCaloriesConsumed': totalCaloriesConsumed,
         'streak': streak,
         'weekLabels': weekLabels,
         'weeklyWorkouts': weeklyWorkouts,
         'weeklyCalories': weeklyCalories,
-        'weeklyMeals': weeklyMeals,
-        'workoutTypes': list(workout_types.keys()),
-        'workoutCounts': list(workout_types.values()),
-        'recentActivity': recent[:5]  # Last 5 activities
+        'recentActivity': recent
     })
+
+
+
+
+    
+    
+
    
       
     
