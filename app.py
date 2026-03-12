@@ -8,22 +8,35 @@ from datetime import datetime, timedelta, timezone
 import os
 from dotenv import load_dotenv
 
+
+# Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = 'your-secret-key-here'
+app.secret_key = os.getenv('SECRET_KEY', 'fitnessappsecretkey2026')
 
-# ===== REPLACE WITH THIS =====
-# Database configuration - Works with both SQLite and PostgreSQL
+# Database configuration with SSL
 database_url = os.environ.get('DATABASE_URL', 'sqlite:///fitness.db')
 
-# Fix for Render's PostgreSQL URL format
+# Add SSL mode for PostgreSQL connections
+if database_url and 'postgresql' in database_url:
+    # Ensure SSL is enabled
+    if '?' not in database_url:
+        database_url += '?sslmode=require'
+    else:
+        database_url += '&sslmode=require'
+
 if database_url and database_url.startswith('postgres://'):
     database_url = database_url.replace('postgres://', 'postgresql://', 1)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
+
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    'pool_size': 10,
+    'pool_recycle': 300,
+    'pool_pre_ping': True,
+}
 
 # Mail configuration for OTP
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
