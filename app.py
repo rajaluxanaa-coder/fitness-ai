@@ -300,49 +300,16 @@ def generate_schedule():
         level = data.get('level', 'beginner')
         equipment = data.get('equipment', 'bodyweight')
         
-        # Get API key
-        api_key = os.getenv('GROQ_API_KEY')
-        if not api_key:
-            return jsonify({'success': False, 'error': 'GROQ_API_KEY not found in .env file'})
-        
-        print(f"🔄 Calling Groq API for {user.name}...")
-        
-        # Updated models for 2026
-        models = [
-            "llama-3.3-70b-versatile",  # Current Llama model
-            "llama-3.1-8b-instant",     # Fast, reliable
-            "gemma2-9b-it"               # Google's Gemma 2
-        ]
-        
-        schedule = None
-        
-        for model in models:
-            try:
-                print(f"  Trying model: {model}")
-                
-                response = requests.post(
-                    "https://api.groq.com/openai/v1/chat/completions",
-                    headers={
-                        "Authorization": f"Bearer {api_key}",
-                        "Content-Type": "application/json"
-                    },
-                    json={
-                        "model": model,
-                        "messages": [
-                            {"role": "system", "content": "You are a professional fitness trainer. Create unique workout plans with different exercises each day."},
-                            {"role": "user", "content": f"""Create a 5-day workout schedule for a {user.age}-year-old person.
+        # Create a VERY specific prompt to ensure AI generation
+        prompt = f"""Generate a COMPLETE 5-day workout schedule for a {user.age}-year-old person.
 
-Details:
+USER DETAILS:
 - Goal: {goal}
 - Level: {level}
 - Equipment: {equipment}
 
-IMPORTANT RULES:
-- Day 1,2,3,4,5 must have DIFFERENT focus areas
-- Each day must have 5 DIFFERENT exercises
-- No repeating exercises across days
-- Make it appropriate for {level} level
-- Use only {equipment} equipment
+IMPORTANT: Generate ALL 5 days. Each day must have 5 exercises.
+Do NOT use templates. Be creative.
 
 Format EXACTLY like this:
 
@@ -354,11 +321,44 @@ DAY 1: [Focus Area]
 5. [Exercise] - [sets] sets x [reps] reps
 
 DAY 2: [Different Focus Area]
-...continue for 5 days"""}
+...continue for DAYS 3, 4, and 5
 
+Make every day different and unique."""
+        
+        # Try Groq API first
+        groq_key = os.getenv('GROQ_API_KEY')
+        if not groq_key:
+            return jsonify({'success': False, 'error': 'GROQ_API_KEY not found'})
+        
+        headers = {
+            "Authorization": f"Bearer {groq_key}",
+            "Content-Type": "application/json"
+        }
+        
+        # Try multiple models in sequence
+        models = [
+            "llama-3.3-70b-versatile",
+            "llama-3.1-8b-instant",
+            "gemma2-9b-it"
+        ]
+        
+        schedule = None
+        
+        for model in models:
+            try:
+                print(f"🔄 Trying Groq model: {model}")
+                
+                response = requests.post(
+                    "https://api.groq.com/openai/v1/chat/completions",
+                    headers=headers,
+                    json={
+                        "model": model,
+                        "messages": [
+                            {"role": "system", "content": "You are a professional fitness trainer. Create complete, detailed 5-day workout plans."},
+                            {"role": "user", "content": prompt}
                         ],
                         "temperature": 0.8,
-                        "max_tokens": 1000
+                        "max_tokens": 1200
                     },
                     timeout=30
                 )
@@ -366,18 +366,51 @@ DAY 2: [Different Focus Area]
                 if response.status_code == 200:
                     result = response.json()
                     schedule = result['choices'][0]['message']['content']
-                    print(f"  ✅ Success with {model}")
-                    break
+                    
+                    # Verify we got all 5 days
+                    if schedule and len(schedule) > 200 and "DAY 5" in schedule:
+                        print(f"✅ Success with {model}")
+                        break
+                    else:
+                        print(f"⚠️ {model} response incomplete, trying next...")
+                        schedule = None
                 else:
-                    print(f"  ❌ {model} failed: {response.status_code}")
+                    print(f"❌ {model} failed: {response.status_code}")
                     
             except Exception as e:
-                print(f"  ⚠️ Error with {model}: {str(e)}")
+                print(f"⚠️ Error with {model}: {str(e)}")
                 continue
         
-        # If all models fail, use a simple fallback
+        # If all Groq models fail, try OpenRouter as backup
         if not schedule:
-            print("❌ All models failed, using fallback")
+            print("🔄 Trying OpenRouter backup...")
+            try:
+                response = requests.post(
+                    "https://openrouter.ai/api/v1/chat/completions",
+                    headers={
+                        "Authorization": "Bearer sk-or-v1-64e1068c3d61c5b8b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b",
+                        "Content-Type": "application/json"
+                    },
+                    json={
+                        "model": "google/gemini-2.0-flash-lite-preview-02-05:free",
+                        "messages": [
+                            {"role": "user", "content": prompt}
+                        ],
+                        "temperature": 0.8
+                    },
+                    timeout=30
+                )
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    schedule = result['choices'][0]['message']['content']
+                    print("✅ OpenRouter success!")
+            except Exception as e:
+                print(f"❌ OpenRouter failed: {str(e)}")
+        
+        # If ALL AI fails, use a clean template (but still personalized)
+        if not schedule:
+            print("⚠️ All AI failed, using clean template")
             
             # Set sets/reps based on level
             if level == 'beginner':
@@ -390,58 +423,68 @@ DAY 2: [Different Focus Area]
                 sets = 4
                 reps = "6-8"
             
+            # Equipment-specific exercises
+            if 'pullup' in equipment:
+                exercises = {
+                    'upper': ['Pull-ups', 'Chin-ups', 'Inverted Rows', 'Pull-up Holds', 'Negative Pull-ups'],
+                    'lower': ['Squats', 'Lunges', 'Glute Bridges', 'Calf Raises', 'Step-ups'],
+                    'core': ['Hanging Knee Raises', 'L-sits', 'Planks', 'Leg Raises', 'Russian Twists']
+                }
+            else:
+                exercises = {
+                    'upper': ['Push-ups', 'Dips', 'Rows', 'Pike Push-ups', 'Archer Push-ups'],
+                    'lower': ['Squats', 'Lunges', 'Glute Bridges', 'Calf Raises', 'Step-ups'],
+                    'core': ['Planks', 'Crunches', 'Leg Raises', 'Mountain Climbers', 'Russian Twists']
+                }
+            
             schedule = f"""━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-5-DAY WORKOUT PLAN (Temporary)
+🎯 YOUR 5-DAY WORKOUT PLAN
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-For: {user.name} | Goal: {goal} | Level: {level} | Equipment: {equipment}
+👤 For: {user.name} | Goal: {goal} | Level: {level} | Equipment: {equipment}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-DAY 1: Upper Body
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. Push-ups - {sets} x {reps}
-2. Dumbbell Rows - {sets} x {reps}
-3. Overhead Press - {sets} x {reps}
-4. Bicep Curls - {sets} x {reps}
-5. Tricep Dips - {sets} x {reps}
+📅 DAY 1: Upper Body Focus
+───────────────────────────────
+1. {exercises['upper'][0]} - {sets} x {reps}
+2. {exercises['upper'][1]} - {sets} x {reps}
+3. {exercises['upper'][2]} - {sets} x {reps}
+4. {exercises['upper'][3]} - {sets} x {reps}
+5. {exercises['upper'][4]} - {sets} x {reps}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-DAY 2: Lower Body
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. Squats - {sets} x {reps}
-2. Lunges - {sets} x {reps}
-3. Romanian Deadlifts - {sets} x {reps}
-4. Calf Raises - {sets} x 15
-5. Glute Bridges - {sets} x {reps}
+📅 DAY 2: Lower Body Focus
+───────────────────────────────
+1. {exercises['lower'][0]} - {sets} x {reps}
+2. {exercises['lower'][1]} - {sets} x {reps}
+3. {exercises['lower'][2]} - {sets} x {reps}
+4. {exercises['lower'][3]} - {sets} x {reps}
+5. {exercises['lower'][4]} - {sets} x {reps}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-DAY 3: Core & Cardio
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. Planks - 3 x 45 sec
-2. Mountain Climbers - 3 x 30 sec
-3. Bicycle Crunches - 3 x 20
-4. Leg Raises - 3 x 15
-5. Jumping Jacks - 3 x 30 sec
+📅 DAY 3: Core & Conditioning
+───────────────────────────────
+1. {exercises['core'][0]} - 3 x 45 sec
+2. {exercises['core'][1]} - 3 x 15
+3. {exercises['core'][2]} - 3 x 12
+4. {exercises['core'][3]} - 3 x 30 sec
+5. {exercises['core'][4]} - 3 x 12
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-DAY 4: Full Body
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. Burpees - 3 x 8
-2. Dumbbell Thrusters - {sets} x {reps}
-3. Renegade Rows - {sets} x {reps}
-4. Dumbbell Swings - {sets} x {reps}
-5. Push-ups - {sets} x {reps}
+📅 DAY 4: Full Body Power
+───────────────────────────────
+1. {exercises['upper'][0]} - {sets} x {reps}
+2. {exercises['lower'][0]} - {sets} x {reps}
+3. {exercises['upper'][2]} - {sets} x {reps}
+4. {exercises['lower'][2]} - {sets} x {reps}
+5. Burpees - 3 x 8
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-DAY 5: Active Recovery
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. Light walking - 20 min
+📅 DAY 5: Active Recovery
+───────────────────────────────
+1. Light cardio - 20 min
 2. Full body stretching - 15 min
 3. Foam rolling - 10 min
 4. Deep breathing - 5 min
-5. Yoga poses - 10 min
+5. Mobility work - 10 min
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-💡 TIP: Stay hydrated and rest 60s between sets!
+💪 PRO TIP: Stay consistent and track your progress!
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"""
         
         # Save schedule
@@ -457,10 +500,8 @@ DAY 5: Active Recovery
     except Exception as e:
         print(f"❌ Error: {str(e)}")
         return jsonify({'success': False, 'error': str(e)})
-        
-
-        
-        
+      
+                
  
 
 
