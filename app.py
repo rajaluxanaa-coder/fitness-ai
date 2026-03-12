@@ -625,7 +625,7 @@ def log_workout():
     workout = WorkoutLog(
         user_id=session['user_id'],
         date=datetime.now().date(),
-        workout_type=data['workout_type'],
+        workout_name=data['workout_type'],
         duration=data['duration'],
         calories_burned=data['calories_burned'],
         exercises=data.get('excercise',''),
