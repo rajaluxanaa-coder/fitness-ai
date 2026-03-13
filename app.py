@@ -621,18 +621,23 @@ def community():
 
 @app.route('/log-workout', methods=['POST'])
 def log_workout():
-    data = request.json
-    workout = WorkoutLog(
-        user_id=session['user_id'],
-        date=datetime.now().date(),
-        workout_name=data['type'],
-        duration=data['duration'],
-        calories_burned=data['calories'],
-        exercises=data.get('exercises','')
-    )
-    db.session.add(workout)
-    db.session.commit()
-    return jsonify({'success': True})
+    try:
+        data = request.json
+        workout = WorkoutLog(
+            user_id=session['user_id'],
+            date=datetime.now().date(),
+            workout_name=data['type'],
+            duration=data['duration'],
+            calories_burned=data['calories'],
+            exercises=data.get('exercises','')
+        )
+        db.session.add(workout)
+        db.session.commit()
+        print(f"✅ Workout saved: {workout.workout_name}, {workout.calories_burned} calories")  # Debug
+        return jsonify({'success': True})
+    except Exception as e:
+        print(f"Error saving workout: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 
@@ -847,6 +852,9 @@ def progress_page():
 
 
 
+ 
+       
+        
 @app.route('/get-progress-data')
 def get_progress_data():
     try:
@@ -854,31 +862,30 @@ def get_progress_data():
         
         # Get workouts
         workouts = WorkoutLog.query.filter_by(user_id=user_id).order_by(WorkoutLog.date).all()
-        print(f"Found {len(workouts)} workouts for user {user_id}")  # Debug log
         
         # Calculate stats
         totalWorkouts = len(workouts)
-        totalCaloriesBurned = sum(w.calories_burned for w in workouts) if workouts else 0
-        totalMinutes = sum(w.duration for w in workouts) if workouts else 0
+        totalCaloriesBurned = sum(w.calories_burned for w in workouts)
+        totalMinutes = sum(w.duration for w in workouts)
         
         # Calculate streak
         from datetime import datetime, timedelta
         today = datetime.now().date()
         streak = 0
         
-        if workouts:
-            # Sort workouts by date
-            workout_dates = sorted(set(w.date for w in workouts), reverse=True)
-            
-            # Check consecutive days
-            for i, date in enumerate(workout_dates):
-                expected_date = today - timedelta(days=i)
-                if date == expected_date:
+        # Get unique workout dates sorted
+        workout_dates = sorted(list(set([w.date for w in workouts])), reverse=True)
+        
+        # Calculate consecutive days streak
+        if workout_dates:
+            streak = 1
+            for i in range(1, len(workout_dates)):
+                if (workout_dates[i-1] - workout_dates[i]).days == 1:
                     streak += 1
                 else:
                     break
         
-        # Weekly data
+        # Weekly data (last 7 days)
         weekLabels = []
         weeklyWorkouts = []
         weeklyCalories = []
@@ -892,7 +899,7 @@ def get_progress_data():
         
         # Recent activity
         recent = []
-        for w in sorted(workouts, key=lambda x: x.date, reverse=True)[:5]:
+        for w in workouts[-5:]:  # Last 5 workouts
             recent.append({
                 'icon': 'fa-dumbbell',
                 'date': w.date.strftime('%b %d'),
@@ -901,6 +908,7 @@ def get_progress_data():
                 'duration': w.duration
             })
         
+        # Return data in the format your frontend expects
         return jsonify({
             'totalWorkouts': totalWorkouts,
             'totalCaloriesBurned': totalCaloriesBurned,
@@ -915,8 +923,6 @@ def get_progress_data():
     except Exception as e:
         print(f"Error in get-progress-data: {str(e)}")
         return jsonify({'error': str(e)}), 500
-    
-    
     
 
 
