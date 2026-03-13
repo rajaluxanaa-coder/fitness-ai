@@ -849,85 +849,72 @@ def progress_page():
 
 @app.route('/get-progress-data')
 def get_progress_data():
-    user_id = session['user_id']
-    
-    # Get workouts
-    workouts = WorkoutLog.query.filter_by(user_id=user_id).order_by(WorkoutLog.date).all()
-    
-    # Get meals
-    meals = MealLog.query.filter_by(user_id=user_id).order_by(MealLog.date).all()
-    
-    # Calculate workout stats
-    totalWorkouts = len(workouts)
-    totalCaloriesBurned = sum(w.calories_burned for w in workouts)
-    totalMinutes = sum(w.duration for w in workouts)
-    
-    # Calculate meal stats
-    totalMeals = len(meals)
-    totalCaloriesConsumed = sum(m.calories for m in meals)
-    
-    # Calculate streak
-    from datetime import datetime, timedelta
-    today = datetime.now().date()
-    streak = 0
-    for i in range(30):
-        day = today - timedelta(days=i)
-        if any(w.date == day for w in workouts):
-            streak += 1
-        else:
-            break
-    
-    # Weekly data
-    weekLabels = []
-    weeklyWorkouts = []
-    weeklyCalories = []
-    
-    for i in range(6, -1, -1):
-        day = today - timedelta(days=i)
-        weekLabels.append(day.strftime('%a'))
-        day_workouts = [w for w in workouts if w.date == day]
-        weeklyWorkouts.append(len(day_workouts))
-        weeklyCalories.append(sum(w.calories_burned for w in day_workouts))
-    
-    # Recent activity (mix of workouts and meals)
-    recent = []
-    
-    # Add workouts
-    for w in sorted(workouts, key=lambda x: x.date, reverse=True)[:3]:
-        recent.append({
-            'icon': 'fa-dumbbell',
-            'date': w.date.strftime('%b %d'),
-            'title': w.workout_name,
-            'calories': w.calories_burned,
-            'duration': w.duration,
-            'type': 'workout'
+    try:
+        user_id = session['user_id']
+        
+        # Get workouts
+        workouts = WorkoutLog.query.filter_by(user_id=user_id).order_by(WorkoutLog.date).all()
+        print(f"Found {len(workouts)} workouts for user {user_id}")  # Debug log
+        
+        # Calculate stats
+        totalWorkouts = len(workouts)
+        totalCaloriesBurned = sum(w.calories_burned for w in workouts) if workouts else 0
+        totalMinutes = sum(w.duration for w in workouts) if workouts else 0
+        
+        # Calculate streak
+        from datetime import datetime, timedelta
+        today = datetime.now().date()
+        streak = 0
+        
+        if workouts:
+            # Sort workouts by date
+            workout_dates = sorted(set(w.date for w in workouts), reverse=True)
+            
+            # Check consecutive days
+            for i, date in enumerate(workout_dates):
+                expected_date = today - timedelta(days=i)
+                if date == expected_date:
+                    streak += 1
+                else:
+                    break
+        
+        # Weekly data
+        weekLabels = []
+        weeklyWorkouts = []
+        weeklyCalories = []
+        
+        for i in range(6, -1, -1):
+            day = today - timedelta(days=i)
+            weekLabels.append(day.strftime('%a'))
+            day_workouts = [w for w in workouts if w.date == day]
+            weeklyWorkouts.append(len(day_workouts))
+            weeklyCalories.append(sum(w.calories_burned for w in day_workouts))
+        
+        # Recent activity
+        recent = []
+        for w in sorted(workouts, key=lambda x: x.date, reverse=True)[:5]:
+            recent.append({
+                'icon': 'fa-dumbbell',
+                'date': w.date.strftime('%b %d'),
+                'title': w.workout_name,
+                'calories': w.calories_burned,
+                'duration': w.duration
+            })
+        
+        return jsonify({
+            'totalWorkouts': totalWorkouts,
+            'totalCaloriesBurned': totalCaloriesBurned,
+            'totalMinutes': totalMinutes,
+            'streak': streak,
+            'weekLabels': weekLabels,
+            'weeklyWorkouts': weeklyWorkouts,
+            'weeklyCalories': weeklyCalories,
+            'recentActivity': recent
         })
-    
-    # Add meals
-    for m in sorted(meals, key=lambda x: x.date, reverse=True)[:3]:
-        recent.append({
-            'icon': 'fa-utensils',
-            'date': m.date.strftime('%b %d'),
-            'title': m.food_name,
-            'calories': m.calories,
-            'type': 'meal'
-        })
-    
-    # Sort by date (most recent first)
-    recent.sort(key=lambda x: x['date'], reverse=True)
-    
-    return jsonify({
-        'totalWorkouts': totalWorkouts,
-        'totalCaloriesBurned': totalCaloriesBurned,
-        'totalMinutes': totalMinutes,
-        'totalMeals': totalMeals,
-        'totalCaloriesConsumed': totalCaloriesConsumed,
-        'streak': streak,
-        'weekLabels': weekLabels,
-        'weeklyWorkouts': weeklyWorkouts,
-        'weeklyCalories': weeklyCalories,
-        'recentActivity': recent[:5]  # Limit to 5 items
-    })
+        
+    except Exception as e:
+        print(f"Error in get-progress-data: {str(e)}")
+        return jsonify({'error': str(e)}), 500
     
     
     
@@ -955,7 +942,20 @@ def get_daily_totals():
         'protein': total_protein
     })
 
-
+@app.route('/debug-workouts')
+def debug_workouts():
+    if 'user_id' not in session:
+        return "Login first"
+    
+    user_id = session['user_id']
+    workouts = WorkoutLog.query.filter_by(user_id=user_id).all()
+    
+    result = "<h2>Workouts in Database:</h2>"
+    for w in workouts:
+        result += f"<p>ID: {w.id}, Date: {w.date}, Name: {w.workout_name}, Calories: {w.calories_burned}, Duration: {w.duration}</p>"
+    
+    result += f"<h3>Total: {len(workouts)} workouts</h3>"
+    return result
 
 
 # ===== ADD THIS AT THE VERY BOTTOM, BEFORE if __name__ =====
