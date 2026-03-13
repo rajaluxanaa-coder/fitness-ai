@@ -854,10 +854,17 @@ def get_progress_data():
     # Get workouts
     workouts = WorkoutLog.query.filter_by(user_id=user_id).order_by(WorkoutLog.date).all()
     
-    # Calculate stats
+    # Get meals
+    meals = MealLog.query.filter_by(user_id=user_id).order_by(MealLog.date).all()
+    
+    # Calculate workout stats
     totalWorkouts = len(workouts)
     totalCaloriesBurned = sum(w.calories_burned for w in workouts)
     totalMinutes = sum(w.duration for w in workouts)
+    
+    # Calculate meal stats
+    totalMeals = len(meals)
+    totalCaloriesConsumed = sum(m.calories for m in meals)
     
     # Calculate streak
     from datetime import datetime, timedelta
@@ -882,30 +889,48 @@ def get_progress_data():
         weeklyWorkouts.append(len(day_workouts))
         weeklyCalories.append(sum(w.calories_burned for w in day_workouts))
     
-    # Recent activity
+    # Recent activity (mix of workouts and meals)
     recent = []
-    for w in sorted(workouts, key=lambda x: x.date, reverse=True)[:5]:
+    
+    # Add workouts
+    for w in sorted(workouts, key=lambda x: x.date, reverse=True)[:3]:
         recent.append({
             'icon': 'fa-dumbbell',
             'date': w.date.strftime('%b %d'),
-            'title': w.workout_type,
+            'title': w.workout_name,
             'calories': w.calories_burned,
-            'duration': w.duration
+            'duration': w.duration,
+            'type': 'workout'
         })
+    
+    # Add meals
+    for m in sorted(meals, key=lambda x: x.date, reverse=True)[:3]:
+        recent.append({
+            'icon': 'fa-utensils',
+            'date': m.date.strftime('%b %d'),
+            'title': m.food_name,
+            'calories': m.calories,
+            'type': 'meal'
+        })
+    
+    # Sort by date (most recent first)
+    recent.sort(key=lambda x: x['date'], reverse=True)
     
     return jsonify({
         'totalWorkouts': totalWorkouts,
         'totalCaloriesBurned': totalCaloriesBurned,
         'totalMinutes': totalMinutes,
+        'totalMeals': totalMeals,
+        'totalCaloriesConsumed': totalCaloriesConsumed,
         'streak': streak,
         'weekLabels': weekLabels,
         'weeklyWorkouts': weeklyWorkouts,
         'weeklyCalories': weeklyCalories,
-        'recentActivity': recent
+        'recentActivity': recent[:5]  # Limit to 5 items
     })
-
-
-
+    
+    
+    
 
 
 
