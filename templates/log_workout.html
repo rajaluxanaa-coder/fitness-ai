@@ -288,21 +288,22 @@
         
         // Main log workout function
         // Main log workout function
+// Main log workout function
 async function logWorkout(event) {
     event.preventDefault();
     
-    // Get form values - using the correct field names that backend expects
+    // Get form values - matching your actual database model
     const workout = {
-        workout_type: document.getElementById('workoutType').value,  // Changed from 'type' to 'workout_type'
+        type: document.getElementById('workoutType').value,  // Changed back to 'type' (not workout_type)
         duration: parseInt(document.getElementById('duration').value),
-        calories_burned: parseInt(document.getElementById('calories').value),  // Changed from 'calories' to 'calories_burned'
+        calories: parseInt(document.getElementById('calories').value),  // Changed back to 'calories' (not calories_burned)
         exercises: document.getElementById('exercises').value,
         mood: document.getElementById('mood').value,
         date: document.getElementById('workoutDate').value
     };
     
     // Validate
-    if (!workout.workout_type) {
+    if (!workout.type) {
         alert('Please select a workout type');
         return;
     }
@@ -337,6 +338,9 @@ async function logWorkout(event) {
         btn.disabled = false;
     }
 }
+    
+        
+        
 
         // Set today's date as default
         document.addEventListener('DOMContentLoaded', function() {
