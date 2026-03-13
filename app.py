@@ -625,11 +625,10 @@ def log_workout():
     workout = WorkoutLog(
         user_id=session['user_id'],
         date=datetime.now().date(),
-        workout_name=data['workout_type'],
+        workout_name=data['type'],
         duration=data['duration'],
-        calories_burned=data['calories_burned'],
-        exercises=data.get('excercise',''),
-        notes=data.get('notes', '')
+        calories_burned=data['calories'],
+        exercises=data.get('exercises','')
     )
     db.session.add(workout)
     db.session.commit()
