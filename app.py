@@ -683,22 +683,26 @@ def get_recent_workouts():
 
 @app.route('/save-settings', methods=['POST'])
 def save_settings():
-    data = request.json
-    settings = UserSettings.query.filter_by(user_id=session['user_id']).first()
-    if not settings:
-        settings = UserSettings(user_id=session['user_id'])
+    try:
+        data = request.json
+        settings = UserSettings.query.filter_by(user_id=session['user_id']).first()
+        if not settings:
+            settings = UserSettings(user_id=session['user_id'])
     
-    settings.notification_enabled = data.get('notification_enabled', True)
-    settings.dark_mode = data.get('dark_mode', False)
-    settings.measurement_unit = data.get('measurement_unit', 'metric')
-    settings.workout_reminder_time = data.get('workout_reminder_time', '08:00')
-    settings.meal_reminder_time = data.get('meal_reminder_time', '12:00')
-    settings.water_goal = data.get('water_goal', 2.5)
-    settings.daily_calorie_goal = data.get('daily_calorie_goal', 2000)
+        settings.notification_enabled = data.get('notification_enabled', True)
+        settings.dark_mode = data.get('dark_mode', False)
+        settings.measurement_unit = data.get('measurement_unit', 'metric')
+        settings.workout_reminder_time = data.get('workout_reminder_time', '08:00')
+        settings.meal_reminder_time = data.get('meal_reminder_time', '12:00')
+        settings.water_goal = data.get('water_goal', 2.5)
+        settings.daily_calorie_goal = data.get('daily_calorie_goal', 2000)
     
-    db.session.add(settings)
-    db.session.commit()
-    return jsonify({'success': True})
+        db.session.add(settings)
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        print(f"Error saving settings: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/get-weather')
 def get_weather():
@@ -947,6 +951,44 @@ def get_daily_totals():
         'calories': total_calories,
         'protein': total_protein
     })
+
+
+@app.route('/get-settings')
+def get_settings():
+    try:
+        user_id = session['user_id']
+        settings = UserSettings.query.filter_by(user_id=user_id).first()
+        
+        if settings:
+            return jsonify({
+                'success': True,
+                'notification_enabled': settings.notification_enabled,
+                'dark_mode': settings.dark_mode,
+                'measurement_unit': settings.measurement_unit,
+                'workout_reminder_time': settings.workout_reminder_time,
+                'meal_reminder_time': settings.meal_reminder_time,
+                'water_goal': settings.water_goal,
+                'daily_calorie_goal': settings.daily_calorie_goal,
+                'profile_visibility': 'public'  # Default value
+            })
+        else:
+            return jsonify({
+                'success': True,
+                'notification_enabled': True,
+                'dark_mode': False,
+                'measurement_unit': 'metric',
+                'workout_reminder_time': '08:00',
+                'meal_reminder_time': '12:00',
+                'water_goal': 2.5,
+                'daily_calorie_goal': 2000,
+                'profile_visibility': 'public'
+            })
+            
+    except Exception as e:
+        print(f"Error loading settings: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)})
+
+
 
 @app.route('/debug-workouts')
 def debug_workouts():

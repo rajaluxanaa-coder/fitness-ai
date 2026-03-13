@@ -920,15 +920,32 @@ input:checked + .slider:before {
         <!-- RIGHT PANEL -->
         <div class="right-panel">
             <!-- Meal Recommendations -->
-            <div style="background: white; padding: 1.5rem; border-radius: 1rem;">
+            <div style="background: white; padding: 1.5rem; border-radius: 1rem; margin-top: 1rem;">
                 <h3><i class="fas fa-utensils"></i> Recommended Meals</h3>
                 <div id="mealRecommendations" style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;"></div>
             </div>
 
             <!-- Workout Tips -->
             <div style="background: white; padding: 1.5rem; border-radius: 1rem; margin-top: 1rem;">
-                <h3><i class="fas fa-lightbulb"></i> Quick Tips</h3>
-                <div id="workoutTips"></div>
+                <h3><i class="fas fa-lightbulb" style="color: #6b46c1;"></i> Quick Tips</h3>
+                <div id="workoutTips" style="margin-top: 1rem;">
+                    <div class="tip-item" style="padding: 0.75rem; background: #f3f4f6; border-radius: 0.5rem; margin-bottom: 0.5rem;">
+            <i class="fas fa-dumbbell" style="color: #6b46c1; margin-right: 0.5rem;"></i>
+            <strong>Form First:</strong> Always prioritize proper form over heavy weights
+        </div>
+        <div class="tip-item" style="padding: 0.75rem; background: #f3f4f6; border-radius: 0.5rem; margin-bottom: 0.5rem;">
+            <i class="fas fa-bed" style="color: #6b46c1; margin-right: 0.5rem;"></i>
+            <strong>Rest & Recovery:</strong> Get 7-8 hours of sleep for muscle growth
+        </div>
+        <div class="tip-item" style="padding: 0.75rem; background: #f3f4f6; border-radius: 0.5rem; margin-bottom: 0.5rem;">
+            <i class="fas fa-fire" style="color: #6b46c1; margin-right: 0.5rem;"></i>
+            <strong>Stay Hydrated:</strong> Drink water before, during, and after workouts
+        </div>
+        <div class="tip-item" style="padding: 0.75rem; background: #f3f4f6; border-radius: 0.5rem; margin-bottom: 0.5rem;">
+            <i class="fas fa-utensils" style="color: #6b46c1; margin-right: 0.5rem;"></i>
+            <strong>Pre-Workout Fuel:</strong> Eat a banana 30 mins before workout
+        </div>
+                
             </div>
         </div>
     </div>
@@ -1107,27 +1124,80 @@ input:checked + .slider:before {
             saveSettings();
         }
 
-        async function saveSettings() {
-            const settings = {
-                notification_enabled: document.getElementById('notificationToggle').checked,
-                dark_mode: document.getElementById('darkModeToggle').checked,
-                measurement_unit: document.getElementById('measurementUnit').value,
-                workout_reminder_time: document.getElementById('workoutReminder').value,
-                meal_reminder_time: document.getElementById('mealReminder').value,
-                water_goal: parseFloat(document.getElementById('waterGoal').value),
-                daily_calorie_goal: parseInt(document.getElementById('calorieGoal').value)
-            };
+        // Save settings function
+async function saveSettings() {
+    const settings = {
+        notification_enabled: document.getElementById('notificationToggle').checked,
+        dark_mode: document.getElementById('darkModeToggle').checked,
+        measurement_unit: document.getElementById('measurementUnit').value,
+        workout_reminder_time: document.getElementById('workoutReminder').value,
+        meal_reminder_time: document.getElementById('mealReminder').value,
+        water_goal: parseFloat(document.getElementById('waterGoal').value),
+        daily_calorie_goal: parseInt(document.getElementById('calorieGoal').value),
+        profile_visibility: document.getElementById('profileVisibility').value
+    };
+    
+    // Show loading state
+    const btn = document.querySelector('.save-settings-btn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    btn.disabled = true;
+    
+    try {
+        const response = await fetch('/save-settings', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(settings)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Show success message
+            alert('✅ Settings saved successfully!');
             
+            // Update water goal display
             waterGoal = settings.water_goal;
             document.getElementById('waterGoal').innerText = waterGoal + 'L';
             updateWaterDisplay();
-            
-            await fetch('/save-settings', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(settings)
-            });
+        } else {
+            alert('❌ Failed to save settings');
         }
+    } catch (error) {
+        console.error('Error saving settings:', error);
+        alert('❌ Error saving settings');
+    } finally {
+        // Restore button
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}
+
+async function loadSettings() {
+    try {
+        const response = await fetch('/get-settings');
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('notificationToggle').checked = data.notification_enabled;
+            document.getElementById('darkModeToggle').checked = data.dark_mode;
+            document.getElementById('measurementUnit').value = data.measurement_unit;
+            document.getElementById('workoutReminder').value = data.workout_reminder_time;
+            document.getElementById('mealReminder').value = data.meal_reminder_time;
+            document.getElementById('waterGoal').value = data.water_goal;
+            document.getElementById('calorieGoal').value = data.daily_calorie_goal;
+            document.getElementById('profileVisibility').value = data.profile_visibility;
+            
+            // Apply dark mode if enabled
+            if (data.dark_mode) {
+                document.body.classList.add('dark-mode');
+            }
+        }
+    } catch (error) {
+        console.error('Error loading settings:', error);
+    }
+}
+
 
         // Meal Logging
         function showLogMealModal() {
@@ -1190,6 +1260,7 @@ input:checked + .slider:before {
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
+            loadSettings();
             updateWeather();
             refreshNutritionTip();
             loadAchievements();
@@ -1202,6 +1273,10 @@ input:checked + .slider:before {
             // Refresh nutrition tip every hour
             setInterval(refreshNutritionTip, 3600000);
         });
+
+
+
+        
     </script>
 </body>
 </html>
