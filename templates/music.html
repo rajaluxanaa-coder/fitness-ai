@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music - FitAI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            padding-top: 100px;
+        }
+        
+        /* Navbar Styles */
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #6b46c1;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #4b5563;
+            font-weight: 500;
+        }
+        
+        .nav-links a:hover {
+            color: #6b46c1;
+        }
+        
+        .profile-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #6b46c1;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .player-section {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .now-playing {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .album-art {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #6b46c1, #38a169);
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+        
+        .track-info {
+            flex: 1;
+        }
+        
+        .track-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1f2937;
+        }
+        
+        .track-artist {
+            color: #6b7280;
+            margin-bottom: 1rem;
+        }
+        
+        .progress {
+            width: 100%;
+            height: 5px;
+            background: #e5e7eb;
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .progress-fill {
+            width: 45%;
+            height: 100%;
+            background: #6b46c1;
+            border-radius: 5px;
+        }
+        
+        .time {
+            display: flex;
+            justify-content: space-between;
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+        
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #6b46c1;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+        
+        .control-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .playlists-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .playlist-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .playlist-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .playlist-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #6b46c1, #38a169);
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+        }
+        
+        .playlist-name {
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+        
+        .playlist-songs {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+        
+        .mood-section {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+        }
+        
+        .mood-title {
+            color: #6b46c1;
+            margin-bottom: 1rem;
+        }
+        
+        .mood-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .mood-btn {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .mood-btn:hover {
+            background: #6b46c1;
+            color: white;
+            border-color: #6b46c1;
+        }
+        
+        @media (max-width: 768px) {
+            .playlists-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .now-playing {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-dumbbell"></i>
+            <span>FitAI</span>
+        </div>
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/profile">Profile</a>
+            <a href="/analytics">📊 Analytics</a>
+            <a href="/achievements">🏆 Achievements</a>
+            <a href="/community">👥 Community</a>
+            <a href="/goals">🎯 Goals</a>
+            <a href="/calendar">📅 Calendar</a>
+            <a href="/music" style="color: #6b46c1;">🎵 Music</a>
+        </div>
+        <div class="profile-circle" onclick="window.location.href='/profile'">
+            {{ user.name[0]|upper }}
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>
+                <i class="fas fa-headphones"></i>
+                Workout Music
+            </h1>
+            <a href="/dashboard" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Dashboard
+            </a>
+        </div>
+
+        <!-- Now Playing -->
+        <div class="player-section">
+            <div class="now-playing">
+                <div class="album-art">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div class="track-info">
+                    <div class="track-name">Eye of the Tiger</div>
+                    <div class="track-artist">Survivor</div>
+                    <div class="progress">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <div class="time">
+                        <span>1:45</span>
+                        <span>4:05</span>
+                    </div>
+                </div>
+            </div>
+            <div class="controls">
+                <button class="control-btn"><i class="fas fa-random"></i></button>
+                <button class="control-btn"><i class="fas fa-step-backward"></i></button>
+                <button class="control-btn"><i class="fas fa-play"></i></button>
+                <button class="control-btn"><i class="fas fa-step-forward"></i></button>
+                <button class="control-btn"><i class="fas fa-redo"></i></button>
+            </div>
+        </div>
+
+        <!-- Workout Playlists -->
+        <h2 style="color: white; margin-bottom: 1rem;">🏋️ Workout Playlists</h2>
+        <div class="playlists-grid">
+            <div class="playlist-card">
+                <div class="playlist-icon">
+                    <i class="fas fa-dumbbell"></i>
+                </div>
+                <div class="playlist-name">Heavy Lifting</div>
+                <div class="playlist-songs">15 songs • 45 min</div>
+            </div>
+            <div class="playlist-card">
+                <div class="playlist-icon">
+                    <i class="fas fa-running"></i>
+                </div>
+                <div class="playlist-name">Cardio Rush</div>
+                <div class="playlist-songs">20 songs • 60 min</div>
+            </div>
+            <div class="playlist-card">
+                <div class="playlist-icon">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                <div class="playlist-name">HIIT Mix</div>
+                <div class="playlist-songs">12 songs • 30 min</div>
+            </div>
+            <div class="playlist-card">
+                <div class="playlist-icon">
+                    <i class="fas fa-peace"></i>
+                </div>
+                <div class="playlist-name">Yoga & Meditation</div>
+                <div class="playlist-songs">10 songs • 50 min</div>
+            </div>
+        </div>
+
+        <!-- Mood-Based Selection -->
+        <div class="mood-section">
+            <h3 class="mood-title">🎯 Choose Your Workout Mood</h3>
+            <div class="mood-buttons">
+                <button class="mood-btn">🔥 High Energy</button>
+                <button class="mood-btn">💪 Pump Up</button>
+                <button class="mood-btn">🧘 Calm Focus</button>
+                <button class="mood-btn">⚡ Power</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
