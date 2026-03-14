@@ -911,22 +911,49 @@ def get_nutrition_tip():
 def get_achievements():
     user_id = session['user_id']
     
-    # Calculate achievements based on user data
-    workout_count = WorkoutLog.query.filter_by(user_id=user_id).count()
-    meal_count = MealLog.query.filter_by(user_id=user_id).count()
+    # Get user data
+    user = User.query.get(user_id)
+    workouts = WorkoutLog.query.filter_by(user_id=user_id).all()
+    meals = MealLog.query.filter_by(user_id=user_id).all()
+    
+    # Calculate stats
+    workout_count = len(workouts)
+    meal_count = len(meals)
+    
+    # Calculate total XP (example: 10 XP per workout, 5 XP per meal)
+    total_xp = (workout_count * 10) + (meal_count * 5)
+    
+    # Calculate level (every 100 XP = 1 level)
+    level = total_xp // 100
+    current_level_xp = total_xp % 100
+    next_level_xp = 100
+    xp_to_next = next_level_xp - current_level_xp
     
     # Get streak
     from datetime import datetime, timedelta
     today = datetime.now().date()
-    streak = 0
-    for i in range(30):  # Check last 30 days
-        day = today - timedelta(days=i)
-        workout = WorkoutLog.query.filter_by(user_id=user_id, date=day).first()
-        if workout:
-            streak += 1
-        else:
-            break
     
+    # Get unique workout dates sorted
+    workout_dates = sorted(list(set([w.date for w in workouts])), reverse=True)
+    
+    # Calculate streak
+    streak = 0
+    if workout_dates:
+        streak = 1
+        for i in range(1, len(workout_dates)):
+            if (workout_dates[i-1] - workout_dates[i]).days == 1:
+                streak += 1
+            else:
+                break
+    
+    # Calculate badge count (example: 1 badge per 10 workouts)
+    badge_count = (workout_count // 10) + (1 if workout_count >= 1 else 0) + (1 if streak >= 7 else 0)
+    
+    # Challenge progress (example)
+    water_challenge_days = min(workout_count, 7)  # Mock data - replace with actual challenge tracking
+    workout_challenge_days = min(workout_count, 5)
+    
+    # Achievements list
     achievements = []
     
     if workout_count >= 1:
@@ -958,8 +985,27 @@ def get_achievements():
             'date': 'Recent'
         })
     
-    return jsonify(achievements)
+    return jsonify({
+        'level': level,
+        'current_xp': current_level_xp,
+        'total_xp': total_xp,
+        'xp_to_next': xp_to_next,
+        'workout_count': workout_count,
+        'badge_count': badge_count,
+        'streak': streak,
+        'challenge_count': 2,  # Mock data - replace with actual challenge tracking
+        'water_challenge': {
+            'completed': water_challenge_days,
+            'total': 7
+        },
+        'workout_challenge': {
+            'completed': workout_challenge_days,
+            'total': 5
+        },
+        'achievements': achievements
+    })
 
+    
 
 
 @app.route('/log-workout-page')

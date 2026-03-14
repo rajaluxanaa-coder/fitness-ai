@@ -251,35 +251,58 @@
         </div>
         
         <!-- Level & XP -->
-        <div class="level-card">
-            <div>Current Level</div>
-            <div class="level-number">12</div>
-            <div class="progress-bar">
-                <div class="progress-fill"></div>
+<div class="level-card">
+    <div>Current Level</div>
+    <div class="level-number" id="currentLevel">0</div>
+    <div class="progress-bar">
+        <div class="progress-fill" id="xpProgress" style="width: 0%;"></div>
+    </div>
+    <div><span id="currentXP">0</span> / <span id="totalXP">0</span> XP to Level <span id="xpToNext">0</span></div>
+</div>
+
+<!-- Stats Overview -->
+<div class="stats-overview">
+    <div class="stat-card">
+        <div class="stat-value" id="workoutCount">0</div>
+        <div>Workouts</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value" id="badgeCount">0</div>
+        <div>Badges</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value" id="streakCount">0</div>
+        <div>Day Streak</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value" id="challengeCount">0</div>
+        <div>Challenges</div>
+    </div>
+</div>
+
+
+<!-- Challenges -->
+        <h2 style="color: white; margin: 2rem 0 1rem;">⚡ Active Challenges</h2>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
+            <div style="background: white; border-radius: 1rem; padding: 1.5rem;">
+                <h3>💧 Water Challenge</h3>
+                <p>Drink 2.5L water daily for 7 days</p>
+                <div class="progress-bar" style="background: #e5e7eb;">
+                    <div class="progress-fill" style="width: 60%; background: #6b46c1;"></div>
+                </div>
+                <p><span id="waterCompleted">0</span>/<span id="waterTotal">7</span> days completed</p>
             </div>
-            <div>1,250 / 2,000 XP to Level 13</div>
+            
+            <div style="background: white; border-radius: 1rem; padding: 1.5rem;">
+                <h3>🏋️ Workout Challenge</h3>
+                <p>Complete 5 workouts this week</p>
+                <div class="progress-bar" style="background: #e5e7eb;">
+                    <div class="progress-fill" style="width: 80%; background: #6b46c1;"></div>
+                </div>
+                <p><span id="workoutCompleted">0</span>/<span id="workoutTotal">5</span> workouts done</p>
+            </div>
         </div>
-        
-        <!-- Stats Overview -->
-        <div class="stats-overview">
-            <div class="stat-card">
-                <div class="stat-value">47</div>
-                <div>Workouts</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">12</div>
-                <div>Badges</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">7</div>
-                <div>Day Streak</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">3</div>
-                <div>Challenges</div>
-            </div>
-        </div>
-        
+
         <!-- Badges Grid -->
         <h2 style="color: white; margin-bottom: 1rem;">🏅 Your Badges</h2>
         <div class="badges-grid">
@@ -340,27 +363,69 @@
             </div>
         </div>
         
-        <!-- Challenges -->
-        <h2 style="color: white; margin: 2rem 0 1rem;">⚡ Active Challenges</h2>
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
-            <div style="background: white; border-radius: 1rem; padding: 1.5rem;">
-                <h3>💧 Water Challenge</h3>
-                <p>Drink 2.5L water daily for 7 days</p>
-                <div class="progress-bar" style="background: #e5e7eb;">
-                    <div class="progress-fill" style="width: 60%; background: #6b46c1;"></div>
-                </div>
-                <p>4/7 days completed</p>
-            </div>
-            
-            <div style="background: white; border-radius: 1rem; padding: 1.5rem;">
-                <h3>🏋️ Workout Challenge</h3>
-                <p>Complete 5 workouts this week</p>
-                <div class="progress-bar" style="background: #e5e7eb;">
-                    <div class="progress-fill" style="width: 80%; background: #6b46c1;"></div>
-                </div>
-                <p>4/5 workouts done</p>
-            </div>
-        </div>
+        
     </div>
 </body>
+<script>
+async function loadAchievements() {
+    try {
+        const response = await fetch('/get-achievements');
+        const data = await response.json();
+        
+        console.log("Achievements data:", data);
+        
+        // Update level and XP
+        document.getElementById('currentLevel').innerText = data.level;
+        document.getElementById('currentXP').innerText = data.current_xp;
+        document.getElementById('totalXP').innerText = data.total_xp;
+        document.getElementById('xpToNext').innerText = data.xp_to_next;
+        
+        // Update progress bar
+        const xpPercentage = (data.current_xp / 100) * 100;
+        document.getElementById('xpProgress').style.width = xpPercentage + '%';
+        
+        // Update stats
+        document.getElementById('workoutCount').innerText = data.workout_count;
+        document.getElementById('badgeCount').innerText = data.badge_count;
+        document.getElementById('streakCount').innerText = data.streak;
+        document.getElementById('challengeCount').innerText = data.challenge_count;
+        
+        // Update challenges
+        const waterPercentage = (data.water_challenge.completed / data.water_challenge.total) * 100;
+        const workoutPercentage = (data.workout_challenge.completed / data.workout_challenge.total) * 100;
+        
+        document.getElementById('waterProgress').style.width = waterPercentage + '%';
+        document.getElementById('waterCompleted').innerText = data.water_challenge.completed;
+        document.getElementById('waterTotal').innerText = data.water_challenge.total;
+        
+        document.getElementById('workoutProgress').style.width = workoutPercentage + '%';
+        document.getElementById('workoutCompleted').innerText = data.workout_challenge.completed;
+        document.getElementById('workoutTotal').innerText = data.workout_challenge.total;
+        
+        // Update badges grid
+        const badgesGrid = document.getElementById('badgesGrid');
+        if (badgesGrid) {
+            badgesGrid.innerHTML = '';
+            data.achievements.forEach(badge => {
+                badgesGrid.innerHTML += `
+                    <div class="badge-card">
+                        <div class="badge-icon">${badge.icon}</div>
+                        <div class="badge-name">${badge.name}</div>
+                        <div class="badge-desc">${badge.description}</div>
+                        <div class="badge-date">${badge.date}</div>
+                    </div>
+                `;
+            });
+        }
+        
+    } catch (error) {
+        console.error('Error loading achievements:', error);
+    }
+}
+
+// Load on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadAchievements();
+});
+    </script>
 </html>
