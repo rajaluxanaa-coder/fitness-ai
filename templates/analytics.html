@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - FitAI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #6b46c1;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #4b5563;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #6b46c1;
+        }
+        
+        .profile-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #6b46c1;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: white;
+            color: #667eea;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+        
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+        
+        .tab-btn.active {
+            background: #6b46c1;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .measurement-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .measurement-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .measurement-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            color: #6b46c1;
+        }
+        
+        .measurement-input {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .measurement-input input {
+            width: 100px;
+            padding: 0.5rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+        }
+        
+        .measurement-input button {
+            background: #6b46c1;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+        }
+        
+        .strength-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .strength-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .pr-display {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #6b46c1;
+            text-align: center;
+            margin: 1rem 0;
+        }
+        
+        .update-pr {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .update-pr input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+        }
+        
+        .update-pr button {
+            background: #6b46c1;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        @media (max-width: 768px) {
+            .measurement-grid,
+            .strength-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-tabs {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar - Add these new links -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-dumbbell"></i>
+        <span>FitAI</span>
+    </div>
+    <div class="nav-links">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/profile">Profile</a>
+        <a href="/analytics">📊 Analytics</a>
+        <a href="/achievements">🏆 Achievements</a>
+        <a href="/community">👥 Community</a>
+        <a href="/goals">🎯 Goals</a>
+        <a href="/calendar">📅 Calendar</a>
+        <a href="/music">🎵 Music</a>
+    </div>
+    <div class="profile-circle" onclick="window.location.href='/profile'">
+        {{ user.name[0]|upper }}
+    </div>
+</nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>
+                <i class="fas fa-chart-line"></i>
+                Analytics
+            </h1>
+            <a href="/dashboard" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Dashboard
+            </a>
+        </div>
+        
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="showTab('measurements')">📏 Measurements</button>
+            <button class="tab-btn" onclick="showTab('strength')">💪 Strength</button>
+            <button class="tab-btn" onclick="showTab('variety')">🔄 Workout Variety</button>
+        </div>
+        
+        <!-- Measurements Tab -->
+        <div id="measurements" class="tab-content active">
+            <h2 style="color: white; margin-bottom: 1rem;">Body Measurements</h2>
+            
+            <div class="measurement-grid">
+                <div class="measurement-card">
+                    <div class="measurement-header">
+                        <i class="fas fa-tshirt"></i>
+                        <h3>Chest</h3>
+                    </div>
+                    <div class="measurement-input">
+                        <input type="number" id="chest" step="0.1" placeholder="cm">
+                        <button onclick="updateMeasurement('chest')">Update</button>
+                    </div>
+                    <div class="current-value" id="chest-value">-- cm</div>
+                </div>
+                
+                <div class="measurement-card">
+                    <div class="measurement-header">
+                        <i class="fas fa-tshirt"></i>
+                        <h3>Waist</h3>
+                    </div>
+                    <div class="measurement-input">
+                        <input type="number" id="waist" step="0.1" placeholder="cm">
+                        <button onclick="updateMeasurement('waist')">Update</button>
+                    </div>
+                    <div class="current-value" id="waist-value">-- cm</div>
+                </div>
+                
+                <div class="measurement-card">
+                    <div class="measurement-header">
+                        <i class="fas fa-tshirt"></i>
+                        <h3>Hips</h3>
+                    </div>
+                    <div class="measurement-input">
+                        <input type="number" id="hips" step="0.1" placeholder="cm">
+                        <button onclick="updateMeasurement('hips')">Update</button>
+                    </div>
+                    <div class="current-value" id="hips-value">-- cm</div>
+                </div>
+                
+                <div class="measurement-card">
+                    <div class="measurement-header">
+                        <i class="fas fa-tshirt"></i>
+                        <h3>Arms</h3>
+                    </div>
+                    <div class="measurement-input">
+                        <input type="number" id="arms" step="0.1" placeholder="cm">
+                        <button onclick="updateMeasurement('arms')">Update</button>
+                    </div>
+                    <div class="current-value" id="arms-value">-- cm</div>
+                </div>
+                
+                <div class="measurement-card">
+                    <div class="measurement-header">
+                        <i class="fas fa-tshirt"></i>
+                        <h3>Thighs</h3>
+                    </div>
+                    <div class="measurement-input">
+                        <input type="number" id="thighs" step="0.1" placeholder="cm">
+                        <button onclick="updateMeasurement('thighs')">Update</button>
+                    </div>
+                    <div class="current-value" id="thighs-value">-- cm</div>
+                </div>
+                
+                <div class="measurement-card">
+                    <div class="measurement-header">
+                        <i class="fas fa-tshirt"></i>
+                        <h3>Calves</h3>
+                    </div>
+                    <div class="measurement-input">
+                        <input type="number" id="calves" step="0.1" placeholder="cm">
+                        <button onclick="updateMeasurement('calves')">Update</button>
+                    </div>
+                    <div class="current-value" id="calves-value">-- cm</div>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <h3>📈 Measurement Progress</h3>
+                <canvas id="measurementChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Strength Tab -->
+        <div id="strength" class="tab-content">
+            <h2 style="color: white; margin-bottom: 1rem;">Personal Records</h2>
+            
+            <div class="strength-grid">
+                <div class="strength-card">
+                    <h3>🏋️ Bench Press</h3>
+                    <div class="pr-display" id="bench-pr">0 kg</div>
+                    <div class="update-pr">
+                        <input type="number" id="bench-input" placeholder="Weight (kg)">
+                        <button onclick="updatePR('bench')">Update PR</button>
+                    </div>
+                </div>
+                
+                <div class="strength-card">
+                    <h3>🏋️ Squat</h3>
+                    <div class="pr-display" id="squat-pr">0 kg</div>
+                    <div class="update-pr">
+                        <input type="number" id="squat-input" placeholder="Weight (kg)">
+                        <button onclick="updatePR('squat')">Update PR</button>
+                    </div>
+                </div>
+                
+                <div class="strength-card">
+                    <h3>🏋️ Deadlift</h3>
+                    <div class="pr-display" id="deadlift-pr">0 kg</div>
+                    <div class="update-pr">
+                        <input type="number" id="deadlift-input" placeholder="Weight (kg)">
+                        <button onclick="updatePR('deadlift')">Update PR</button>
+                    </div>
+                </div>
+                
+                <div class="strength-card">
+                    <h3>🏋️ Overhead Press</h3>
+                    <div class="pr-display" id="ohp-pr">0 kg</div>
+                    <div class="update-pr">
+                        <input type="number" id="ohp-input" placeholder="Weight (kg)">
+                        <button onclick="updatePR('ohp')">Update PR</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <h3>📊 Strength Progression</h3>
+                <canvas id="strengthChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Workout Variety Tab -->
+        <div id="variety" class="tab-content">
+            <h2 style="color: white; margin-bottom: 1rem;">Workout Distribution</h2>
+            
+            <div class="chart-container">
+                <canvas id="varietyChart"></canvas>
+            </div>
+            
+            <div class="chart-container">
+                <h3>📊 Weekly Focus Areas</h3>
+                <canvas id="focusChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+        
+        function updateMeasurement(type) {
+            const value = document.getElementById(type).value;
+            if (value) {
+                document.getElementById(type + '-value').innerText = value + ' cm';
+                alert(`✅ ${type} measurement updated to ${value} cm`);
+            }
+        }
+        
+        function updatePR(exercise) {
+            const value = document.getElementById(exercise + '-input').value;
+            if (value) {
+                document.getElementById(exercise + '-pr').innerText = value + ' kg';
+                alert(`✅ ${exercise} PR updated to ${value} kg`);
+            }
+        }
+        
+        // Initialize charts
+        document.addEventListener('DOMContentLoaded', function() {
+            // Measurement Chart
+            const ctx = document.getElementById('measurementChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                    datasets: [
+                        {
+                            label: 'Chest',
+                            data: [95, 96, 97, 98],
+                            borderColor: '#6b46c1'
+                        },
+                        {
+                            label: 'Waist',
+                            data: [80, 79, 78, 77],
+                            borderColor: '#38a169'
+                        }
+                    ]
+                }
+            });
+            
+            // Strength Chart
+            const ctx2 = document.getElementById('strengthChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: ['Bench', 'Squat', 'Deadlift', 'OHP'],
+                    datasets: [{
+                        label: 'Current PR (kg)',
+                        data: [80, 100, 120, 50],
+                        backgroundColor: '#6b46c1'
+                    }]
+                }
+            });
+            
+            // Variety Chart
+            const ctx3 = document.getElementById('varietyChart').getContext('2d');
+            new Chart(ctx3, {
+                type: 'pie',
+                data: {
+                    labels: ['Upper Body', 'Lower Body', 'Cardio', 'Core', 'Full Body'],
+                    datasets: [{
+                        data: [40, 25, 15, 10, 10],
+                        backgroundColor: ['#6b46c1', '#38a169', '#e53e3e', '#dd6b20', '#3182ce']
+                    }]
+                }
+            });
+        });
+    </script>
+</body>
+</html>
