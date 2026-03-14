@@ -192,6 +192,24 @@ class Challenge(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
+class Goal(db.Model):
+    """User goals tracking"""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    name = db.Column(db.String(100))
+    description = db.Column(db.Text)
+    goal_type = db.Column(db.String(50))  # 'weight', 'workout', 'strength', 'custom'
+    current_value = db.Column(db.Float, default=0)
+    target_value = db.Column(db.Float)
+    unit = db.Column(db.String(20))  # 'kg', 'workouts', 'reps', 'minutes', 'km'
+    start_date = db.Column(db.Date, default=datetime.utcnow().date())
+    deadline = db.Column(db.Date)
+    status = db.Column(db.String(20), default='active')  # 'active', 'completed', 'expired'
+    progress_percent = db.Column(db.Float, default=0)
+    completed_date = db.Column(db.Date)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
 class Achievement(db.Model):
     """User achievements"""
     id = db.Column(db.Integer, primary_key=True)
@@ -1320,6 +1338,125 @@ def goals():
     if 'user_id' not in session:
         return redirect(url_for('index'))
     return render_template('goals.html',user=User.query.get(session['user_id']))
+
+
+@app.route('/create-goal', methods=['POST'])
+def create_goal():
+    try:
+        data = request.json
+        goal = Goal(
+            user_id=session['user_id'],
+            name=data['name'],
+            description=data.get('description', ''),
+            goal_type=data['goal_type'],
+            current_value=0,
+            target_value=data['target_value'],
+            unit=data['unit'],
+            deadline=datetime.strptime(data['deadline'], '%Y-%m-%d').date()
+        )
+        db.session.add(goal)
+        db.session.commit()
+        return jsonify({'success': True, 'goal_id': goal.id})
+    except Exception as e:
+        print(f"Error creating goal: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/update-goal', methods=['POST'])
+def update_goal():
+    try:
+        data = request.json
+        goal = Goal.query.get(data['goal_id'])
+        
+        if not goal or goal.user_id != session['user_id']:
+            return jsonify({'success': False, 'error': 'Goal not found'})
+        
+        goal.current_value = data['current_value']
+        goal.progress_percent = (goal.current_value / goal.target_value) * 100
+        
+        if goal.current_value >= goal.target_value:
+            goal.status = 'completed'
+            goal.completed_date = datetime.now().date()
+        
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        print(f"Error updating goal: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/complete-goal', methods=['POST'])
+def complete_goal():
+    try:
+        data = request.json
+        goal = Goal.query.get(data['goal_id'])
+        
+        if not goal or goal.user_id != session['user_id']:
+            return jsonify({'success': False, 'error': 'Goal not found'})
+        
+        goal.status = 'completed'
+        goal.completed_date = datetime.now().date()
+        goal.progress_percent = 100
+        
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        print(f"Error completing goal: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/delete-goal', methods=['POST'])
+def delete_goal():
+    try:
+        data = request.json
+        goal = Goal.query.get(data['goal_id'])
+        
+        if not goal or goal.user_id != session['user_id']:
+            return jsonify({'success': False, 'error': 'Goal not found'})
+        
+        db.session.delete(goal)
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        print(f"Error deleting goal: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/get-goals')
+def get_goals():
+    try:
+        user_id = session['user_id']
+        
+        # Get active goals
+        active_goals = Goal.query.filter_by(
+            user_id=user_id, 
+            status='active'
+        ).order_by(Goal.deadline).all()
+        
+        # Get completed goals
+        completed_goals = Goal.query.filter_by(
+            user_id=user_id, 
+            status='completed'
+        ).order_by(Goal.completed_date.desc()).all()
+        
+        return jsonify({
+            'active': [{
+                'id': g.id,
+                'name': g.name,
+                'description': g.description,
+                'goal_type': g.goal_type,
+                'current_value': g.current_value,
+                'target_value': g.target_value,
+                'unit': g.unit,
+                'progress': g.progress_percent,
+                'deadline': g.deadline.strftime('%b %d, %Y'),
+                'days_left': (g.deadline - datetime.now().date()).days
+            } for g in active_goals],
+            'completed': [{
+                'id': g.id,
+                'name': g.name,
+                'completed_date': g.completed_date.strftime('%b %d, %Y')
+            } for g in completed_goals]
+        })
+    except Exception as e:
+        print(f"Error getting goals: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/calendar')
 def calendar():
