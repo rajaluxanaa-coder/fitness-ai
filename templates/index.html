@@ -36,6 +36,12 @@
             font-weight: bold;
             color: #6b46c1;
         }
+
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
         .nav-buttons {
             display: flex;
             gap: 1rem;
@@ -316,18 +322,22 @@
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="logo">
-            <i class="fas fa-dumbbell"></i>
-            <span>FitAI</span>
-        </div>
-        <div class="nav-buttons">
-            <button class="btn-outline" onclick="showSignInModal()">Sign In</button>
-            <button class="btn-primary" onclick="showSignUpModal()">Sign Up</button>
-        </div>
-    </nav>
-
+    <!-- Navbar for Homepage (no user yet) -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-dumbbell"></i>
+        <span>FitAI</span>
+    </div>
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="#features">Features</a>
+        <a href="#about">About</a>
+    </div>
+    <div class="auth-buttons">
+        <button class="btn-outline" onclick="showSignInModal()">Sign In</button>
+        <button class="btn-primary" onclick="showSignUpModal()">Sign Up</button>
+    </div>
+</nav>
     <!-- Hero Section -->
     <!-- Hero Section - Updated with more content -->
 <div class="hero">
