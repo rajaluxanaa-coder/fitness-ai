@@ -667,7 +667,7 @@ def nutrition():
 def analytics():
     if 'user_id' not in session:
         return redirect(url_for('index'))
-    return render_template('analytics.html')
+    return render_template('analytics.html',user=User.query.get(session['user_id']))
 
 @app.route('/community')
 def community():
