@@ -129,12 +129,38 @@
             border-radius: 50%;
             cursor: pointer;
             font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+        
+        .month-nav button:hover {
+            transform: scale(1.1);
         }
         
         .current-month {
             font-size: 1.5rem;
             font-weight: bold;
             color: #6b46c1;
+            min-width: 200px;
+            text-align: center;
+        }
+        
+        .add-event-btn {
+            background: #6b46c1;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .add-event-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
         
         .weekdays {
@@ -157,6 +183,7 @@
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 0.5rem;
+            margin-bottom: 2rem;
         }
         
         .calendar-day {
@@ -166,11 +193,12 @@
             padding: 0.5rem;
             position: relative;
             transition: all 0.3s;
+            cursor: pointer;
         }
         
         .calendar-day:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
         
         .calendar-day.other-month {
@@ -178,29 +206,40 @@
             opacity: 0.5;
         }
         
+        .calendar-day.today {
+            border: 2px solid #6b46c1;
+        }
+        
         .day-number {
             font-weight: bold;
             margin-bottom: 0.5rem;
+            font-size: 1.1rem;
         }
         
-        .workout-badge {
+        .event-badge {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.3rem;
+            margin-bottom: 0.2rem;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .event-workout {
             background: #6b46c1;
             color: white;
-            font-size: 0.7rem;
-            padding: 0.2rem 0.4rem;
-            border-radius: 0.3rem;
-            margin-bottom: 0.2rem;
-            display: inline-block;
         }
         
-        .meal-badge {
+        .event-meal {
             background: #38a169;
             color: white;
-            font-size: 0.7rem;
-            padding: 0.2rem 0.4rem;
-            border-radius: 0.3rem;
-            margin-bottom: 0.2rem;
-            display: inline-block;
+        }
+        
+        .event-custom {
+            background: #fbbf24;
+            color: #1f2937;
         }
         
         .event-count {
@@ -221,10 +260,10 @@
         .legend {
             display: flex;
             gap: 2rem;
-            margin-top: 1.5rem;
             background: white;
             border-radius: 1rem;
             padding: 1.5rem;
+            margin-bottom: 2rem;
         }
         
         .legend-item {
@@ -241,6 +280,86 @@
         
         .color-box.workout { background: #6b46c1; }
         .color-box.meal { background: #38a169; }
+        .color-box.custom { background: #fbbf24; }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+        }
+        
+        .modal h3 {
+            color: #6b46c1;
+            margin-bottom: 1rem;
+        }
+        
+        .modal input, .modal select, .modal textarea {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+        }
+        
+        .modal .btn {
+            padding: 0.75rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .btn-primary {
+            background: #6b46c1;
+            color: white;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #6b46c1;
+            color: #6b46c1;
+        }
+        
+        .btn-danger {
+            background: #e53e3e;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #38a169;
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .calendar-grid {
+                grid-template-columns: repeat(7, 1fr);
+                font-size: 0.8rem;
+            }
+            
+            .calendar-day {
+                min-height: 80px;
+            }
+            
+            .event-badge {
+                font-size: 0.6rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -279,11 +398,11 @@
         <!-- Calendar Header -->
         <div class="calendar-header">
             <div class="month-nav">
-                <button><i class="fas fa-chevron-left"></i></button>
-                <span class="current-month">March 2026</span>
-                <button><i class="fas fa-chevron-right"></i></button>
+                <button onclick="changeMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+                <span class="current-month" id="currentMonth">March 2026</span>
+                <button onclick="changeMonth(1)"><i class="fas fa-chevron-right"></i></button>
             </div>
-            <button class="btn" style="background: #6b46c1; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem;">
+            <button class="add-event-btn" onclick="showAddEventModal()">
                 <i class="fas fa-plus"></i> Add Event
             </button>
         </div>
@@ -299,63 +418,253 @@
             <div class="weekday">Sat</div>
         </div>
 
-        <!-- Calendar Days -->
-        <div class="calendar-grid">
-            <!-- Previous month days -->
-            <div class="calendar-day other-month">
-                <div class="day-number">25</div>
-            </div>
-            <div class="calendar-day other-month">
-                <div class="day-number">26</div>
-            </div>
-            <div class="calendar-day other-month">
-                <div class="day-number">27</div>
-            </div>
-            <div class="calendar-day other-month">
-                <div class="day-number">28</div>
-            </div>
-            
-            <!-- Current month days -->
-            <div class="calendar-day">
-                <div class="day-number">1</div>
-                <span class="workout-badge">💪 Upper Body</span>
-                <div class="event-count">2</div>
-            </div>
-            <div class="calendar-day">
-                <div class="day-number">2</div>
-                <span class="meal-badge">🥗 Meal Log</span>
-            </div>
-            <div class="calendar-day">
-                <div class="day-number">3</div>
-            </div>
-            <div class="calendar-day">
-                <div class="day-number">4</div>
-                <span class="workout-badge">🏃 Cardio</span>
-            </div>
-            <div class="calendar-day">
-                <div class="day-number">5</div>
-            </div>
-            <div class="calendar-day">
-                <div class="day-number">6</div>
-            </div>
-            <div class="calendar-day">
-                <div class="day-number">7</div>
-                <span class="workout-badge">🦵 Leg Day</span>
-            </div>
-            <!-- Add more days as needed -->
+        <!-- Calendar Grid -->
+        <div id="calendarGrid" class="calendar-grid">
+            <!-- Calendar days will be loaded here -->
         </div>
 
         <!-- Legend -->
         <div class="legend">
             <div class="legend-item">
                 <div class="color-box workout"></div>
-                <span>Workout Day</span>
+                <span>Workout</span>
             </div>
             <div class="legend-item">
                 <div class="color-box meal"></div>
                 <span>Meal Logged</span>
             </div>
+            <div class="legend-item">
+                <div class="color-box custom"></div>
+                <span>Custom Event</span>
+            </div>
+        </div>
+
+        <!-- Events for selected day -->
+        <div id="dayEvents" style="background: white; border-radius: 1rem; padding: 1.5rem; display: none;">
+            <h3 style="color: #6b46c1; margin-bottom: 1rem;" id="selectedDateTitle"></h3>
+            <div id="eventsList"></div>
         </div>
     </div>
+
+    <!-- Add Event Modal -->
+    <div id="eventModal" class="modal">
+        <div class="modal-content">
+            <h3>Add New Event</h3>
+            <input type="date" id="eventDate" value="">
+            <select id="eventType">
+                <option value="workout">💪 Workout</option>
+                <option value="meal">🥗 Meal</option>
+                <option value="custom">📝 Custom</option>
+            </select>
+            <input type="text" id="eventTitle" placeholder="Event Title">
+            <textarea id="eventDescription" placeholder="Description" rows="2"></textarea>
+            <div style="display: flex; gap: 1rem;">
+                <button class="btn btn-primary" onclick="addEvent()" style="flex: 1;">Add Event</button>
+                <button class="btn btn-outline" onclick="closeModal()" style="flex: 1;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Events Modal -->
+    <div id="viewModal" class="modal">
+        <div class="modal-content">
+            <h3 id="viewModalDate">Events</h3>
+            <div id="viewEventsList"></div>
+            <button class="btn btn-primary" onclick="closeViewModal()" style="width: 100%; margin-top: 1rem;">Close</button>
+        </div>
+    </div>
+
+    <script>
+        let currentDate = new Date();
+        let currentMonth = currentDate.getMonth();
+        let currentYear = currentDate.getFullYear();
+        let events = [];
+
+        // Load events from localStorage (you can replace with API call)
+        function loadEvents() {
+            const saved = localStorage.getItem('calendarEvents');
+            if (saved) {
+                events = JSON.parse(saved);
+            }
+        }
+
+        // Save events to localStorage
+        function saveEvents() {
+            localStorage.setItem('calendarEvents', JSON.stringify(events));
+        }
+
+        // Get events for a specific date
+        function getEventsForDate(date) {
+            return events.filter(e => e.date === date);
+        }
+
+        // Render calendar
+        function renderCalendar() {
+            const monthNames = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"];
+            
+            document.getElementById('currentMonth').textContent = 
+                `${monthNames[currentMonth]} ${currentYear}`;
+
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            
+            // Previous month days
+            const prevMonthDays = new Date(currentYear, currentMonth, 0).getDate();
+            
+            let calendarHTML = '';
+            
+            // Previous month days
+            for (let i = firstDay - 1; i >= 0; i--) {
+                const day = prevMonthDays - i;
+                const dateStr = `${currentYear}-${String(currentMonth).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+                calendarHTML += renderDay(day, true, dateStr);
+            }
+            
+            // Current month days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+                const isToday = isCurrentDay(day);
+                calendarHTML += renderDay(day, false, dateStr, isToday);
+            }
+            
+            // Next month days to fill grid
+            const totalDays = calendarHTML.split('<div class="calendar-day').length - 1;
+            const remainingDays = 42 - totalDays; // 6 rows * 7 days = 42
+            
+            for (let day = 1; day <= remainingDays; day++) {
+                const dateStr = `${currentYear}-${String(currentMonth + 2).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+                calendarHTML += renderDay(day, true, dateStr);
+            }
+            
+            document.getElementById('calendarGrid').innerHTML = calendarHTML;
+        }
+
+        function renderDay(day, isOtherMonth, dateStr, isToday = false) {
+            const dayEvents = getEventsForDate(dateStr);
+            const eventCount = dayEvents.length;
+            const todayClass = isToday ? ' today' : '';
+            
+            let eventHTML = '';
+            dayEvents.slice(0, 2).forEach(event => {
+                eventHTML += `<div class="event-badge event-${event.type}">${event.title}</div>`;
+            });
+            
+            return `
+                <div class="calendar-day${isOtherMonth ? ' other-month' : ''}${todayClass}" onclick="showDayEvents('${dateStr}')">
+                    <div class="day-number">${day}</div>
+                    ${eventHTML}
+                    ${eventCount > 2 ? `<div class="event-count">+${eventCount - 2}</div>` : ''}
+                </div>
+            `;
+        }
+
+        function isCurrentDay(day) {
+            const today = new Date();
+            return today.getDate() === day && 
+                   today.getMonth() === currentMonth && 
+                   today.getFullYear() === currentYear;
+        }
+
+        function changeMonth(direction) {
+            currentMonth += direction;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            } else if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar();
+        }
+
+        function showAddEventModal() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('eventDate').value = today;
+            document.getElementById('eventModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('eventModal').style.display = 'none';
+        }
+
+        function closeViewModal() {
+            document.getElementById('viewModal').style.display = 'none';
+        }
+
+        function addEvent() {
+            const event = {
+                id: Date.now(),
+                date: document.getElementById('eventDate').value,
+                type: document.getElementById('eventType').value,
+                title: document.getElementById('eventTitle').value,
+                description: document.getElementById('eventDescription').value
+            };
+
+            if (!event.title) {
+                alert('Please enter an event title');
+                return;
+            }
+
+            events.push(event);
+            saveEvents();
+            renderCalendar();
+            closeModal();
+            
+            // Clear form
+            document.getElementById('eventTitle').value = '';
+            document.getElementById('eventDescription').value = '';
+        }
+
+        function showDayEvents(dateStr) {
+            const dayEvents = getEventsForDate(dateStr);
+            const date = new Date(dateStr);
+            const formattedDate = date.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            document.getElementById('viewModalDate').textContent = `Events for ${formattedDate}`;
+            
+            const eventsList = document.getElementById('viewEventsList');
+            if (dayEvents.length > 0) {
+                eventsList.innerHTML = dayEvents.map(event => `
+                    <div style="background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; margin-bottom: 0.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <span class="event-badge event-${event.type}" style="display: inline-block; margin-bottom: 0.25rem;">
+${event.type}
+                                </span>
+                                <h4 style="margin: 0.25rem 0;">${event.title}</h4>
+                                <p style="color: #6b7280; font-size: 0.9rem;">${event.description || ''}</p>
+                            </div>
+                            <button onclick="deleteEvent(${event.id})" style="background: none; border: none; color: #e53e3e; cursor: pointer;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                eventsList.innerHTML = '<p style="color: #6b7280; text-align: center;">No events for this day</p>';
+            }
+            
+            document.getElementById('viewModal').style.display = 'flex';
+        }
+
+        function deleteEvent(eventId) {
+            events = events.filter(e => e.id !== eventId);
+            saveEvents();
+            renderCalendar();
+            showDayEvents(document.getElementById('viewModalDate').textContent.split('for ')[1]);
+        }
+
+        // Initialize calendar
+        document.addEventListener('DOMContentLoaded', function() {
+            loadEvents();
+            renderCalendar();
+        });
+    </script>
 </body>
 </html>
