@@ -120,14 +120,6 @@ class NutritionLog(db.Model):
     fats = db.Column(db.Float)
     water_intake = db.Column(db.Float)  # in liters
 
-class FriendRequest(db.Model):
-    """Friend connections"""
-    id = db.Column(db.Integer, primary_key=True)
-    sender_id = db.Column(db.Integer)
-    receiver_id = db.Column(db.Integer)
-    status = db.Column(db.String(20))  # pending, accepted, rejected
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
 
 # ===== AFTER YOUR EXISTING MODELS (WorkoutLog, Achievement etc) =====
 
