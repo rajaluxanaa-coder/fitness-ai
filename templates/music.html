@@ -104,6 +104,7 @@
             transition: all 0.3s;
         }
         
+        /* Now Playing Section */
         .player-section {
             background: white;
             border-radius: 1rem;
@@ -120,8 +121,8 @@
         }
         
         .album-art {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             background: linear-gradient(135deg, #6b46c1, #38a169);
             border-radius: 1rem;
             display: flex;
@@ -129,6 +130,7 @@
             justify-content: center;
             color: white;
             font-size: 3rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
         
         .track-info {
@@ -136,29 +138,45 @@
         }
         
         .track-name {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             font-weight: bold;
             color: #1f2937;
         }
         
         .track-artist {
             color: #6b7280;
+            font-size: 1.1rem;
             margin-bottom: 1rem;
         }
         
-        .progress {
+        .track-meta {
+            display: flex;
+            gap: 1rem;
+            color: #6b46c1;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .progress-container {
             width: 100%;
-            height: 5px;
-            background: #e5e7eb;
-            border-radius: 5px;
             margin-bottom: 0.5rem;
         }
         
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            cursor: pointer;
+            position: relative;
+        }
+        
         .progress-fill {
-            width: 45%;
+            width: 0%;
             height: 100%;
-            background: #6b46c1;
-            border-radius: 5px;
+            background: linear-gradient(90deg, #6b46c1, #38a169);
+            border-radius: 3px;
+            transition: width 0.1s linear;
         }
         
         .time {
@@ -166,12 +184,14 @@
             justify-content: space-between;
             color: #6b7280;
             font-size: 0.9rem;
+            margin-top: 0.25rem;
         }
         
         .controls {
             display: flex;
             justify-content: center;
             gap: 2rem;
+            margin-top: 1.5rem;
         }
         
         .control-btn {
@@ -188,6 +208,21 @@
         
         .control-btn:hover {
             transform: scale(1.1);
+            background: #553c9a;
+        }
+        
+        .control-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        /* Workout Playlists Grid */
+        .section-title {
+            color: white;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         
         .playlists-grid {
@@ -204,11 +239,18 @@
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
+            border: 2px solid transparent;
         }
         
         .playlist-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-color: #6b46c1;
+        }
+        
+        .playlist-card.active {
+            border-color: #6b46c1;
+            background: #f3f4f6;
         }
         
         .playlist-icon {
@@ -230,20 +272,32 @@
             margin-bottom: 0.5rem;
         }
         
+        .playlist-bpm {
+            color: #6b46c1;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+        
         .playlist-songs {
             color: #6b7280;
             font-size: 0.9rem;
         }
         
+        /* Mood-Based Selection */
         .mood-section {
             background: white;
             border-radius: 1rem;
             padding: 1.5rem;
+            margin-bottom: 2rem;
         }
         
         .mood-title {
             color: #6b46c1;
             margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         
         .mood-buttons {
@@ -259,6 +313,7 @@
             background: white;
             cursor: pointer;
             transition: all 0.3s;
+            font-weight: 600;
         }
         
         .mood-btn:hover {
@@ -267,13 +322,92 @@
             border-color: #6b46c1;
         }
         
+        .mood-btn.active {
+            background: #6b46c1;
+            color: white;
+            border-color: #6b46c1;
+        }
+        
+        /* Playlist Tracks */
+        .tracks-section {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+        }
+        
+        .track-list {
+            margin-top: 1rem;
+        }
+        
+        .track-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .track-item:hover {
+            background: #f3f4f6;
+        }
+        
+        .track-item.playing {
+            background: #f3f4f6;
+            border-left: 4px solid #6b46c1;
+        }
+        
+        .track-number {
+            width: 30px;
+            color: #6b7280;
+            font-weight: 600;
+        }
+        
+        .track-info-small {
+            flex: 2;
+        }
+        
+        .track-title {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .track-artist-small {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+        
+        .track-duration {
+            color: #6b7280;
+            margin-right: 1rem;
+        }
+        
+        .play-indicator {
+            color: #6b46c1;
+            margin-right: 1rem;
+        }
+        
+        .bpm-badge {
+            background: #f3f4f6;
+            padding: 0.25rem 0.5rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            color: #6b46c1;
+            font-weight: 600;
+        }
+        
         @media (max-width: 768px) {
             .playlists-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
+            
             .now-playing {
                 flex-direction: column;
                 text-align: center;
+            }
+            
+            .mood-buttons {
+                flex-wrap: wrap;
             }
         }
     </style>
@@ -311,76 +445,323 @@
             </a>
         </div>
 
-        <!-- Now Playing -->
+        <!-- Now Playing Section -->
         <div class="player-section">
             <div class="now-playing">
-                <div class="album-art">
+                <div class="album-art" id="albumArt">
                     <i class="fas fa-bolt"></i>
                 </div>
                 <div class="track-info">
-                    <div class="track-name">Eye of the Tiger</div>
-                    <div class="track-artist">Survivor</div>
-                    <div class="progress">
-                        <div class="progress-fill"></div>
+                    <div class="track-name" id="currentTrack">Eye of the Tiger</div>
+                    <div class="track-artist" id="currentArtist">Survivor</div>
+                    <div class="track-meta">
+                        <span><i class="fas fa-fire"></i> <span id="currentBPM">155</span> BPM</span>
+                        <span><i class="fas fa-clock"></i> <span id="currentDuration">4:05</span></span>
                     </div>
-                    <div class="time">
-                        <span>1:45</span>
-                        <span>4:05</span>
+                    <div class="progress-container">
+                        <div class="progress-bar" onclick="seekTrack(event)">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="time">
+                            <span id="currentTime">0:00</span>
+                            <span id="totalTime">4:05</span>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="controls">
-                <button class="control-btn"><i class="fas fa-random"></i></button>
-                <button class="control-btn"><i class="fas fa-step-backward"></i></button>
-                <button class="control-btn"><i class="fas fa-play"></i></button>
-                <button class="control-btn"><i class="fas fa-step-forward"></i></button>
-                <button class="control-btn"><i class="fas fa-redo"></i></button>
+                <button class="control-btn" onclick="prevTrack()"><i class="fas fa-step-backward"></i></button>
+                <button class="control-btn" id="playPauseBtn" onclick="togglePlay()"><i class="fas fa-play"></i></button>
+                <button class="control-btn" onclick="nextTrack()"><i class="fas fa-step-forward"></i></button>
             </div>
         </div>
 
-        <!-- Workout Playlists -->
-        <h2 style="color: white; margin-bottom: 1rem;">🏋️ Workout Playlists</h2>
-        <div class="playlists-grid">
-            <div class="playlist-card">
-                <div class="playlist-icon">
-                    <i class="fas fa-dumbbell"></i>
-                </div>
-                <div class="playlist-name">Heavy Lifting</div>
-                <div class="playlist-songs">15 songs • 45 min</div>
-            </div>
-            <div class="playlist-card">
-                <div class="playlist-icon">
-                    <i class="fas fa-running"></i>
-                </div>
-                <div class="playlist-name">Cardio Rush</div>
-                <div class="playlist-songs">20 songs • 60 min</div>
-            </div>
-            <div class="playlist-card">
-                <div class="playlist-icon">
-                    <i class="fas fa-heartbeat"></i>
-                </div>
-                <div class="playlist-name">HIIT Mix</div>
-                <div class="playlist-songs">12 songs • 30 min</div>
-            </div>
-            <div class="playlist-card">
-                <div class="playlist-icon">
-                    <i class="fas fa-peace"></i>
-                </div>
-                <div class="playlist-name">Yoga & Meditation</div>
-                <div class="playlist-songs">10 songs • 50 min</div>
-            </div>
+        <!-- Workout Playlists Grid -->
+        <h2 class="section-title"><i class="fas fa-dumbbell"></i> Workout Playlists by BPM</h2>
+        <div class="playlists-grid" id="playlistsGrid">
+            <!-- Playlists will be loaded here -->
         </div>
 
         <!-- Mood-Based Selection -->
         <div class="mood-section">
-            <h3 class="mood-title">🎯 Choose Your Workout Mood</h3>
-            <div class="mood-buttons">
-                <button class="mood-btn">🔥 High Energy</button>
-                <button class="mood-btn">💪 Pump Up</button>
-                <button class="mood-btn">🧘 Calm Focus</button>
-                <button class="mood-btn">⚡ Power</button>
+            <h3 class="mood-title"><i class="fas fa-heart"></i> Choose Your Workout Mood</h3>
+            <div class="mood-buttons" id="moodButtons">
+                <button class="mood-btn" onclick="filterByMood('power')">⚡ Power (140-180 BPM)</button>
+                <button class="mood-btn" onclick="filterByMood('cardio')">🏃 Cardio (120-140 BPM)</button>
+                <button class="mood-btn" onclick="filterByMood('strength')">💪 Strength (100-120 BPM)</button>
+                <button class="mood-btn" onclick="filterByMood('recovery')">🧘 Recovery (60-100 BPM)</button>
+            </div>
+        </div>
+
+        <!-- Playlist Tracks -->
+        <div class="tracks-section">
+            <h3 id="currentPlaylistTitle">Heavy Lifting Playlist</h3>
+            <div class="track-list" id="trackList">
+                <!-- Tracks will be loaded here -->
             </div>
         </div>
     </div>
+
+    <!-- Hidden Audio Element -->
+    <audio id="audioPlayer" preload="auto"></audio>
+
+    <script>
+        // Music database with royalty-free tracks [citation:5]
+        const musicDatabase = {
+            playlists: [
+                {
+                    id: 'heavy-lifting',
+                    name: 'Heavy Lifting',
+                    icon: '🏋️',
+                    bpm: '140-180',
+                    songs: 15,
+                    duration: 45,
+                    mood: 'power',
+                    tracks: [
+                        { title: 'Eye of the Tiger', artist: 'Survivor', duration: '4:05', bpm: 155, audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
+                        { title: 'Thunderstruck', artist: 'AC/DC', duration: '4:52', bpm: 165, audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
+                        { title: 'Stronger', artist: 'Kanye West', duration: '5:12', bpm: 150, audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' },
+                        { title: 'Believer', artist: 'Imagine Dragons', duration: '3:24', bpm: 145, audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3' },
+                        { title: 'Lose Yourself', artist: 'Eminem', duration: '5:26', bpm: 160, audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3' }
+                    ]
+                },
+                {
+                    id: 'cardio-rush',
+                    name: 'Cardio Rush',
+                    icon: '🏃',
+                    bpm: '120-140',
+                    songs: 20,
+                    duration: 60,
+                    mood: 'cardio',
+                    tracks: [
+                        { title: 'Uptown Funk', artist: 'Mark Ronson ft. Bruno Mars', duration: '4:30', bpm: 130, audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3' },
+                        { title: 'Can\'t Stop the Feeling', artist: 'Justin Timberlake', duration: '3:56', bpm: 125, audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3' },
+                        { title: 'Shake It Off', artist: 'Taylor Swift', duration: '3:39', bpm: 135, audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3' },
+                        { title: 'Happy', artist: 'Pharrell Williams', duration: '3:53', bpm: 130, audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3' },
+                        { title: 'Dance Monkey', artist: 'Tones and I', duration: '3:29', bpm: 125, audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3' }
+                    ]
+                },
+                {
+                    id: 'hiit-mix',
+                    name: 'HIIT Mix',
+                    icon: '⚡',
+                    bpm: '130-160',
+                    songs: 12,
+                    duration: 30,
+                    mood: 'power',
+                    tracks: [
+                        { title: 'Titanium', artist: 'David Guetta ft. Sia', duration: '4:05', bpm: 150, audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-11.mp3' },
+                        { title: 'Animals', artist: 'Martin Garrix', duration: '5:03', bpm: 155, audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-12.mp3' },
+                        { title: 'Turn Down for What', artist: 'DJ Snake', duration: '3:33', bpm: 145, audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-13.mp3' },
+                        { title: 'Levels', artist: 'Avicii', duration: '5:38', bpm: 140, audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-14.mp3' },
+                        { title: 'Wake Me Up', artist: 'Avicii', duration: '4:09', bpm: 135, audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3' }
+                    ]
+                },
+                {
+                    id: 'yoga-meditation',
+                    name: 'Yoga & Meditation',
+                    icon: '🧘',
+                    bpm: '60-100',
+                    songs: 10,
+                    duration: 50,
+                    mood: 'recovery',
+                    tracks: [
+                        { title: 'Weightless', artist: 'Marconi Union', duration: '8:00', bpm: 60, audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-16.mp3' },
+                        { title: 'Spiegel im Spiegel', artist: 'Arvo Pärt', duration: '10:00', bpm: 70, audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-17.mp3' },
+                        { title: 'Gymnopédie No.1', artist: 'Erik Satie', duration: '3:00', bpm: 65, audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-18.mp3' },
+                        { title: 'Clair de Lune', artist: 'Claude Debussy', duration: '5:00', bpm: 80, audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-19.mp3' },
+                        { title: 'Meditation', artist: 'Jules Massenet', duration: '6:00', bpm: 75, audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-20.mp3' }
+                    ]
+                }
+            ]
+        };
+
+        // Player state
+        let currentPlaylist = musicDatabase.playlists[0];
+        let currentTrackIndex = 0;
+        let isPlaying = false;
+        let audioPlayer = document.getElementById('audioPlayer');
+        let progressInterval = null;
+
+        // Initialize page
+        function initMusic() {
+            renderPlaylists();
+            renderTracks();
+            setupAudioPlayer();
+        }
+
+        function renderPlaylists() {
+            const grid = document.getElementById('playlistsGrid');
+            grid.innerHTML = musicDatabase.playlists.map(playlist => `
+                <div class="playlist-card ${playlist.id === currentPlaylist.id ? 'active' : ''}" onclick="selectPlaylist('${playlist.id}')">
+                    <div class="playlist-icon">${playlist.icon}</div>
+                    <div class="playlist-name">${playlist.name}</div>
+                    <div class="playlist-bpm">${playlist.bpm} BPM</div>
+                    <div class="playlist-songs">${playlist.songs} songs • ${playlist.duration} min</div>
+                </div>
+            `).join('');
+        }
+
+        function renderTracks() {
+            const trackList = document.getElementById('trackList');
+            const title = document.getElementById('currentPlaylistTitle');
+            title.textContent = currentPlaylist.name + ' Playlist';
+            
+            trackList.innerHTML = currentPlaylist.tracks.map((track, index) => `
+                <div class="track-item ${index === currentTrackIndex ? 'playing' : ''}" onclick="playTrack(${index})">
+                    <span class="track-number">${index + 1}</span>
+                    <div class="track-info-small">
+                        <div class="track-title">${track.title}</div>
+                        <div class="track-artist-small">${track.artist}</div>
+                    </div>
+                    <span class="bpm-badge">${track.bpm} BPM</span>
+                    <span class="track-duration">${track.duration}</span>
+                    ${index === currentTrackIndex && isPlaying ? 
+                        '<span class="play-indicator"><i class="fas fa-volume-up"></i></span>' : ''}
+                </div>
+            `).join('');
+        }
+
+        function selectPlaylist(playlistId) {
+            currentPlaylist = musicDatabase.playlists.find(p => p.id === playlistId);
+            currentTrackIndex = 0;
+            renderPlaylists();
+            renderTracks();
+            loadTrack();
+            updateNowPlaying();
+        }
+
+        function playTrack(index) {
+            currentTrackIndex = index;
+            loadTrack();
+            playAudio();
+            renderTracks();
+        }
+
+        function loadTrack() {
+            const track = currentPlaylist.tracks[currentTrackIndex];
+            audioPlayer.src = track.audio;
+            document.getElementById('currentTrack').textContent = track.title;
+            document.getElementById('currentArtist').textContent = track.artist;
+            document.getElementById('currentBPM').textContent = track.bpm;
+            document.getElementById('currentDuration').textContent = track.duration;
+            document.getElementById('totalTime').textContent = track.duration;
+            
+            // Update album art based on playlist
+            const albumArt = document.getElementById('albumArt');
+            albumArt.innerHTML = `<i class="fas ${getIconForPlaylist(currentPlaylist.id)}"></i>`;
+        }
+
+        function getIconForPlaylist(playlistId) {
+            const icons = {
+                'heavy-lifting': 'fa-dumbbell',
+                'cardio-rush': 'fa-running',
+                'hiit-mix': 'fa-bolt',
+                'yoga-meditation': 'fa-pray'
+            };
+            return icons[playlistId] || 'fa-headphones';
+        }
+
+        function setupAudioPlayer() {
+            audioPlayer.addEventListener('timeupdate', updateProgress);
+            audioPlayer.addEventListener('ended', nextTrack);
+        }
+
+        function togglePlay() {
+            if (isPlaying) {
+                pauseAudio();
+            } else {
+                playAudio();
+            }
+        }
+
+        function playAudio() {
+            audioPlayer.play();
+            isPlaying = true;
+            document.getElementById('playPauseBtn').innerHTML = '<i class="fas fa-pause"></i>';
+            startProgressUpdate();
+        }
+
+        function pauseAudio() {
+            audioPlayer.pause();
+            isPlaying = false;
+            document.getElementById('playPauseBtn').innerHTML = '<i class="fas fa-play"></i>';
+            stopProgressUpdate();
+        }
+
+        function nextTrack() {
+            currentTrackIndex = (currentTrackIndex + 1) % currentPlaylist.tracks.length;
+            loadTrack();
+            if (isPlaying) {
+                playAudio();
+            }
+            renderTracks();
+        }
+
+        function prevTrack() {
+            currentTrackIndex = (currentTrackIndex - 1 + currentPlaylist.tracks.length) % currentPlaylist.tracks.length;
+            loadTrack();
+            if (isPlaying) {
+                playAudio();
+            }
+            renderTracks();
+        }
+
+        function updateProgress() {
+            if (audioPlayer.duration) {
+                const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+                document.getElementById('progressFill').style.width = progress + '%';
+                
+                const currentMinutes = Math.floor(audioPlayer.currentTime / 60);
+                const currentSeconds = Math.floor(audioPlayer.currentTime % 60);
+                document.getElementById('currentTime').textContent = 
+                    `${currentMinutes}:${currentSeconds.toString().padStart(2, '0')}`;
+            }
+        }
+
+        function seekTrack(event) {
+            const progressBar = event.currentTarget;
+            const clickPosition = event.offsetX / progressBar.offsetWidth;
+            audioPlayer.currentTime = clickPosition * audioPlayer.duration;
+        }
+
+        function startProgressUpdate() {
+            if (progressInterval) clearInterval(progressInterval);
+            progressInterval = setInterval(updateProgress, 100);
+        }
+
+        function stopProgressUpdate() {
+            if (progressInterval) {
+                clearInterval(progressInterval);
+                progressInterval = null;
+            }
+        }
+
+        function filterByMood(mood) {
+            // Highlight active mood button
+            document.querySelectorAll('.mood-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Filter playlists by mood
+            const filtered = musicDatabase.playlists.filter(p => p.mood === mood);
+            if (filtered.length > 0) {
+                selectPlaylist(filtered[0].id);
+            }
+        }
+
+        function updateNowPlaying() {
+            const track = currentPlaylist.tracks[currentTrackIndex];
+            document.getElementById('currentTrack').textContent = track.title;
+            document.getElementById('currentArtist').textContent = track.artist;
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initMusic();
+            loadTrack();
+        });
+    </script>
 </body>
 </html>
