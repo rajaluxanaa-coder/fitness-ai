@@ -24,7 +24,7 @@
             color: #fff;
         }
         
-        /* Navbar */
+        /* Navbar Styles */
         .navbar {
             background: white;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -35,9 +35,11 @@
             position: fixed;
             width: 100%;
             top: 0;
-            z-index: 100;
+            left: 0;
+            z-index: 1000;
         }
-        
+
+
         .dark-mode .navbar {
             background: #2d2d2d;
             color: white;
@@ -70,6 +72,11 @@
         .nav-links a:hover {
             color: #6b46c1;
         }
+
+
+
+
+
         
         .profile-circle {
             width: 40px;
@@ -443,20 +450,26 @@
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="logo">
-            <i class="fas fa-dumbbell"></i>
-            <span>FitAI</span>
-        </div>
-        <div class="nav-links">
-            <a href="/dashboard">Dashboard</a>
-            <a href="/profile" style="color: #6b46c1;">Profile</a>
-        </div>
-        <div class="profile-circle" onclick="window.location.href='/profile'">
-            {{ user.name[0]|upper }}
-        </div>
-    </nav>
+    <!-- Navbar - Add these new links -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-dumbbell"></i>
+        <span>FitAI</span>
+    </div>
+    <div class="nav-links">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/profile">Profile</a>
+        <a href="/analytics">📊 Analytics</a>
+        <a href="/achievements">🏆 Achievements</a>
+        <a href="/community">👥 Community</a>
+        <a href="/goals">🎯 Goals</a>
+        <a href="/calendar">📅 Calendar</a>
+        <a href="/music">🎵 Music</a>
+    </div>
+    <div class="profile-circle" onclick="window.location.href='/profile'">
+        {{ user.name[0]|upper }}
+    </div>
+</nav>
 
     <!-- Settings Panel -->
 <div id="settingsPanel" class="settings-panel">
