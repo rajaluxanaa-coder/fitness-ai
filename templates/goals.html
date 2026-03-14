@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goals - FitAI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            padding-top: 100px;
+        }
+        
+        /* Navbar Styles */
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #6b46c1;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #4b5563;
+            font-weight: 500;
+        }
+        
+        .nav-links a:hover {
+            color: #6b46c1;
+        }
+        
+        .profile-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #6b46c1;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .goals-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .goal-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .goal-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            color: #6b46c1;
+        }
+        
+        .goal-progress {
+            margin: 1rem 0;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e5e7eb;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #6b46c1, #667eea);
+            transition: width 0.3s;
+        }
+        
+        .goal-stats {
+            display: flex;
+            justify-content: space-between;
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .goal-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn {
+            background: #6b46c1;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-decoration: none;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #6b46c1;
+            color: #6b46c1;
+        }
+        
+        .add-goal {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .add-goal h3 {
+            color: #6b46c1;
+            margin-bottom: 1rem;
+        }
+        
+        .add-goal input, .add-goal select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .goal-types {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .goal-type {
+            background: #f3f4f6;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .goal-type:hover {
+            background: #6b46c1;
+            color: white;
+        }
+        
+        .goal-type i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .goals-grid {
+                grid-template-columns: 1fr;
+            }
+            .goal-types {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-dumbbell"></i>
+            <span>FitAI</span>
+        </div>
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/profile">Profile</a>
+            <a href="/analytics">📊 Analytics</a>
+            <a href="/achievements">🏆 Achievements</a>
+            <a href="/community">👥 Community</a>
+            <a href="/goals" style="color: #6b46c1;">🎯 Goals</a>
+            <a href="/calendar">📅 Calendar</a>
+            <a href="/music">🎵 Music</a>
+        </div>
+        <div class="profile-circle" onclick="window.location.href='/profile'">
+            {{ user.name[0]|upper }}
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>
+                <i class="fas fa-bullseye"></i>
+                Goals & Milestones
+            </h1>
+            <a href="/dashboard" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Dashboard
+            </a>
+        </div>
+
+        <!-- Add New Goal -->
+        <div class="add-goal">
+            <h3>🎯 Create New Goal</h3>
+            <div class="goal-types">
+                <div class="goal-type" onclick="setGoalType('weight')">
+                    <i class="fas fa-weight"></i>
+                    <p>Weight Goal</p>
+                </div>
+                <div class="goal-type" onclick="setGoalType('workout')">
+                    <i class="fas fa-dumbbell"></i>
+                    <p>Workout Goal</p>
+                </div>
+                <div class="goal-type" onclick="setGoalType('strength')">
+                    <i class="fas fa-fire"></i>
+                    <p>Strength Goal</p>
+                </div>
+            </div>
+            <input type="text" id="goalName" placeholder="Goal Name (e.g., Lose 5kg)">
+            <input type="number" id="goalTarget" placeholder="Target Value">
+            <select id="goalUnit">
+                <option value="kg">kg</option>
+                <option value="workouts">workouts</option>
+                <option value="reps">reps</option>
+                <option value="minutes">minutes</option>
+            </select>
+            <input type="date" id="goalDeadline">
+            <button class="btn" onclick="createGoal()" style="width: 100%;">Create Goal</button>
+        </div>
+
+        <!-- Active Goals -->
+        <h2 style="color: white; margin-bottom: 1rem;">🔥 Active Goals</h2>
+        <div class="goals-grid">
+            <div class="goal-card">
+                <div class="goal-header">
+                    <i class="fas fa-weight"></i>
+                    <h3>Weight Loss</h3>
+                </div>
+                <div class="goal-stats">
+                    <span>Current: 63kg</span>
+                    <span>Target: 58kg</span>
+                </div>
+                <div class="goal-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 45%"></div>
+                    </div>
+                </div>
+                <div class="goal-stats">
+                    <span>Progress: 45%</span>
+                    <span>Deadline: 30 days</span>
+                </div>
+                <div class="goal-actions">
+                    <button class="btn btn-outline">Update</button>
+                    <button class="btn btn-outline">Complete</button>
+                </div>
+            </div>
+
+            <div class="goal-card">
+                <div class="goal-header">
+                    <i class="fas fa-dumbbell"></i>
+                    <h3>Workout Frequency</h3>
+                </div>
+                <div class="goal-stats">
+                    <span>Current: 12</span>
+                    <span>Target: 20</span>
+                </div>
+                <div class="goal-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 60%"></div>
+                    </div>
+                </div>
+                <div class="goal-stats">
+                    <span>Progress: 60%</span>
+                    <span>Deadline: 15 days</span>
+                </div>
+                <div class="goal-actions">
+                    <button class="btn btn-outline">Update</button>
+                    <button class="btn btn-outline">Complete</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Completed Goals -->
+        <h2 style="color: white; margin: 2rem 0 1rem;">✅ Completed Goals</h2>
+        <div style="background: white; border-radius: 1rem; padding: 1.5rem;">
+            <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; border-bottom: 1px solid #e5e7eb;">
+                <i class="fas fa-check-circle" style="color: #38a169;"></i>
+                <div style="flex: 1;">
+                    <strong>Run 50km</strong>
+                    <span style="color: #6b7280;"> • Completed on Mar 10, 2026</span>
+                </div>
+                <span style="color: #38a169;">Achieved! 🏆</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem;">
+                <i class="fas fa-check-circle" style="color: #38a169;"></i>
+                <div style="flex: 1;">
+                    <strong>10 Workouts</strong>
+                    <span style="color: #6b7280;"> • Completed on Mar 5, 2026</span>
+                </div>
+                <span style="color: #38a169;">Achieved! 🏆</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function setGoalType(type) {
+            const nameInput = document.getElementById('goalName');
+            if (type === 'weight') {
+                nameInput.value = 'Weight Goal';
+            } else if (type === 'workout') {
+                nameInput.value = 'Workout Goal';
+            } else if (type === 'strength') {
+                nameInput.value = 'Strength Goal';
+            }
+        }
+
+        function createGoal() {
+            const name = document.getElementById('goalName').value;
+            const target = document.getElementById('goalTarget').value;
+            const unit = document.getElementById('goalUnit').value;
+            const deadline = document.getElementById('goalDeadline').value;
+            
+            if (name && target && deadline) {
+                alert(`✅ Goal "${name}" created successfully!`);
+                location.reload();
+            } else {
+                alert('Please fill all fields');
+            }
+        }
+    </script>
+</body>
+</html>
