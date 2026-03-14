@@ -526,169 +526,60 @@
         </div>
     </div>
 
+         
+        
+
     <script>
-        // Analytics Features
-        const analyticsFeatures = {
-            // 1. Workout Statistics
-            workoutStats: () => ({
-                totalWorkouts: 47,
-                totalMinutes: 2850,
-                avgWorkoutTime: 45,
-                caloriesBurned: 15600
-            }),
-            
-            // 2. Progress Tracking
-            progressTracking: () => ({
-                weightStart: 70,
-                weightCurrent: 65,
-                weightGoal: 60,
-                strengthPRs: {
-                    bench: 80,
-                    squat: 100,
-                    deadlift: 120
-                }
-            }),
-            
-            // 3. Trend Analysis
-            trends: () => ({
-                weeklyProgress: [5, 7, 4, 6, 8, 5, 7],
-                monthlyProgress: [20, 25, 22, 28, 30],
-                bestStreak: 12,
-                currentStreak: 5
-            }),
-            
-            // 4. Workout Distribution
-            distribution: () => ({
-                upper: 40,
-                lower: 30,
-                cardio: 20,
-                core: 10
-            }),
-            
-            // 5. Performance Metrics
-            performance: () => ({
-                avgHeartRate: 145,
-                maxHeartRate: 175,
-                recoveryRate: 65,
-                vo2max: 42
-            }),
-            
-            // 6. Nutrition Analytics
-            nutrition: () => ({
-                avgCalories: 2200,
-                protein: 120,
-                carbs: 250,
-                fats: 70,
-                waterIntake: 2.1
-            }),
-            
-            // 7. Goal Progress
-            goalProgress: () => ({
-                weightLoss: 65,
-                workoutFrequency: 80,
-                strengthGain: 45
-            }),
-            
-            // 8. Comparison Metrics
-            comparison: () => ({
-                vsLastMonth: +15,
-                vsLastYear: +45,
-                vsAverage: +10
-            }),
-            
-            // 9. Personalized Insights
-            insights: () => [
-                {
-                    icon: '💪',
-                    title: 'Peak Performance',
-                    text: 'Your workout frequency has increased 15% this month!'
-                },
-                {
-                    icon: '🔥',
-                    title: 'Calorie Burn',
-                    text: 'You burned 15,600 calories this month - equivalent to 45 hours of running!'
-                },
-                {
-                    icon: '🎯',
-                    title: 'Goal Progress',
-                    text: 'You\'re 65% towards your weight loss goal. Keep going!'
-                },
-                {
-                    icon: '🏆',
-                    title: 'Achievement Unlocked',
-                    text: '12 day streak! You\'re more consistent than 80% of users.'
-                },
-                {
-                    icon: '📊',
-                    title: 'Favorite Workout',
-                    text: 'Upper body workouts are your most frequent. Try mixing it up!'
-                },
-                {
-                    icon: '🌅',
-                    title: 'Optimal Time',
-                    text: 'You perform best in the morning (8-10 AM) based on your data.'
-                }
-            ],
-            
-            // 10. Predictive Analytics
-            predictions: () => ({
-                nextMilestone: '5kg loss by April 15',
-                projectedWeight: 62,
-                estimatedGoalDate: 'May 2026'
-            })
-        };
+    let currentRange = 'week';
 
-        function changeDateRange(range) {
-            document.querySelectorAll('.date-range button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            loadAnalyticsData(range);
-        }
+    function changeDateRange(range) {
+        currentRange = range;
+        document.querySelectorAll('.date-range button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        loadAnalyticsData();
+    }
 
-        function loadAnalyticsData(range = 'week') {
-            // Load all analytics data
-            const stats = analyticsFeatures.workoutStats();
-            const progress = analyticsFeatures.progressTracking();
-            const trends = analyticsFeatures.trends();
-            const dist = analyticsFeatures.distribution();
-            const nutrition = analyticsFeatures.nutrition();
-            const goals = analyticsFeatures.goalProgress();
+    async function loadAnalyticsData() {
+        try {
+            const response = await fetch(`/get-analytics-data?range=${currentRange}`);
+            const data = await response.json();
+            
+            console.log("Analytics data:", data);
             
             // Update stats
-            document.getElementById('totalCalories').textContent = stats.caloriesBurned.toLocaleString();
-            document.getElementById('totalMinutes').textContent = stats.totalMinutes;
-            document.getElementById('totalWorkouts').textContent = stats.totalWorkouts;
-            document.getElementById('bestStreak').textContent = trends.bestStreak;
-            document.getElementById('currentStreak').textContent = trends.currentStreak;
+            document.getElementById('totalCalories').textContent = data.stats.totalCaloriesBurned.toLocaleString();
+            document.getElementById('totalMinutes').textContent = data.stats.totalMinutes;
+            document.getElementById('totalWorkouts').textContent = data.stats.totalWorkouts;
+            document.getElementById('bestStreak').textContent = data.stats.bestStreak;
+            document.getElementById('currentStreak').textContent = data.stats.currentStreak;
             
             // Update weight progress
-            document.getElementById('startWeight').textContent = progress.weightStart;
-            document.getElementById('currentWeight').textContent = progress.weightCurrent;
-            document.getElementById('goalWeight').textContent = progress.weightGoal;
+            document.getElementById('startWeight').textContent = data.progress.weightStart;
+            document.getElementById('currentWeight').textContent = data.progress.weightCurrent;
+            document.getElementById('goalWeight').textContent = data.progress.weightGoal;
             
-            const weightProgress = ((progress.weightStart - progress.weightCurrent) / 
-                                   (progress.weightStart - progress.weightGoal)) * 100;
-            document.getElementById('weightPercent').textContent = Math.round(weightProgress) + '%';
-            document.getElementById('weightProgress').style.width = weightProgress + '%';
+            const weightPercent = Math.round(data.progress.weightProgress);
+            document.getElementById('weightPercent').textContent = weightPercent + '%';
+            document.getElementById('weightProgress').style.width = weightPercent + '%';
             
             // Update workout progress
-            document.getElementById('completedWorkouts').textContent = stats.totalWorkouts;
+            document.getElementById('completedWorkouts').textContent = data.stats.totalWorkouts;
             document.getElementById('targetWorkouts').textContent = '50';
-            const workoutProgress = (stats.totalWorkouts / 50) * 100;
-            document.getElementById('workoutPercent').textContent = Math.round(workoutProgress) + '%';
-            document.getElementById('workoutProgress').style.width = workoutProgress + '%';
+            const workoutPercent = Math.round(data.progress.workoutProgress);
+            document.getElementById('workoutPercent').textContent = workoutPercent + '%';
+            document.getElementById('workoutProgress').style.width = workoutPercent + '%';
             
             // Update strength progress
-            document.getElementById('benchPR').textContent = progress.strengthPRs.bench;
-            document.getElementById('squatPR').textContent = progress.strengthPRs.squat;
-            const strengthProgress = ((progress.strengthPRs.bench + progress.strengthPRs.squat) / 250) * 100;
-            document.getElementById('strengthPercent').textContent = Math.round(strengthProgress) + '%';
-            document.getElementById('strengthProgress').style.width = strengthProgress + '%';
+            document.getElementById('benchPR').textContent = data.progress.strengthPRs.bench;
+            document.getElementById('squatPR').textContent = data.progress.strengthPRs.squat;
+            const strengthPercent = Math.round(((data.progress.strengthPRs.bench + data.progress.strengthPRs.squat) / 250) * 100);
+            document.getElementById('strengthPercent').textContent = strengthPercent + '%';
+            document.getElementById('strengthProgress').style.width = strengthPercent + '%';
             
             // Load insights
-            const insights = analyticsFeatures.insights();
-            const insightsHTML = insights.map(insight => `
+            const insightsHTML = data.insights.map(insight => `
                 <div class="insight-card">
                     <div class="insight-icon">${insight.icon}</div>
                     <div class="insight-title">${insight.title}</div>
@@ -697,120 +588,118 @@
             `).join('');
             document.getElementById('insights').innerHTML = insightsHTML;
             
-            // Initialize all charts
-            initCharts(stats, trends, dist, nutrition);
+            // Update charts
+            updateCharts(data.charts);
+            
+        } catch (error) {
+            console.error('Error loading analytics:', error);
         }
+    }
 
-        function initCharts(stats, trends, dist, nutrition) {
-            // Weekly Workout Chart
-            new Chart(document.getElementById('weeklyChart'), {
-                type: 'line',
-                data: {
-                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                    datasets: [{
-                        label: 'Workouts',
-                        data: trends.weeklyProgress,
-                        borderColor: '#6b46c1',
-                        backgroundColor: 'rgba(107, 70, 193, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { display: false }
-                    }
-                }
-            });
-
-            // Calories Chart
-            new Chart(document.getElementById('caloriesChart'), {
-                type: 'bar',
-                data: {
-                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-                    datasets: [{
-                        label: 'Calories',
-                        data: [2500, 2800, 2600, 3000],
-                        backgroundColor: '#6b46c1'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { display: false }
-                    }
-                }
-            });
-
-            // Distribution Chart
-            new Chart(document.getElementById('distributionChart'), {
-                type: 'doughnut',
-                data: {
-                    labels: ['Upper Body', 'Lower Body', 'Cardio', 'Core'],
-                    datasets: [{
-                        data: [dist.upper, dist.lower, dist.cardio, dist.core],
-                        backgroundColor: ['#6b46c1', '#38a169', '#fbbf24', '#e53e3e']
-                    }]
-                }
-            });
-
-            // Time of Day Chart
-            new Chart(document.getElementById('timeChart'), {
-                type: 'pie',
-                data: {
-                    labels: ['Morning (6-12)', 'Afternoon (12-6)', 'Evening (6-12)'],
-                    datasets: [{
-                        data: [45, 30, 25],
-                        backgroundColor: ['#fbbf24', '#38a169', '#6b46c1']
-                    }]
-                }
-            });
-
-            // Nutrition Chart
-            new Chart(document.getElementById('nutritionChart'), {
-                type: 'bar',
-                data: {
-                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                    datasets: [
-                        {
-                            label: 'Calories Consumed',
-                            data: [2200, 2100, 2300, 2150, 2250, 2400, 2000],
-                            backgroundColor: '#38a169'
-                        },
-                        {
-                            label: 'Calories Burned',
-                            data: [500, 600, 450, 700, 550, 650, 400],
-                            backgroundColor: '#6b46c1'
-                        }
-                    ]
-                }
-            });
-
-            // Macro Chart
-            new Chart(document.getElementById('macroChart'), {
-                type: 'bar',
-                data: {
-                    labels: ['Protein', 'Carbs', 'Fats'],
-                    datasets: [{
-                        data: [nutrition.protein, nutrition.carbs, nutrition.fats],
-                        backgroundColor: ['#e53e3e', '#38a169', '#fbbf24']
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    plugins: {
-                        legend: { display: false }
-                    }
-                }
-            });
-        }
-
-        // Load on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            loadAnalyticsData('week');
+    function updateCharts(chartData) {
+        // Weekly Workout Chart
+        new Chart(document.getElementById('weeklyChart'), {
+            type: 'line',
+            data: {
+                labels: chartData.weekLabels,
+                datasets: [{
+                    label: 'Workouts',
+                    data: chartData.weeklyWorkouts,
+                    borderColor: '#6b46c1',
+                    backgroundColor: 'rgba(107, 70, 193, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } }
+            }
         });
-    </script>
+
+        // Calories Chart
+        new Chart(document.getElementById('caloriesChart'), {
+            type: 'bar',
+            data: {
+                labels: chartData.weekLabels,
+                datasets: [{
+                    label: 'Calories',
+                    data: chartData.weeklyCalories,
+                    backgroundColor: '#6b46c1'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        // Distribution Chart
+        new Chart(document.getElementById('distributionChart'), {
+            type: 'doughnut',
+            data: {
+                labels: chartData.distributionLabels,
+                datasets: [{
+                    data: chartData.distribution,
+                    backgroundColor: ['#6b46c1', '#38a169', '#fbbf24', '#e53e3e']
+                }]
+            }
+        });
+
+        // Time of Day Chart
+        new Chart(document.getElementById('timeChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Morning', 'Afternoon', 'Evening'],
+                datasets: [{
+                    data: Object.values(chartData.timeDistribution),
+                    backgroundColor: ['#fbbf24', '#38a169', '#6b46c1']
+                }]
+            }
+        });
+
+        // Nutrition Chart
+        new Chart(document.getElementById('nutritionChart'), {
+            type: 'bar',
+            data: {
+                labels: chartData.weekLabels,
+                datasets: [
+                    {
+                        label: 'Calories Consumed',
+                        data: chartData.nutrition.caloriesConsumed,
+                        backgroundColor: '#38a169'
+                    },
+                    {
+                        label: 'Calories Burned',
+                        data: chartData.nutrition.caloriesBurned,
+                        backgroundColor: '#6b46c1'
+                    }
+                ]
+            }
+        });
+
+        // Macro Chart
+        new Chart(document.getElementById('macroChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Protein', 'Carbs', 'Fats'],
+                datasets: [{
+                    data: [chartData.macros.protein, chartData.macros.carbs, chartData.macros.fats],
+                    backgroundColor: ['#e53e3e', '#38a169', '#fbbf24']
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                plugins: { legend: { display: false } }
+            }
+        });
+    }
+
+    // Load on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        loadAnalyticsData();
+    });
+</script>
 </body>
 </html>

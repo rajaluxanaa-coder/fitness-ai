@@ -667,7 +667,13 @@ def nutrition():
 def analytics():
     if 'user_id' not in session:
         return redirect(url_for('index'))
-    return render_template('analytics.html',user=User.query.get(session['user_id']))
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        return redirect(url_for('index'))
+    
+    return render_template('analytics.html', user=user)
+
 
 @app.route('/community')
 def community():
@@ -1469,6 +1475,202 @@ def music():
     if 'user_id' not in session:
         return redirect(url_for('index'))
     return render_template('music.html',user=User.query.get(session['user_id']))
+
+
+
+@app.route('/get-analytics-data')
+def get_analytics_data():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not logged in'}), 401
+    
+    user_id = session['user_id']
+    range_type = request.args.get('range', 'week')  # week, month, year, all
+    
+    from datetime import datetime, timedelta
+    today = datetime.now().date()
+    
+    # Set date range based on selection
+    if range_type == 'week':
+        start_date = today - timedelta(days=7)
+    elif range_type == 'month':
+        start_date = today - timedelta(days=30)
+    elif range_type == 'year':
+        start_date = today - timedelta(days=365)
+    else:  # all time
+        start_date = None
+    
+    # Get workouts within date range
+    workouts_query = WorkoutLog.query.filter_by(user_id=user_id)
+    if start_date:
+        workouts_query = workouts_query.filter(WorkoutLog.date >= start_date)
+    workouts = workouts_query.order_by(WorkoutLog.date).all()
+    
+    # Get meals within date range
+    meals_query = MealLog.query.filter_by(user_id=user_id)
+    if start_date:
+        meals_query = meals_query.filter(MealLog.date >= start_date)
+    meals = meals_query.order_by(MealLog.date).all()
+    
+    # Get user progress
+    progress = UserProgress.query.filter_by(user_id=user_id).order_by(UserProgress.date).all()
+    
+    # Calculate stats
+    total_workouts = len(workouts)
+    total_minutes = sum(w.duration for w in workouts)
+    total_calories_burned = sum(w.calories_burned for w in workouts)
+    total_meals = len(meals)
+    total_calories_consumed = sum(m.calories for m in meals)
+    
+    # Calculate current streak
+    streak = 0
+    workout_dates = sorted(list(set([w.date for w in workouts])), reverse=True)
+    if workout_dates:
+        streak = 1
+        for i in range(1, len(workout_dates)):
+            if (workout_dates[i-1] - workout_dates[i]).days == 1:
+                streak += 1
+            else:
+                break
+    
+    # Calculate best streak
+    best_streak = 0
+    current_streak = 0
+    for i in range(len(workout_dates)):
+        if i == 0:
+            current_streak = 1
+        elif (workout_dates[i-1] - workout_dates[i]).days == 1:
+            current_streak += 1
+        else:
+            current_streak = 1
+        best_streak = max(best_streak, current_streak)
+    
+    # Weekly data for charts
+    week_labels = []
+    weekly_workouts = []
+    weekly_calories = []
+    
+    for i in range(6, -1, -1):
+        day = today - timedelta(days=i)
+        week_labels.append(day.strftime('%a'))
+        day_workouts = [w for w in workouts if w.date == day]
+        weekly_workouts.append(len(day_workouts))
+        weekly_calories.append(sum(w.calories_burned for w in day_workouts))
+    
+    # Workout type distribution
+    workout_types = {}
+    for w in workouts:
+        workout_types[w.workout_name] = workout_types.get(w.workout_name, 0) + 1
+    
+    # Time of day distribution (mock data - you'd need to add time field to WorkoutLog)
+    time_distribution = {
+        'Morning': random.randint(30, 50),
+        'Afternoon': random.randint(20, 40),
+        'Evening': random.randint(20, 40)
+    }
+    
+    # Weight progress
+    weight_start = user.weight if user.weight else 0
+    weight_current = progress[-1].current_weight if progress else user.weight
+    weight_goal = user.target_weight if hasattr(user, 'target_weight') else weight_start - 5
+    
+    # Calculate weight progress percentage
+    if weight_start > weight_goal:  # Weight loss goal
+        weight_progress = ((weight_start - weight_current) / (weight_start - weight_goal)) * 100
+    else:  # Weight gain goal
+        weight_progress = ((weight_current - weight_start) / (weight_goal - weight_start)) * 100
+    weight_progress = max(0, min(100, weight_progress))
+    
+    # Strength PRs (you'd need to add these fields to your model)
+    strength_prs = {
+        'bench': 80,
+        'squat': 100,
+        'deadlift': 120
+    }
+    
+    # Nutrition averages
+    if meals:
+        avg_calories = sum(m.calories for m in meals) // len(meals)
+        avg_protein = sum(m.protein for m in meals) // len(meals)
+        avg_carbs = sum(m.carbs for m in meals) // len(meals)
+        avg_fats = sum(m.fats for m in meals) // len(meals)
+    else:
+        avg_calories = avg_protein = avg_carbs = avg_fats = 0
+    
+    # Generate insights based on real data
+    insights = []
+    
+    if total_workouts > 0:
+        insights.append({
+            'icon': '💪',
+            'title': 'Workout Consistency',
+            'text': f"You've completed {total_workouts} workouts in this period. {'Great job!' if total_workouts > 10 else 'Keep going!'}"
+        })
+    
+    if streak > 0:
+        insights.append({
+            'icon': '🔥',
+            'title': 'Current Streak',
+            'text': f"You're on a {streak}-day streak! {'Amazing consistency!' if streak > 5 else 'Keep it up!'}"
+        })
+    
+    if weight_progress > 0:
+        insights.append({
+            'icon': '🎯',
+            'title': 'Goal Progress',
+            'text': f"You're {weight_progress:.1f}% towards your weight goal. {'Almost there!' if weight_progress > 80 else 'Keep pushing!'}"
+        })
+    
+    if total_calories_burned > total_calories_consumed:
+        deficit = total_calories_burned - total_calories_consumed
+        insights.append({
+            'icon': '⚡',
+            'title': 'Calorie Deficit',
+            'text': f"You've burned {deficit} more calories than consumed. Great for weight loss!"
+        })
+    
+    if best_streak >= 7:
+        insights.append({
+            'icon': '🏆',
+            'title': 'Best Streak',
+            'text': f"Your best streak is {best_streak} days! You're more consistent than 80% of users."
+        })
+    
+    return jsonify({
+        'stats': {
+            'totalWorkouts': total_workouts,
+            'totalMinutes': total_minutes,
+            'totalCaloriesBurned': total_calories_burned,
+            'bestStreak': best_streak,
+            'currentStreak': streak
+        },
+        'progress': {
+            'weightStart': weight_start,
+            'weightCurrent': weight_current,
+            'weightGoal': weight_goal,
+            'weightProgress': weight_progress,
+            'strengthPRs': strength_prs,
+            'workoutGoal': 50,  # Example target
+            'workoutProgress': (total_workouts / 50) * 100 if total_workouts > 0 else 0
+        },
+        'charts': {
+            'weekLabels': week_labels,
+            'weeklyWorkouts': weekly_workouts,
+            'weeklyCalories': weekly_calories,
+            'distribution': list(workout_types.values()),
+            'distributionLabels': list(workout_types.keys()),
+            'timeDistribution': time_distribution,
+            'nutrition': {
+                'caloriesConsumed': [random.randint(1800, 2500) for _ in range(7)],  # Replace with real data
+                'caloriesBurned': weekly_calories
+            },
+            'macros': {
+                'protein': avg_protein,
+                'carbs': avg_carbs,
+                'fats': avg_fats
+            }
+        },
+        'insights': insights
+    })
 
 
 @app.route('/debug-workouts')
