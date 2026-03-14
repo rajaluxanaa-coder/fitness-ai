@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Achievements - FitAI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #6b46c1;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #4b5563;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #6b46c1;
+        }
+        
+        .profile-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #6b46c1;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #6b46c1;
+        }
+        
+        .level-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .level-number {
+            font-size: 5rem;
+            font-weight: bold;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: white;
+            width: 60%;
+        }
+        
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+        }
+        
+        .badge-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s;
+            position: relative;
+        }
+        
+        .badge-card.locked {
+            opacity: 0.5;
+            filter: grayscale(1);
+        }
+        
+        .badge-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .badge-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .badge-name {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .badge-desc {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+        
+        .badge-date {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #f3f4f6;
+            padding: 0.25rem 0.5rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-overview,
+            .badges-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+
+
+<!-- Navbar - Add these new links -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-dumbbell"></i>
+        <span>FitAI</span>
+    </div>
+    <div class="nav-links">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/profile">Profile</a>
+        <a href="/analytics">📊 Analytics</a>
+        <a href="/achievements">🏆 Achievements</a>
+        <a href="/community">👥 Community</a>
+        <a href="/goals">🎯 Goals</a>
+        <a href="/calendar">📅 Calendar</a>
+        <a href="/music">🎵 Music</a>
+    </div>
+    <div class="profile-circle" onclick="window.location.href='/profile'">
+        {{ user.name[0]|upper }}
+    </div>
+</nav>
+
+
+
+
+    <div class="container">
+        <div class="header">
+            <h1>
+                <i class="fas fa-trophy"></i>
+                Achievements
+            </h1>
+            <a href="/dashboard" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Dashboard
+            </a>
+        </div>
+        
+        <!-- Level & XP -->
+        <div class="level-card">
+            <div>Current Level</div>
+            <div class="level-number">12</div>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <div>1,250 / 2,000 XP to Level 13</div>
+        </div>
+        
+        <!-- Stats Overview -->
+        <div class="stats-overview">
+            <div class="stat-card">
+                <div class="stat-value">47</div>
+                <div>Workouts</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">12</div>
+                <div>Badges</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">7</div>
+                <div>Day Streak</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">3</div>
+                <div>Challenges</div>
+            </div>
+        </div>
+        
+        <!-- Badges Grid -->
+        <h2 style="color: white; margin-bottom: 1rem;">🏅 Your Badges</h2>
+        <div class="badges-grid">
+            <div class="badge-card">
+                <div class="badge-icon">🎯</div>
+                <div class="badge-name">First Workout</div>
+                <div class="badge-desc">Completed your first workout</div>
+                <div class="badge-date">Mar 1, 2026</div>
+            </div>
+            
+            <div class="badge-card">
+                <div class="badge-icon">🔥</div>
+                <div class="badge-name">7-Day Streak</div>
+                <div class="badge-desc">Worked out 7 days in a row</div>
+                <div class="badge-date">Mar 8, 2026</div>
+            </div>
+            
+            <div class="badge-card">
+                <div class="badge-icon">💪</div>
+                <div class="badge-name">Getting Stronger</div>
+                <div class="badge-desc">Completed 10 workouts</div>
+                <div class="badge-date">Mar 5, 2026</div>
+            </div>
+            
+            <div class="badge-card locked">
+                <div class="badge-icon">⚡</div>
+                <div class="badge-name">30-Day Streak</div>
+                <div class="badge-desc">Workout for 30 days straight</div>
+                <div class="badge-date">Locked</div>
+            </div>
+            
+            <div class="badge-card">
+                <div class="badge-icon">🏋️</div>
+                <div class="badge-name">Weight Lifter</div>
+                <div class="badge-desc">Lifted 1000kg total</div>
+                <div class="badge-date">Mar 3, 2026</div>
+            </div>
+            
+            <div class="badge-card locked">
+                <div class="badge-icon">🏃</div>
+                <div class="badge-name">Marathon Ready</div>
+                <div class="badge-desc">Ran 42km total</div>
+                <div class="badge-date">Locked</div>
+            </div>
+            
+            <div class="badge-card">
+                <div class="badge-icon">🥗</div>
+                <div class="badge-name">Healthy Eater</div>
+                <div class="badge-desc">Logged 5 meals</div>
+                <div class="badge-date">Mar 2, 2026</div>
+            </div>
+            
+            <div class="badge-card">
+                <div class="badge-icon">🌅</div>
+                <div class="badge-name">Early Bird</div>
+                <div class="badge-desc">5 morning workouts</div>
+                <div class="badge-date">Mar 10, 2026</div>
+            </div>
+        </div>
+        
+        <!-- Challenges -->
+        <h2 style="color: white; margin: 2rem 0 1rem;">⚡ Active Challenges</h2>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
+            <div style="background: white; border-radius: 1rem; padding: 1.5rem;">
+                <h3>💧 Water Challenge</h3>
+                <p>Drink 2.5L water daily for 7 days</p>
+                <div class="progress-bar" style="background: #e5e7eb;">
+                    <div class="progress-fill" style="width: 60%; background: #6b46c1;"></div>
+                </div>
+                <p>4/7 days completed</p>
+            </div>
+            
+            <div style="background: white; border-radius: 1rem; padding: 1.5rem;">
+                <h3>🏋️ Workout Challenge</h3>
+                <p>Complete 5 workouts this week</p>
+                <div class="progress-bar" style="background: #e5e7eb;">
+                    <div class="progress-fill" style="width: 80%; background: #6b46c1;"></div>
+                </div>
+                <p>4/5 workouts done</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
