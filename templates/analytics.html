@@ -18,8 +18,9 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 2rem;
+            padding-top: 100px;
         }
-
+        
         /* Navbar Styles */
         .navbar {
             background: white;
@@ -34,7 +35,7 @@
             left: 0;
             z-index: 1000;
         }
-
+        
         .logo {
             display: flex;
             align-items: center;
@@ -53,9 +54,8 @@
             text-decoration: none;
             color: #4b5563;
             font-weight: 500;
-            transition: color 0.3s;
         }
-
+        
         .nav-links a:hover {
             color: #6b46c1;
         }
@@ -70,7 +70,6 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-weight: bold;
         }
         
         .container {
@@ -108,423 +107,709 @@
         
         .back-btn:hover {
             background: white;
-            color: #667eea;
+            color: #6b46c1;
         }
         
-        .nav-tabs {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
+        .date-range {
             background: white;
-            padding: 1rem;
             border-radius: 0.5rem;
+            padding: 0.5rem;
+            display: flex;
+            gap: 0.5rem;
         }
         
-        .tab-btn {
-            padding: 0.75rem 1.5rem;
+        .date-range button {
+            padding: 0.5rem 1rem;
             border: none;
             border-radius: 0.5rem;
             cursor: pointer;
-            font-weight: 600;
+            font-weight: 500;
             transition: all 0.3s;
-            background: #f3f4f6;
-            color: #4b5563;
         }
         
-        .tab-btn.active {
+        .date-range button.active {
             background: #6b46c1;
             color: white;
         }
         
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        .measurement-grid {
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
         
-        .measurement-card {
+        .stat-card {
             background: white;
             border-radius: 1rem;
             padding: 1.5rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
         }
         
-        .measurement-header {
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-header {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            margin-bottom: 1rem;
             color: #6b46c1;
-        }
-        
-        .measurement-input {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
             margin-bottom: 1rem;
         }
         
-        .measurement-input input {
-            width: 100px;
-            padding: 0.5rem;
-            border: 2px solid #e5e7eb;
-            border-radius: 0.5rem;
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #1f2937;
         }
         
-        .measurement-input button {
-            background: #6b46c1;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            cursor: pointer;
+        .stat-change {
+            font-size: 0.9rem;
+            color: #38a169;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
         }
         
-        .strength-grid {
+        .charts-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
         
-        .strength-card {
+        .chart-card {
             background: white;
             border-radius: 1rem;
             padding: 1.5rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
         
-        .pr-display {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #6b46c1;
-            text-align: center;
-            margin: 1rem 0;
-        }
-        
-        .update-pr {
+        .chart-header {
             display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .chart-title {
+            font-weight: 600;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
             gap: 0.5rem;
-            margin-top: 1rem;
         }
         
-        .update-pr input {
-            flex: 1;
-            padding: 0.5rem;
-            border: 2px solid #e5e7eb;
-            border-radius: 0.5rem;
+        .chart-legend {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.9rem;
         }
         
-        .update-pr button {
-            background: #6b46c1;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            cursor: pointer;
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
         }
         
-        .chart-container {
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+        
+        .progress-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .progress-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        
+        .progress-label {
+            color: #6b7280;
+        }
+        
+        .progress-percent {
+            font-weight: 600;
+            color: #6b46c1;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e5e7eb;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #6b46c1, #38a169);
+            border-radius: 5px;
+            transition: width 0.3s;
+        }
+        
+        .progress-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+        
+        .insights-section {
             background: white;
             border-radius: 1rem;
             padding: 1.5rem;
             margin-bottom: 2rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
         
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .insight-card {
+            background: #f3f4f6;
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+        
+        .insight-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .insight-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .insight-text {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+        
+        .trend-up { color: #38a169; }
+        .trend-down { color: #e53e3e; }
+        
         @media (max-width: 768px) {
-            .measurement-grid,
-            .strength-grid {
+            .stats-grid,
+            .charts-grid,
+            .progress-grid,
+            .insights-grid {
                 grid-template-columns: 1fr;
-            }
-            
-            .nav-tabs {
-                flex-wrap: wrap;
             }
         }
     </style>
 </head>
 <body>
-
-    <!-- Navbar - Add these new links -->
-<nav class="navbar">
-    <div class="logo">
-        <i class="fas fa-dumbbell"></i>
-        <span>FitAI</span>
-    </div>
-    <div class="nav-links">
-        <a href="/dashboard">Dashboard</a>
-        <a href="/profile">Profile</a>
-        <a href="/analytics">📊 Analytics</a>
-        <a href="/achievements">🏆 Achievements</a>
-        <a href="/community">👥 Community</a>
-        <a href="/goals">🎯 Goals</a>
-        <a href="/calendar">📅 Calendar</a>
-        <a href="/music">🎵 Music</a>
-    </div>
-    <div class="profile-circle" onclick="window.location.href='/profile'">
-        {{ user.name[0]|upper }}
-    </div>
-</nav>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-dumbbell"></i>
+            <span>FitAI</span>
+        </div>
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/profile">Profile</a>
+            <a href="/analytics" style="color: #6b46c1;">📊 Analytics</a>
+            <a href="/achievements">🏆 Achievements</a>
+            <a href="/community">👥 Community</a>
+            <a href="/goals">🎯 Goals</a>
+            <a href="/calendar">📅 Calendar</a>
+            <a href="/music">🎵 Music</a>
+        </div>
+        <div class="profile-circle" onclick="window.location.href='/profile'">
+            {{ user.name[0]|upper }}
+        </div>
+    </nav>
 
     <div class="container">
         <div class="header">
             <h1>
                 <i class="fas fa-chart-line"></i>
-                Analytics
+                Advanced Analytics
             </h1>
             <a href="/dashboard" class="back-btn">
                 <i class="fas fa-arrow-left"></i> Dashboard
             </a>
         </div>
-        
-        <!-- Navigation Tabs -->
-        <div class="nav-tabs">
-            <button class="tab-btn active" onclick="showTab('measurements')">📏 Measurements</button>
-            <button class="tab-btn" onclick="showTab('strength')">💪 Strength</button>
-            <button class="tab-btn" onclick="showTab('variety')">🔄 Workout Variety</button>
-        </div>
-        
-        <!-- Measurements Tab -->
-        <div id="measurements" class="tab-content active">
-            <h2 style="color: white; margin-bottom: 1rem;">Body Measurements</h2>
-            
-            <div class="measurement-grid">
-                <div class="measurement-card">
-                    <div class="measurement-header">
-                        <i class="fas fa-tshirt"></i>
-                        <h3>Chest</h3>
-                    </div>
-                    <div class="measurement-input">
-                        <input type="number" id="chest" step="0.1" placeholder="cm">
-                        <button onclick="updateMeasurement('chest')">Update</button>
-                    </div>
-                    <div class="current-value" id="chest-value">-- cm</div>
-                </div>
-                
-                <div class="measurement-card">
-                    <div class="measurement-header">
-                        <i class="fas fa-tshirt"></i>
-                        <h3>Waist</h3>
-                    </div>
-                    <div class="measurement-input">
-                        <input type="number" id="waist" step="0.1" placeholder="cm">
-                        <button onclick="updateMeasurement('waist')">Update</button>
-                    </div>
-                    <div class="current-value" id="waist-value">-- cm</div>
-                </div>
-                
-                <div class="measurement-card">
-                    <div class="measurement-header">
-                        <i class="fas fa-tshirt"></i>
-                        <h3>Hips</h3>
-                    </div>
-                    <div class="measurement-input">
-                        <input type="number" id="hips" step="0.1" placeholder="cm">
-                        <button onclick="updateMeasurement('hips')">Update</button>
-                    </div>
-                    <div class="current-value" id="hips-value">-- cm</div>
-                </div>
-                
-                <div class="measurement-card">
-                    <div class="measurement-header">
-                        <i class="fas fa-tshirt"></i>
-                        <h3>Arms</h3>
-                    </div>
-                    <div class="measurement-input">
-                        <input type="number" id="arms" step="0.1" placeholder="cm">
-                        <button onclick="updateMeasurement('arms')">Update</button>
-                    </div>
-                    <div class="current-value" id="arms-value">-- cm</div>
-                </div>
-                
-                <div class="measurement-card">
-                    <div class="measurement-header">
-                        <i class="fas fa-tshirt"></i>
-                        <h3>Thighs</h3>
-                    </div>
-                    <div class="measurement-input">
-                        <input type="number" id="thighs" step="0.1" placeholder="cm">
-                        <button onclick="updateMeasurement('thighs')">Update</button>
-                    </div>
-                    <div class="current-value" id="thighs-value">-- cm</div>
-                </div>
-                
-                <div class="measurement-card">
-                    <div class="measurement-header">
-                        <i class="fas fa-tshirt"></i>
-                        <h3>Calves</h3>
-                    </div>
-                    <div class="measurement-input">
-                        <input type="number" id="calves" step="0.1" placeholder="cm">
-                        <button onclick="updateMeasurement('calves')">Update</button>
-                    </div>
-                    <div class="current-value" id="calves-value">-- cm</div>
-                </div>
-            </div>
-            
-            <div class="chart-container">
-                <h3>📈 Measurement Progress</h3>
-                <canvas id="measurementChart"></canvas>
+
+        <!-- Date Range Selector -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div class="date-range">
+                <button class="active" onclick="changeDateRange('week')">Week</button>
+                <button onclick="changeDateRange('month')">Month</button>
+                <button onclick="changeDateRange('year')">Year</button>
+                <button onclick="changeDateRange('all')">All Time</button>
             </div>
         </div>
-        
-        <!-- Strength Tab -->
-        <div id="strength" class="tab-content">
-            <h2 style="color: white; margin-bottom: 1rem;">Personal Records</h2>
-            
-            <div class="strength-grid">
-                <div class="strength-card">
-                    <h3>🏋️ Bench Press</h3>
-                    <div class="pr-display" id="bench-pr">0 kg</div>
-                    <div class="update-pr">
-                        <input type="number" id="bench-input" placeholder="Weight (kg)">
-                        <button onclick="updatePR('bench')">Update PR</button>
-                    </div>
+
+        <!-- Key Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <i class="fas fa-fire"></i>
+                    <span>Total Calories</span>
                 </div>
-                
-                <div class="strength-card">
-                    <h3>🏋️ Squat</h3>
-                    <div class="pr-display" id="squat-pr">0 kg</div>
-                    <div class="update-pr">
-                        <input type="number" id="squat-input" placeholder="Weight (kg)">
-                        <button onclick="updatePR('squat')">Update PR</button>
-                    </div>
-                </div>
-                
-                <div class="strength-card">
-                    <h3>🏋️ Deadlift</h3>
-                    <div class="pr-display" id="deadlift-pr">0 kg</div>
-                    <div class="update-pr">
-                        <input type="number" id="deadlift-input" placeholder="Weight (kg)">
-                        <button onclick="updatePR('deadlift')">Update PR</button>
-                    </div>
-                </div>
-                
-                <div class="strength-card">
-                    <h3>🏋️ Overhead Press</h3>
-                    <div class="pr-display" id="ohp-pr">0 kg</div>
-                    <div class="update-pr">
-                        <input type="number" id="ohp-input" placeholder="Weight (kg)">
-                        <button onclick="updatePR('ohp')">Update PR</button>
-                    </div>
+                <div class="stat-value" id="totalCalories">0</div>
+                <div class="stat-change">
+                    <i class="fas fa-arrow-up"></i> 12% from last month
                 </div>
             </div>
-            
-            <div class="chart-container">
-                <h3>📊 Strength Progression</h3>
-                <canvas id="strengthChart"></canvas>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <i class="fas fa-clock"></i>
+                    <span>Workout Minutes</span>
+                </div>
+                <div class="stat-value" id="totalMinutes">0</div>
+                <div class="stat-change">
+                    <i class="fas fa-arrow-up"></i> 8% from last month
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <i class="fas fa-dumbbell"></i>
+                    <span>Total Workouts</span>
+                </div>
+                <div class="stat-value" id="totalWorkouts">0</div>
+                <div class="stat-change">
+                    <i class="fas fa-arrow-up"></i> 15% from last month
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <i class="fas fa-trophy"></i>
+                    <span>Best Streak</span>
+                </div>
+                <div class="stat-value" id="bestStreak">0</div>
+                <div class="stat-change">
+                    <span>Current: <span id="currentStreak">0</span> days</span>
+                </div>
             </div>
         </div>
-        
-        <!-- Workout Variety Tab -->
-        <div id="variety" class="tab-content">
-            <h2 style="color: white; margin-bottom: 1rem;">Workout Distribution</h2>
-            
-            <div class="chart-container">
-                <canvas id="varietyChart"></canvas>
+
+        <!-- Charts Grid -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fas fa-calendar-week"></i>
+                        Weekly Workout Frequency
+                    </div>
+                </div>
+                <canvas id="weeklyChart"></canvas>
             </div>
-            
-            <div class="chart-container">
-                <h3>📊 Weekly Focus Areas</h3>
-                <canvas id="focusChart"></canvas>
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fas fa-fire"></i>
+                        Calories Burned Trend
+                    </div>
+                </div>
+                <canvas id="caloriesChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Progress Tracking -->
+        <div class="progress-grid">
+            <div class="progress-card">
+                <div class="progress-header">
+                    <span class="progress-label">Weight Progress</span>
+                    <span class="progress-percent" id="weightPercent">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="weightProgress" style="width: 0%"></div>
+                </div>
+                <div class="progress-stats">
+                    <span>Start: <span id="startWeight">0</span> kg</span>
+                    <span>Current: <span id="currentWeight">0</span> kg</span>
+                    <span>Goal: <span id="goalWeight">0</span> kg</span>
+                </div>
+            </div>
+            <div class="progress-card">
+                <div class="progress-header">
+                    <span class="progress-label">Workout Goal</span>
+                    <span class="progress-percent" id="workoutPercent">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="workoutProgress" style="width: 0%"></div>
+                </div>
+                <div class="progress-stats">
+                    <span>Completed: <span id="completedWorkouts">0</span></span>
+                    <span>Target: <span id="targetWorkouts">20</span></span>
+                </div>
+            </div>
+            <div class="progress-card">
+                <div class="progress-header">
+                    <span class="progress-label">Strength Progress</span>
+                    <span class="progress-percent" id="strengthPercent">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="strengthProgress" style="width: 0%"></div>
+                </div>
+                <div class="progress-stats">
+                    <span>Bench: <span id="benchPR">0</span> kg</span>
+                    <span>Squat: <span id="squatPR">0</span> kg</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workout Distribution -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fas fa-chart-pie"></i>
+                        Workout Type Distribution
+                    </div>
+                </div>
+                <canvas id="distributionChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fas fa-clock"></i>
+                        Workout Time of Day
+                    </div>
+                </div>
+                <canvas id="timeChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Insights Section -->
+        <div class="insights-section">
+            <h3 style="color: #6b46c1; margin-bottom: 1rem;">💡 Personalized Insights</h3>
+            <div class="insights-grid" id="insights">
+                <!-- Insights will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Nutrition Summary -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fas fa-utensils"></i>
+                        Calorie Intake vs Burn
+                    </div>
+                </div>
+                <canvas id="nutritionChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fas fa-chart-bar"></i>
+                        Macronutrient Split
+                    </div>
+                </div>
+                <canvas id="macroChart"></canvas>
             </div>
         </div>
     </div>
-    
+
     <script>
-        function showTab(tabName) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
+        // Analytics Features
+        const analyticsFeatures = {
+            // 1. Workout Statistics
+            workoutStats: () => ({
+                totalWorkouts: 47,
+                totalMinutes: 2850,
+                avgWorkoutTime: 45,
+                caloriesBurned: 15600
+            }),
             
-            // Remove active class from all buttons
-            document.querySelectorAll('.tab-btn').forEach(btn => {
+            // 2. Progress Tracking
+            progressTracking: () => ({
+                weightStart: 70,
+                weightCurrent: 65,
+                weightGoal: 60,
+                strengthPRs: {
+                    bench: 80,
+                    squat: 100,
+                    deadlift: 120
+                }
+            }),
+            
+            // 3. Trend Analysis
+            trends: () => ({
+                weeklyProgress: [5, 7, 4, 6, 8, 5, 7],
+                monthlyProgress: [20, 25, 22, 28, 30],
+                bestStreak: 12,
+                currentStreak: 5
+            }),
+            
+            // 4. Workout Distribution
+            distribution: () => ({
+                upper: 40,
+                lower: 30,
+                cardio: 20,
+                core: 10
+            }),
+            
+            // 5. Performance Metrics
+            performance: () => ({
+                avgHeartRate: 145,
+                maxHeartRate: 175,
+                recoveryRate: 65,
+                vo2max: 42
+            }),
+            
+            // 6. Nutrition Analytics
+            nutrition: () => ({
+                avgCalories: 2200,
+                protein: 120,
+                carbs: 250,
+                fats: 70,
+                waterIntake: 2.1
+            }),
+            
+            // 7. Goal Progress
+            goalProgress: () => ({
+                weightLoss: 65,
+                workoutFrequency: 80,
+                strengthGain: 45
+            }),
+            
+            // 8. Comparison Metrics
+            comparison: () => ({
+                vsLastMonth: +15,
+                vsLastYear: +45,
+                vsAverage: +10
+            }),
+            
+            // 9. Personalized Insights
+            insights: () => [
+                {
+                    icon: '💪',
+                    title: 'Peak Performance',
+                    text: 'Your workout frequency has increased 15% this month!'
+                },
+                {
+                    icon: '🔥',
+                    title: 'Calorie Burn',
+                    text: 'You burned 15,600 calories this month - equivalent to 45 hours of running!'
+                },
+                {
+                    icon: '🎯',
+                    title: 'Goal Progress',
+                    text: 'You\'re 65% towards your weight loss goal. Keep going!'
+                },
+                {
+                    icon: '🏆',
+                    title: 'Achievement Unlocked',
+                    text: '12 day streak! You\'re more consistent than 80% of users.'
+                },
+                {
+                    icon: '📊',
+                    title: 'Favorite Workout',
+                    text: 'Upper body workouts are your most frequent. Try mixing it up!'
+                },
+                {
+                    icon: '🌅',
+                    title: 'Optimal Time',
+                    text: 'You perform best in the morning (8-10 AM) based on your data.'
+                }
+            ],
+            
+            // 10. Predictive Analytics
+            predictions: () => ({
+                nextMilestone: '5kg loss by April 15',
+                projectedWeight: 62,
+                estimatedGoalDate: 'May 2026'
+            })
+        };
+
+        function changeDateRange(range) {
+            document.querySelectorAll('.date-range button').forEach(btn => {
                 btn.classList.remove('active');
             });
-            
-            // Show selected tab
-            document.getElementById(tabName).classList.add('active');
-            
-            // Add active class to clicked button
             event.target.classList.add('active');
+            loadAnalyticsData(range);
         }
-        
-        function updateMeasurement(type) {
-            const value = document.getElementById(type).value;
-            if (value) {
-                document.getElementById(type + '-value').innerText = value + ' cm';
-                alert(`✅ ${type} measurement updated to ${value} cm`);
-            }
+
+        function loadAnalyticsData(range = 'week') {
+            // Load all analytics data
+            const stats = analyticsFeatures.workoutStats();
+            const progress = analyticsFeatures.progressTracking();
+            const trends = analyticsFeatures.trends();
+            const dist = analyticsFeatures.distribution();
+            const nutrition = analyticsFeatures.nutrition();
+            const goals = analyticsFeatures.goalProgress();
+            
+            // Update stats
+            document.getElementById('totalCalories').textContent = stats.caloriesBurned.toLocaleString();
+            document.getElementById('totalMinutes').textContent = stats.totalMinutes;
+            document.getElementById('totalWorkouts').textContent = stats.totalWorkouts;
+            document.getElementById('bestStreak').textContent = trends.bestStreak;
+            document.getElementById('currentStreak').textContent = trends.currentStreak;
+            
+            // Update weight progress
+            document.getElementById('startWeight').textContent = progress.weightStart;
+            document.getElementById('currentWeight').textContent = progress.weightCurrent;
+            document.getElementById('goalWeight').textContent = progress.weightGoal;
+            
+            const weightProgress = ((progress.weightStart - progress.weightCurrent) / 
+                                   (progress.weightStart - progress.weightGoal)) * 100;
+            document.getElementById('weightPercent').textContent = Math.round(weightProgress) + '%';
+            document.getElementById('weightProgress').style.width = weightProgress + '%';
+            
+            // Update workout progress
+            document.getElementById('completedWorkouts').textContent = stats.totalWorkouts;
+            document.getElementById('targetWorkouts').textContent = '50';
+            const workoutProgress = (stats.totalWorkouts / 50) * 100;
+            document.getElementById('workoutPercent').textContent = Math.round(workoutProgress) + '%';
+            document.getElementById('workoutProgress').style.width = workoutProgress + '%';
+            
+            // Update strength progress
+            document.getElementById('benchPR').textContent = progress.strengthPRs.bench;
+            document.getElementById('squatPR').textContent = progress.strengthPRs.squat;
+            const strengthProgress = ((progress.strengthPRs.bench + progress.strengthPRs.squat) / 250) * 100;
+            document.getElementById('strengthPercent').textContent = Math.round(strengthProgress) + '%';
+            document.getElementById('strengthProgress').style.width = strengthProgress + '%';
+            
+            // Load insights
+            const insights = analyticsFeatures.insights();
+            const insightsHTML = insights.map(insight => `
+                <div class="insight-card">
+                    <div class="insight-icon">${insight.icon}</div>
+                    <div class="insight-title">${insight.title}</div>
+                    <div class="insight-text">${insight.text}</div>
+                </div>
+            `).join('');
+            document.getElementById('insights').innerHTML = insightsHTML;
+            
+            // Initialize all charts
+            initCharts(stats, trends, dist, nutrition);
         }
-        
-        function updatePR(exercise) {
-            const value = document.getElementById(exercise + '-input').value;
-            if (value) {
-                document.getElementById(exercise + '-pr').innerText = value + ' kg';
-                alert(`✅ ${exercise} PR updated to ${value} kg`);
-            }
-        }
-        
-        // Initialize charts
-        document.addEventListener('DOMContentLoaded', function() {
-            // Measurement Chart
-            const ctx = document.getElementById('measurementChart').getContext('2d');
-            new Chart(ctx, {
+
+        function initCharts(stats, trends, dist, nutrition) {
+            // Weekly Workout Chart
+            new Chart(document.getElementById('weeklyChart'), {
                 type: 'line',
                 data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Workouts',
+                        data: trends.weeklyProgress,
+                        borderColor: '#6b46c1',
+                        backgroundColor: 'rgba(107, 70, 193, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            // Calories Chart
+            new Chart(document.getElementById('caloriesChart'), {
+                type: 'bar',
+                data: {
                     labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                    datasets: [{
+                        label: 'Calories',
+                        data: [2500, 2800, 2600, 3000],
+                        backgroundColor: '#6b46c1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            // Distribution Chart
+            new Chart(document.getElementById('distributionChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Upper Body', 'Lower Body', 'Cardio', 'Core'],
+                    datasets: [{
+                        data: [dist.upper, dist.lower, dist.cardio, dist.core],
+                        backgroundColor: ['#6b46c1', '#38a169', '#fbbf24', '#e53e3e']
+                    }]
+                }
+            });
+
+            // Time of Day Chart
+            new Chart(document.getElementById('timeChart'), {
+                type: 'pie',
+                data: {
+                    labels: ['Morning (6-12)', 'Afternoon (12-6)', 'Evening (6-12)'],
+                    datasets: [{
+                        data: [45, 30, 25],
+                        backgroundColor: ['#fbbf24', '#38a169', '#6b46c1']
+                    }]
+                }
+            });
+
+            // Nutrition Chart
+            new Chart(document.getElementById('nutritionChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
                     datasets: [
                         {
-                            label: 'Chest',
-                            data: [95, 96, 97, 98],
-                            borderColor: '#6b46c1'
+                            label: 'Calories Consumed',
+                            data: [2200, 2100, 2300, 2150, 2250, 2400, 2000],
+                            backgroundColor: '#38a169'
                         },
                         {
-                            label: 'Waist',
-                            data: [80, 79, 78, 77],
-                            borderColor: '#38a169'
+                            label: 'Calories Burned',
+                            data: [500, 600, 450, 700, 550, 650, 400],
+                            backgroundColor: '#6b46c1'
                         }
                     ]
                 }
             });
-            
-            // Strength Chart
-            const ctx2 = document.getElementById('strengthChart').getContext('2d');
-            new Chart(ctx2, {
+
+            // Macro Chart
+            new Chart(document.getElementById('macroChart'), {
                 type: 'bar',
                 data: {
-                    labels: ['Bench', 'Squat', 'Deadlift', 'OHP'],
+                    labels: ['Protein', 'Carbs', 'Fats'],
                     datasets: [{
-                        label: 'Current PR (kg)',
-                        data: [80, 100, 120, 50],
-                        backgroundColor: '#6b46c1'
+                        data: [nutrition.protein, nutrition.carbs, nutrition.fats],
+                        backgroundColor: ['#e53e3e', '#38a169', '#fbbf24']
                     }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    }
                 }
             });
-            
-            // Variety Chart
-            const ctx3 = document.getElementById('varietyChart').getContext('2d');
-            new Chart(ctx3, {
-                type: 'pie',
-                data: {
-                    labels: ['Upper Body', 'Lower Body', 'Cardio', 'Core', 'Full Body'],
-                    datasets: [{
-                        data: [40, 25, 15, 10, 10],
-                        backgroundColor: ['#6b46c1', '#38a169', '#e53e3e', '#dd6b20', '#3182ce']
-                    }]
-                }
-            });
+        }
+
+        // Load on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAnalyticsData('week');
         });
     </script>
 </body>
