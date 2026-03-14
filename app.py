@@ -157,6 +157,33 @@ class UserSettings(db.Model):
     daily_calorie_goal = db.Column(db.Integer, default=2000)
 
 
+
+class Friend(db.Model):
+    """Friend connections"""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    friend_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    status = db.Column(db.String(20), default='pending')  # pending, accepted, rejected
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class FriendRequest(db.Model):
+    """Friend requests"""
+    id = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    status = db.Column(db.String(20), default='pending')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Post(db.Model):
+    """Community posts"""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    content = db.Column(db.Text)
+    type = db.Column(db.String(50))  # workout, meal, achievement
+    likes = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
 class Achievement(db.Model):
     """User achievements"""
     id = db.Column(db.Integer, primary_key=True)
@@ -165,6 +192,9 @@ class Achievement(db.Model):
     badge_icon = db.Column(db.String(50))
     date_earned = db.Column(db.DateTime, default=datetime.utcnow)
     description = db.Column(db.Text)
+
+
+
 
 # Create tables
 with app.app_context():
@@ -617,7 +647,113 @@ def analytics():
 def community():
     if 'user_id' not in session:
         return redirect(url_for('index'))
-    return render_template('community.html')
+    
+    user_id = session['user_id']
+    
+    # Get leaderboard data (top users by workout count)
+    leaderboard = db.session.query(
+        User, 
+        db.func.count(WorkoutLog.id).label('workout_count'),
+        db.func.sum(WorkoutLog.calories_burned).label('total_calories')
+    ).join(WorkoutLog).group_by(User.id).order_by(db.func.count(WorkoutLog.id).desc()).limit(10).all()
+    
+    # Get friend requests
+    friend_requests = db.session.query(User).join(
+        FriendRequest, 
+        (FriendRequest.sender_id == User.id) & 
+        (FriendRequest.receiver_id == user_id) &
+        (FriendRequest.status == 'pending')
+    ).all()
+    
+    # Get friends
+    friends = db.session.query(User).join(
+        Friend,
+        ((Friend.user_id == user_id) & (Friend.friend_id == User.id)) |
+        ((Friend.friend_id == user_id) & (Friend.user_id == User.id))
+    ).filter(Friend.status == 'accepted').all()
+    
+    # Get activity feed
+    posts = db.session.query(Post).join(User).order_by(Post.created_at.desc()).limit(20).all()
+    
+    return render_template('community.html', 
+                         user=User.query.get(user_id),
+                         leaderboard=leaderboard,
+                         friend_requests=friend_requests,
+                         friends=friends,
+                         posts=posts)
+
+@app.route('/send-friend-request', methods=['POST'])
+def send_friend_request():
+    data = request.json
+    receiver_email = data.get('email')
+    
+    receiver = User.query.filter_by(email=receiver_email).first()
+    if not receiver:
+        return jsonify({'success': False, 'error': 'User not found'})
+    
+    # Check if request already exists
+    existing = FriendRequest.query.filter_by(
+        sender_id=session['user_id'], 
+        receiver_id=receiver.id
+    ).first()
+    
+    if existing:
+        return jsonify({'success': False, 'error': 'Friend request already sent'})
+    
+    request = FriendRequest(
+        sender_id=session['user_id'],
+        receiver_id=receiver.id
+    )
+    db.session.add(request)
+    db.session.commit()
+    
+    return jsonify({'success': True})
+
+@app.route('/accept-friend-request', methods=['POST'])
+def accept_friend_request():
+    data = request.json
+    sender_id = data.get('sender_id')
+    
+    # Update request status
+    req = FriendRequest.query.filter_by(
+        sender_id=sender_id,
+        receiver_id=session['user_id']
+    ).first()
+    
+    if req:
+        req.status = 'accepted'
+        
+        # Create friend relationship
+        friend = Friend(
+            user_id=session['user_id'],
+            friend_id=sender_id,
+            status='accepted'
+        )
+        db.session.add(friend)
+        db.session.commit()
+        
+    return jsonify({'success': True})
+
+@app.route('/create-post', methods=['POST'])
+def create_post():
+    data = request.json
+    post = Post(
+        user_id=session['user_id'],
+        content=data.get('content'),
+        type=data.get('type', 'update')
+    )
+    db.session.add(post)
+    db.session.commit()
+    return jsonify({'success': True})
+
+@app.route('/like-post', methods=['POST'])
+def like_post():
+    data = request.json
+    post = Post.query.get(data.get('post_id'))
+    if post:
+        post.likes += 1
+        db.session.commit()
+    return jsonify({'success': True})
 
 @app.route('/log-workout', methods=['POST'])
 def log_workout():
@@ -988,6 +1124,15 @@ def get_settings():
         print(f"Error loading settings: {str(e)}")
         return jsonify({'success': False, 'error': str(e)})
 
+
+
+
+
+@app.route('/achievements')
+def achievements():
+    if 'user_id' not in session:
+        return redirect(url_for('index'))
+    return render_template('achievements.html')
 
 
 @app.route('/debug-workouts')
