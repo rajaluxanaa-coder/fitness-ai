@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar - FitAI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            padding-top: 100px;
+        }
+        
+        /* Navbar Styles */
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #6b46c1;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #4b5563;
+            font-weight: 500;
+        }
+        
+        .nav-links a:hover {
+            color: #6b46c1;
+        }
+        
+        .profile-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #6b46c1;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .calendar-header {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .month-nav {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .month-nav button {
+            background: #6b46c1;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        .current-month {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #6b46c1;
+        }
+        
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .weekday {
+            background: white;
+            padding: 1rem;
+            text-align: center;
+            font-weight: bold;
+            color: #6b46c1;
+            border-radius: 0.5rem;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+        }
+        
+        .calendar-day {
+            background: white;
+            min-height: 120px;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        .calendar-day:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .calendar-day.other-month {
+            background: #f3f4f6;
+            opacity: 0.5;
+        }
+        
+        .day-number {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .workout-badge {
+            background: #6b46c1;
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.3rem;
+            margin-bottom: 0.2rem;
+            display: inline-block;
+        }
+        
+        .meal-badge {
+            background: #38a169;
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.3rem;
+            margin-bottom: 0.2rem;
+            display: inline-block;
+        }
+        
+        .event-count {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: #e53e3e;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+        
+        .legend {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .color-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 0.3rem;
+        }
+        
+        .color-box.workout { background: #6b46c1; }
+        .color-box.meal { background: #38a169; }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-dumbbell"></i>
+            <span>FitAI</span>
+        </div>
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/profile">Profile</a>
+            <a href="/analytics">📊 Analytics</a>
+            <a href="/achievements">🏆 Achievements</a>
+            <a href="/community">👥 Community</a>
+            <a href="/goals">🎯 Goals</a>
+            <a href="/calendar" style="color: #6b46c1;">📅 Calendar</a>
+            <a href="/music">🎵 Music</a>
+        </div>
+        <div class="profile-circle" onclick="window.location.href='/profile'">
+            {{ user.name[0]|upper }}
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>
+                <i class="fas fa-calendar-alt"></i>
+                Workout Calendar
+            </h1>
+            <a href="/dashboard" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Dashboard
+            </a>
+        </div>
+
+        <!-- Calendar Header -->
+        <div class="calendar-header">
+            <div class="month-nav">
+                <button><i class="fas fa-chevron-left"></i></button>
+                <span class="current-month">March 2026</span>
+                <button><i class="fas fa-chevron-right"></i></button>
+            </div>
+            <button class="btn" style="background: #6b46c1; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem;">
+                <i class="fas fa-plus"></i> Add Event
+            </button>
+        </div>
+
+        <!-- Weekdays -->
+        <div class="weekdays">
+            <div class="weekday">Sun</div>
+            <div class="weekday">Mon</div>
+            <div class="weekday">Tue</div>
+            <div class="weekday">Wed</div>
+            <div class="weekday">Thu</div>
+            <div class="weekday">Fri</div>
+            <div class="weekday">Sat</div>
+        </div>
+
+        <!-- Calendar Days -->
+        <div class="calendar-grid">
+            <!-- Previous month days -->
+            <div class="calendar-day other-month">
+                <div class="day-number">25</div>
+            </div>
+            <div class="calendar-day other-month">
+                <div class="day-number">26</div>
+            </div>
+            <div class="calendar-day other-month">
+                <div class="day-number">27</div>
+            </div>
+            <div class="calendar-day other-month">
+                <div class="day-number">28</div>
+            </div>
+            
+            <!-- Current month days -->
+            <div class="calendar-day">
+                <div class="day-number">1</div>
+                <span class="workout-badge">💪 Upper Body</span>
+                <div class="event-count">2</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">2</div>
+                <span class="meal-badge">🥗 Meal Log</span>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">3</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">4</div>
+                <span class="workout-badge">🏃 Cardio</span>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">5</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">6</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">7</div>
+                <span class="workout-badge">🦵 Leg Day</span>
+            </div>
+            <!-- Add more days as needed -->
+        </div>
+
+        <!-- Legend -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="color-box workout"></div>
+                <span>Workout Day</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box meal"></div>
+                <span>Meal Logged</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
