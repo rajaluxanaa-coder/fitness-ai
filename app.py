@@ -176,6 +176,22 @@ class Post(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
+class Challenge(db.Model):
+    """User challenges"""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    name = db.Column(db.String(100))
+    description = db.Column(db.Text)
+    goal_type = db.Column(db.String(50))  # 'workouts', 'water', 'calories', 'custom'
+    goal_value = db.Column(db.Integer)
+    current_value = db.Column(db.Integer, default=0)
+    unit = db.Column(db.String(20))
+    start_date = db.Column(db.Date, default=datetime.utcnow().date())
+    end_date = db.Column(db.Date)
+    status = db.Column(db.String(20), default='active')  # 'active', 'completed', 'failed'
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
 class Achievement(db.Model):
     """User achievements"""
     id = db.Column(db.Integer, primary_key=True)
@@ -907,36 +923,40 @@ def get_nutrition_tip():
     import random
     return jsonify(random.choice(tips))
 
+
+
 @app.route('/get-achievements')
 def get_achievements():
     user_id = session['user_id']
     
     # Get user data
     user = User.query.get(user_id)
-    workouts = WorkoutLog.query.filter_by(user_id=user_id).all()
-    meals = MealLog.query.filter_by(user_id=user_id).all()
+    workouts = WorkoutLog.query.filter_by(user_id=user_id).order_by(WorkoutLog.date).all()
+    meals = MealLog.query.filter_by(user_id=user_id).order_by(MealLog.date).all()
     
-    # Calculate stats
+    # Calculate workout stats
     workout_count = len(workouts)
-    meal_count = len(meals)
     
-    # Calculate total XP (example: 10 XP per workout, 5 XP per meal)
-    total_xp = (workout_count * 10) + (meal_count * 5)
+    # Calculate total weight lifted (if you track this)
+    total_weight_lifted = 0  # You'd need to add this to your workout model
     
-    # Calculate level (every 100 XP = 1 level)
-    level = total_xp // 100
-    current_level_xp = total_xp % 100
-    next_level_xp = 100
-    xp_to_next = next_level_xp - current_level_xp
+    # Calculate total distance run (if you track this)
+    total_distance = 0  # You'd need to add this to your workout model
     
-    # Get streak
+    # Count morning workouts (before 12 PM)
+    morning_workouts = 0
+    for w in workouts:
+        # You'd need time field in workout model
+        pass
+    
+    # Calculate streak
     from datetime import datetime, timedelta
     today = datetime.now().date()
     
-    # Get unique workout dates sorted
+    # Get unique workout dates
     workout_dates = sorted(list(set([w.date for w in workouts])), reverse=True)
     
-    # Calculate streak
+    # Calculate current streak
     streak = 0
     if workout_dates:
         streak = 1
@@ -946,66 +966,188 @@ def get_achievements():
             else:
                 break
     
-    # Calculate badge count (example: 1 badge per 10 workouts)
-    badge_count = (workout_count // 10) + (1 if workout_count >= 1 else 0) + (1 if streak >= 7 else 0)
+    # Calculate level and XP
+    total_xp = workout_count * 10 + len(meals) * 5
+    level = total_xp // 100
+    current_level_xp = total_xp % 100
     
-    # Challenge progress (example)
-    water_challenge_days = min(workout_count, 7)  # Mock data - replace with actual challenge tracking
-    workout_challenge_days = min(workout_count, 5)
-    
-    # Achievements list
+    # Determine earned badges based on REAL data
     achievements = []
     
+    # First Workout
     if workout_count >= 1:
+        first_workout_date = workouts[0].date.strftime('%b %d, %Y') if workouts else 'Today'
         achievements.append({
             'name': 'First Workout',
             'icon': '🎯',
             'description': 'Completed your first workout',
-            'date': 'Today'
+            'date': first_workout_date,
+            'earned': True
         })
+    
+    # 10 Workouts
     if workout_count >= 10:
         achievements.append({
             'name': 'Getting Stronger',
             'icon': '💪',
             'description': 'Completed 10 workouts',
-            'date': 'Recent'
+            'date': 'Recent',
+            'earned': True
         })
+    
+    # 7-Day Streak
     if streak >= 7:
         achievements.append({
-            'name': 'Week Warrior',
+            'name': '7-Day Streak',
             'icon': '🔥',
-            'description': f'{streak} day streak',
-            'date': 'Current'
+            'description': 'Worked out 7 days in a row',
+            'date': 'Current',
+            'earned': True
         })
-    if meal_count >= 5:
+    else:
+        achievements.append({
+            'name': '7-Day Streak',
+            'icon': '🔥',
+            'description': 'Work out 7 days in a row',
+            'date': f'{7-streak} days to go',
+            'earned': False
+        })
+    
+    # 30-Day Streak
+    if streak >= 30:
+        achievements.append({
+            'name': '30-Day Streak',
+            'icon': '⚡',
+            'description': 'Worked out 30 days straight',
+            'date': 'Champion!',
+            'earned': True
+        })
+    else:
+        achievements.append({
+            'name': '30-Day Streak',
+            'icon': '⚡',
+            'description': 'Work out 30 days straight',
+            'date': f'{30-streak} days to go',
+            'earned': False
+        })
+    
+    # Healthy Eater
+    if len(meals) >= 5:
         achievements.append({
             'name': 'Healthy Eater',
             'icon': '🥗',
             'description': 'Logged 5 meals',
-            'date': 'Recent'
+            'date': 'Recent',
+            'earned': True
+        })
+    
+    # Weight Lifter (if you track this)
+    if total_weight_lifted >= 1000:
+        achievements.append({
+            'name': 'Weight Lifter',
+            'icon': '🏋️',
+            'description': 'Lifted 1000kg total',
+            'date': 'Achieved',
+            'earned': True
+        })
+    
+    # Marathon Ready (if you track distance)
+    if total_distance >= 42:
+        achievements.append({
+            'name': 'Marathon Ready',
+            'icon': '🏃',
+            'description': 'Ran 42km total',
+            'date': 'Achieved',
+            'earned': True
+        })
+    
+    # Early Bird (if you track workout times)
+    if morning_workouts >= 5:
+        achievements.append({
+            'name': 'Early Bird',
+            'icon': '🌅',
+            'description': '5 morning workouts',
+            'date': 'Achieved',
+            'earned': True
         })
     
     return jsonify({
         'level': level,
         'current_xp': current_level_xp,
         'total_xp': total_xp,
-        'xp_to_next': xp_to_next,
+        'xp_to_next': 100 - current_level_xp,
         'workout_count': workout_count,
-        'badge_count': badge_count,
+        'badge_count': len([a for a in achievements if a.get('earned')]),
         'streak': streak,
-        'challenge_count': 2,  # Mock data - replace with actual challenge tracking
-        'water_challenge': {
-            'completed': water_challenge_days,
-            'total': 7
-        },
-        'workout_challenge': {
-            'completed': workout_challenge_days,
-            'total': 5
-        },
+        'challenge_count': Challenge.query.filter_by(user_id=user_id, status='active').count(),
         'achievements': achievements
     })
-
     
+    
+    
+   
+    
+    
+
+
+
+@app.route('/create-challenge', methods=['POST'])
+def create_challenge():
+    data = request.json
+    challenge = Challenge(
+        user_id=session['user_id'],
+        name=data['name'],
+        description=data['description'],
+        goal_type=data['goal_type'],
+        goal_value=data['goal_value'],
+        unit=data['unit'],
+        end_date=datetime.strptime(data['end_date'], '%Y-%m-%d').date()
+    )
+    db.session.add(challenge)
+    db.session.commit()
+    return jsonify({'success': True})
+
+@app.route('/update-challenge', methods=['POST'])
+def update_challenge():
+    data = request.json
+    challenge = Challenge.query.get(data['challenge_id'])
+    if challenge and challenge.user_id == session['user_id']:
+        challenge.current_value = data['current_value']
+        if challenge.current_value >= challenge.goal_value:
+            challenge.status = 'completed'
+        db.session.commit()
+        return jsonify({'success': True})
+    return jsonify({'success': False})
+
+@app.route('/get-challenges')
+def get_challenges():
+    user_id = session['user_id']
+    active_challenges = Challenge.query.filter_by(
+        user_id=user_id, 
+        status='active'
+    ).all()
+    
+    completed_challenges = Challenge.query.filter_by(
+        user_id=user_id, 
+        status='completed'
+    ).order_by(Challenge.end_date.desc()).limit(5).all()
+    
+    return jsonify({
+        'active': [{
+            'id': c.id,
+            'name': c.name,
+            'description': c.description,
+            'goal_value': c.goal_value,
+            'current_value': c.current_value,
+            'unit': c.unit,
+            'end_date': c.end_date.strftime('%b %d, %Y')
+        } for c in active_challenges],
+        'completed': [{
+            'name': c.name,
+            'end_date': c.end_date.strftime('%b %d, %Y')
+        } for c in completed_challenges]
+    })
+
 
 
 @app.route('/log-workout-page')

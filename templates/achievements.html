@@ -250,6 +250,45 @@
             </a>
         </div>
         
+
+ <!-- Create Challenge Button -->
+    <div style="text-align: right; margin-bottom: 1rem;">
+        <button onclick="showCreateChallengeModal()" class="btn" style="background: #6b46c1; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 0.5rem; cursor: pointer;">
+            <i class="fas fa-plus"></i> Create Challenge
+        </button>
+    </div>
+
+    <!-- Create Challenge Modal -->
+    <div id="challengeModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 2000;">
+        <div style="background: white; border-radius: 1rem; padding: 2rem; max-width: 500px; width: 90%;">
+            <h3 style="margin-bottom: 1rem; color: #6b46c1;">Create New Challenge</h3>
+            <input type="text" id="challengeName" placeholder="Challenge Name" style="width: 100%; padding: 0.75rem; margin-bottom: 1rem; border: 2px solid #e5e7eb; border-radius: 0.5rem;">
+            <textarea id="challengeDesc" placeholder="Description" rows="3" style="width: 100%; padding: 0.75rem; margin-bottom: 1rem; border: 2px solid #e5e7eb; border-radius: 0.5rem;"></textarea>
+            
+            <select id="challengeType" style="width: 100%; padding: 0.75rem; margin-bottom: 1rem; border: 2px solid #e5e7eb; border-radius: 0.5rem;">
+                <option value="workouts">Workouts</option>
+                <option value="water">Water Intake (L)</option>
+                <option value="calories">Calories Burned</option>
+                <option value="custom">Custom</option>
+            </select>
+            
+            <input type="number" id="challengeGoal" placeholder="Goal Value" style="width: 100%; padding: 0.75rem; margin-bottom: 1rem; border: 2px solid #e5e7eb; border-radius: 0.5rem;">
+            <input type="date" id="challengeEndDate" style="width: 100%; padding: 0.75rem; margin-bottom: 1rem; border: 2px solid #e5e7eb; border-radius: 0.5rem;">
+            
+            <div style="display: flex; gap: 1rem;">
+                <button onclick="createChallenge()" class="btn" style="background: #6b46c1; color: white; flex: 1; padding: 0.75rem; border: none; border-radius: 0.5rem; cursor: pointer;">Create</button>
+                <button onclick="closeChallengeModal()" class="btn" style="background: #e53e3e; color: white; flex: 1; padding: 0.75rem; border: none; border-radius: 0.5rem; cursor: pointer;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Challenges Container -->
+    <div id="challengesContainer">
+        <!-- Challenges will load here dynamically -->
+    </div>
+
+
+
         <!-- Level & XP -->
 <div class="level-card">
     <div>Current Level</div>
@@ -366,66 +405,191 @@
         
     </div>
 </body>
+
 <script>
-async function loadAchievements() {
-    try {
-        const response = await fetch('/get-achievements');
-        const data = await response.json();
+    // Function to show/hide challenge modal
+    function showCreateChallengeModal() {
+        document.getElementById('challengeModal').style.display = 'flex';
+    }
+
+    function closeChallengeModal() {
+        document.getElementById('challengeModal').style.display = 'none';
+    }
+
+    // Function to create a new challenge
+    async function createChallenge() {
+        const challenge = {
+            name: document.getElementById('challengeName').value,
+            description: document.getElementById('challengeDesc').value,
+            goal_type: document.getElementById('challengeType').value,
+            goal_value: parseInt(document.getElementById('challengeGoal').value),
+            unit: document.getElementById('challengeType').value === 'water' ? 'L' : 
+                  document.getElementById('challengeType').value === 'workouts' ? 'workouts' : '',
+            end_date: document.getElementById('challengeEndDate').value
+        };
         
-        console.log("Achievements data:", data);
-        
-        // Update level and XP
-        document.getElementById('currentLevel').innerText = data.level;
-        document.getElementById('currentXP').innerText = data.current_xp;
-        document.getElementById('totalXP').innerText = data.total_xp;
-        document.getElementById('xpToNext').innerText = data.xp_to_next;
-        
-        // Update progress bar
-        const xpPercentage = (data.current_xp / 100) * 100;
-        document.getElementById('xpProgress').style.width = xpPercentage + '%';
-        
-        // Update stats
-        document.getElementById('workoutCount').innerText = data.workout_count;
-        document.getElementById('badgeCount').innerText = data.badge_count;
-        document.getElementById('streakCount').innerText = data.streak;
-        document.getElementById('challengeCount').innerText = data.challenge_count;
-        
-        // Update challenges
-        const waterPercentage = (data.water_challenge.completed / data.water_challenge.total) * 100;
-        const workoutPercentage = (data.workout_challenge.completed / data.workout_challenge.total) * 100;
-        
-        document.getElementById('waterProgress').style.width = waterPercentage + '%';
-        document.getElementById('waterCompleted').innerText = data.water_challenge.completed;
-        document.getElementById('waterTotal').innerText = data.water_challenge.total;
-        
-        document.getElementById('workoutProgress').style.width = workoutPercentage + '%';
-        document.getElementById('workoutCompleted').innerText = data.workout_challenge.completed;
-        document.getElementById('workoutTotal').innerText = data.workout_challenge.total;
-        
-        // Update badges grid
-        const badgesGrid = document.getElementById('badgesGrid');
-        if (badgesGrid) {
-            badgesGrid.innerHTML = '';
-            data.achievements.forEach(badge => {
-                badgesGrid.innerHTML += `
-                    <div class="badge-card">
-                        <div class="badge-icon">${badge.icon}</div>
-                        <div class="badge-name">${badge.name}</div>
-                        <div class="badge-desc">${badge.description}</div>
-                        <div class="badge-date">${badge.date}</div>
-                    </div>
-                `;
-            });
+        if (!challenge.name || !challenge.description || !challenge.goal_value || !challenge.end_date) {
+            alert('Please fill all fields');
+            return;
         }
         
-    } catch (error) {
-        console.error('Error loading achievements:', error);
+        const response = await fetch('/create-challenge', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(challenge)
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            alert('✅ Challenge created!');
+            closeChallengeModal();
+            loadChallenges(); // Reload challenges
+        }
     }
-}
 
-// Load on page load
-document.addEventListener('DOMContentLoaded', function() {
-    loadAchievements();
-});
-    </script>
+    // Function to load challenges
+    async function loadChallenges() {
+        try {
+            const response = await fetch('/get-challenges');
+            const data = await response.json();
+            
+            const container = document.getElementById('challengesContainer');
+            
+            // Active challenges section
+            let html = '<h2 style="color: white; margin: 2rem 0 1rem;">⚡ Your Active Challenges</h2>';
+            
+            if (data.active && data.active.length > 0) {
+                data.active.forEach(challenge => {
+                    const percentage = (challenge.current_value / challenge.goal_value) * 100;
+                    html += `
+                        <div style="background: white; border-radius: 1rem; padding: 1.5rem; margin-bottom: 1rem;">
+                            <h3 style="color: #6b46c1;">${challenge.name}</h3>
+                            <p style="color: #4b5563; margin-bottom: 1rem;">${challenge.description}</p>
+                            <div class="progress-bar" style="background: #e5e7eb; height: 10px; border-radius: 5px; overflow: hidden;">
+                                <div class="progress-fill" style="width: ${percentage}%; height: 100%; background: #6b46c1;"></div>
+                            </div>
+                            <p style="margin: 1rem 0; color: #4b5563;">Progress: ${challenge.current_value}/${challenge.goal_value} ${challenge.unit} • Ends: ${challenge.end_date}</p>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <input type="number" id="progress-${challenge.id}" placeholder="Update progress" style="flex: 1; padding: 0.5rem; border: 2px solid #e5e7eb; border-radius: 0.5rem;">
+                                <button onclick="updateChallenge(${challenge.id})" class="btn" style="background: #6b46c1; color: white; padding: 0.5rem 1rem; border: none; border-radius: 0.5rem; cursor: pointer;">Update</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                html += '<p style="color: white; text-align: center;">No active challenges. Create one above! 👆</p>';
+            }
+            
+            // Completed challenges section
+            if (data.completed && data.completed.length > 0) {
+                html += '<h2 style="color: white; margin: 2rem 0 1rem;">✅ Completed Challenges</h2>';
+                data.completed.forEach(challenge => {
+                    html += `
+                        <div style="background: #f0fdf4; border-radius: 0.5rem; padding: 1rem; margin-bottom: 0.5rem; display: flex; justify-content: space-between;">
+                            <span style="color: #38a169;">✓ ${challenge.name}</span>
+                            <span style="color: #6b7280;">${challenge.end_date}</span>
+                        </div>
+                    `;
+                });
+            }
+            
+            container.innerHTML = html;
+            
+        } catch (error) {
+            console.error('Error loading challenges:', error);
+        }
+    }
+
+    // Function to update challenge progress
+    async function updateChallenge(challengeId) {
+        const value = document.getElementById(`progress-${challengeId}`).value;
+        if (!value) {
+            alert('Please enter a progress value');
+            return;
+        }
+        
+        const response = await fetch('/update-challenge', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                challenge_id: challengeId,
+                current_value: parseInt(value)
+            })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            alert('✅ Progress updated!');
+            loadChallenges(); // Reload challenges
+            loadAchievements(); // Refresh achievements too
+        }
+    }
+
+    // Original loadAchievements function (keep this as is)
+    async function loadAchievements() {
+        try {
+            const response = await fetch('/get-achievements');
+            const data = await response.json();
+            
+            console.log("Achievements data:", data);
+            
+            // Update level and XP
+            document.getElementById('currentLevel').innerText = data.level || 0;
+            document.getElementById('currentXP').innerText = data.current_xp || 0;
+            document.getElementById('totalXP').innerText = data.total_xp || 0;
+            document.getElementById('xpToNext').innerText = data.xp_to_next || 0;
+            
+            // Update progress bar
+            const xpPercentage = ((data.current_xp || 0) / 100) * 100;
+            document.getElementById('xpProgress').style.width = xpPercentage + '%';
+            
+            // Update stats
+            document.getElementById('workoutCount').innerText = data.workout_count || 0;
+            document.getElementById('badgeCount').innerText = data.badge_count || 0;
+            document.getElementById('streakCount').innerText = data.streak || 0;
+            document.getElementById('challengeCount').innerText = data.challenge_count || 0;
+            
+            // Update challenges
+            if (data.water_challenge) {
+                const waterPercentage = (data.water_challenge.completed / data.water_challenge.total) * 100;
+                document.getElementById('waterProgress').style.width = waterPercentage + '%';
+                document.getElementById('waterCompleted').innerText = data.water_challenge.completed;
+                document.getElementById('waterTotal').innerText = data.water_challenge.total;
+            }
+            
+            if (data.workout_challenge) {
+                const workoutPercentage = (data.workout_challenge.completed / data.workout_challenge.total) * 100;
+                document.getElementById('workoutProgress').style.width = workoutPercentage + '%';
+                document.getElementById('workoutCompleted').innerText = data.workout_challenge.completed;
+                document.getElementById('workoutTotal').innerText = data.workout_challenge.total;
+            }
+            
+            // Update badges grid
+            const badgesGrid = document.querySelector('.badges-grid');
+            if (badgesGrid && data.achievements) {
+                badgesGrid.innerHTML = '';
+                data.achievements.forEach(badge => {
+                    const lockedClass = badge.earned ? '' : 'locked';
+                    badgesGrid.innerHTML += `
+                        <div class="badge-card ${lockedClass}">
+                            <div class="badge-icon">${badge.icon}</div>
+                            <div class="badge-name">${badge.name}</div>
+                            <div class="badge-desc">${badge.description}</div>
+                            <div class="badge-date">${badge.date}</div>
+                        </div>
+                    `;
+                });
+            }
+            
+        } catch (error) {
+            console.error('Error loading achievements:', error);
+        }
+    }
+
+    // Load on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        loadAchievements();
+        loadChallenges();
+    });
+</script>
 </html>
