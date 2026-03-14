@@ -1124,7 +1124,26 @@ def get_settings():
 def achievements():
     if 'user_id' not in session:
         return redirect(url_for('index'))
-    return render_template('achievements.html')
+    return render_template('achievements.html',user=User.query.get(session['user_id']))
+
+
+@app.route('/goals')
+def goals():
+    if 'user_id' not in session:
+        return redirect(url_for('index'))
+    return render_template('goals.html',user=User.query.get(session['user_id']))
+
+@app.route('/calendar')
+def calendar():
+    if 'user_id' not in session:
+        return redirect(url_for('index'))
+    return render_template('calendar.html',user=User.query.get(session['user_id']))
+
+@app.route('/music')
+def music():
+    if 'user_id' not in session:
+        return redirect(url_for('index'))
+    return render_template('music.html',user=User.query.get(session['user_id']))
 
 
 @app.route('/debug-workouts')
