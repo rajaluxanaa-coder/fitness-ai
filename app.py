@@ -1217,10 +1217,8 @@ def get_progress_data():
         today = datetime.now().date()
         streak = 0
         
-        # Get unique workout dates sorted
+        # Get unique workout dates
         workout_dates = sorted(list(set([w.date for w in workouts])), reverse=True)
-        
-        # Calculate consecutive days streak
         if workout_dates:
             streak = 1
             for i in range(1, len(workout_dates)):
@@ -1229,7 +1227,7 @@ def get_progress_data():
                 else:
                     break
         
-        # Weekly data (last 7 days)
+        # Weekly data
         weekLabels = []
         weeklyWorkouts = []
         weeklyCalories = []
@@ -1243,7 +1241,9 @@ def get_progress_data():
         
         # Recent activity
         recent = []
-        for w in workouts[-5:]:  # Last 5 workouts
+        workout_types = {}
+        
+        for w in sorted(workouts, key=lambda x: x.date, reverse=True)[:10]:
             recent.append({
                 'icon': 'fa-dumbbell',
                 'date': w.date.strftime('%b %d'),
@@ -1251,9 +1251,11 @@ def get_progress_data():
                 'calories': w.calories_burned,
                 'duration': w.duration
             })
+            # Count workout types for distribution
+            workout_types[w.workout_name] = workout_types.get(w.workout_name, 0) + 1
         
-        # Return data in the format your frontend expects
         return jsonify({
+            'success': True,
             'totalWorkouts': totalWorkouts,
             'totalCaloriesBurned': totalCaloriesBurned,
             'totalMinutes': totalMinutes,
@@ -1261,15 +1263,19 @@ def get_progress_data():
             'weekLabels': weekLabels,
             'weeklyWorkouts': weeklyWorkouts,
             'weeklyCalories': weeklyCalories,
-            'recentActivity': recent
+            'recentActivity': recent,
+            'workoutDistribution': {
+                'labels': list(workout_types.keys()),
+                'values': list(workout_types.values())
+            }
         })
         
     except Exception as e:
         print(f"Error in get-progress-data: {str(e)}")
-        return jsonify({'error': str(e)}), 500
-    
+        return jsonify({'success': False, 'error': str(e)})
 
-
+        
+        
 
     
 

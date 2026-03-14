@@ -283,99 +283,139 @@
     
     <script>
     async function loadProgressData() {
-        try {
-            const response = await fetch('/get-progress-data');
-            const data = await response.json();
-            
-            console.log("Progress data received:", data); // Debug log
-            
-            if (data.success === false) {
-                console.error("Error:", data.error);
-                return;
+    try {
+        const response = await fetch('/get-progress-data');
+        const data = await response.json();
+        
+        console.log("Progress data received:", data);
+        
+        if (data.success === false) {
+            console.error("Error:", data.error);
+            return;
+        }
+        
+        // Update stats
+        document.getElementById('totalWorkouts').innerText = data.totalWorkouts || 0;
+        document.getElementById('totalCalories').innerText = (data.totalCaloriesBurned || 0).toLocaleString();
+        document.getElementById('totalMinutes').innerText = data.totalMinutes || 0;
+        document.getElementById('currentStreak').innerText = data.streak || 0;
+        
+        // Workouts Chart
+        const ctx = document.getElementById('workoutsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.weekLabels || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Workouts',
+                    data: data.weeklyWorkouts || [0,0,0,0,0,0,0],
+                    borderColor: '#6b46c1',
+                    backgroundColor: 'rgba(107, 70, 193, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                }
             }
-            
-            // Update stats
-            document.getElementById('totalWorkouts').innerText = data.totalWorkouts || 0;
-            document.getElementById('totalCalories').innerText = (data.totalCaloriesBurned || 0).toLocaleString();
-            document.getElementById('totalMinutes').innerText = data.totalMinutes || 0;
-            document.getElementById('currentStreak').innerText = data.streak || 0;
-            
-            // Workouts Chart
-            const ctx = document.getElementById('workoutsChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: data.weekLabels || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                    datasets: [{
-                        label: 'Workouts',
-                        data: data.weeklyWorkouts || [0,0,0,0,0,0,0],
-                        borderColor: '#6b46c1',
-                        backgroundColor: 'rgba(107, 70, 193, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { display: false }
-                    }
+        });
+        
+        // Calories Chart
+        const ctx2 = document.getElementById('caloriesChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: data.weekLabels || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Calories',
+                    data: data.weeklyCalories || [0,0,0,0,0,0,0],
+                    backgroundColor: '#6b46c1',
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+        
+        // Workout Distribution Pie Chart
+        const ctx3 = document.getElementById('pieChart').getContext('2d');
+        
+        // Calculate workout distribution from recent activity
+        let workoutTypes = {};
+        if (data.recentActivity && data.recentActivity.length > 0) {
+            data.recentActivity.forEach(activity => {
+                if (activity.icon === 'fa-dumbbell') {
+                    workoutTypes[activity.title] = (workoutTypes[activity.title] || 0) + 1;
                 }
             });
-            
-            // Calories Chart
-            const ctx2 = document.getElementById('caloriesChart').getContext('2d');
-            new Chart(ctx2, {
-                type: 'bar',
-                data: {
-                    labels: data.weekLabels || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                    datasets: [{
-                        label: 'Calories',
-                        data: data.weeklyCalories || [0,0,0,0,0,0,0],
-                        backgroundColor: '#6b46c1',
-                        borderRadius: 5
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { display: false }
+        }
+        
+        // If no data, show sample data
+        const labels = Object.keys(workoutTypes).length > 0 ? Object.keys(workoutTypes) : ['Upper Body', 'Lower Body', 'Cardio', 'Core'];
+        const values = Object.keys(workoutTypes).length > 0 ? Object.values(workoutTypes) : [4, 3, 2, 1];
+        
+        new Chart(ctx3, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: ['#6b46c1', '#38a169', '#fbbf24', '#e53e3e', '#dd6b20', '#3182ce'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
                     }
                 }
-            });
-            
-            // Timeline
-            const timeline = document.getElementById('timeline');
-            if (timeline) {
-                timeline.innerHTML = '';
-                if (data.recentActivity && data.recentActivity.length > 0) {
-                    data.recentActivity.forEach(activity => {
-                        timeline.innerHTML += `
-                            <div class="timeline-item">
-                                <div class="timeline-icon">
-                                    <i class="fas ${activity.icon}"></i>
-                                </div>
-                                <div class="timeline-content">
-                                    <div class="timeline-date">${activity.date}</div>
-                                    <div class="timeline-title">${activity.title}</div>
-                                    <div class="timeline-stats">
-                                        <span>🔥 ${activity.calories} cal</span>
-                                        <span>⏱️ ${activity.duration} min</span>
-                                    </div>
+            }
+        });
+        
+        // Timeline
+        const timeline = document.getElementById('timeline');
+        if (timeline) {
+            timeline.innerHTML = '';
+            if (data.recentActivity && data.recentActivity.length > 0) {
+                data.recentActivity.forEach(activity => {
+                    timeline.innerHTML += `
+                        <div class="timeline-item">
+                            <div class="timeline-icon">
+                                <i class="fas ${activity.icon}"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-date">${activity.date}</div>
+                                <div class="timeline-title">${activity.title}</div>
+                                <div class="timeline-stats">
+                                    <span>🔥 ${activity.calories} cal</span>
+                                    <span>⏱️ ${activity.duration} min</span>
                                 </div>
                             </div>
-                        `;
-                    });
-                } else {
-                    timeline.innerHTML = '<p style="text-align: center; color: #6b7280;">No workouts logged yet</p>';
-                }
+                        </div>
+                    `;
+                });
+            } else {
+                timeline.innerHTML = '<p style="text-align: center; color: #6b7280;">No workouts logged yet</p>';
             }
-            
-        } catch (error) {
-            console.error('Error loading progress data:', error);
         }
+        
+    } catch (error) {
+        console.error('Error loading progress data:', error);
     }
+}
+            
     
+                     
     // Load data when page loads
     document.addEventListener('DOMContentLoaded', function() {
         loadProgressData();
