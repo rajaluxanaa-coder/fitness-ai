@@ -1077,6 +1077,7 @@ def get_achievements():
     total_xp = workout_count * 10 + len(meals) * 5
     level = total_xp // 100
     current_level_xp = total_xp % 100
+    xp_to_next=100-current_level_xp
     
     # Determine earned badges based on REAL data
     achievements = []
