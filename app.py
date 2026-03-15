@@ -615,7 +615,8 @@ def logout():
 def schedule():
     if 'user_id' not in session:
         return redirect(url_for('index'))
-    return render_template('schedule.html')
+    user=User.query.get(session['user_id'])
+    return render_template('schedule.html',user=user)
 
 @app.route('/profile')
 def profile():
