@@ -316,9 +316,9 @@
                     {% for post in posts %}
                     <div class="post">
                         <div class="post-header">
-                            <div class="post-avatar">{{ post.user.name[0]|upper }}</div>
+                            <div class="post-avatar">{{ user.name[0]|upper }}</div>
                             <div>
-                                <strong>{{ post.user.name }}</strong>
+                                <strong>{{ user.name }}</strong>
                                 <span style="color: #6b7280;"> • {{ post.created_at.strftime('%b %d, %Y') }}</span>
                             </div>
                         </div>
