@@ -374,9 +374,11 @@ def generate_schedule():
         equipment = data.get('equipment', 'bodyweight')
         
         # Create a VERY specific prompt to ensure AI generation
-        prompt = f"""Generate a COMPLETE 5-day workout schedule for a {user.age}-year-old person.
+        prompt = f"""Generate a COMPLETE 5-day workout schedule for {user.name}.
 
 USER DETAILS:
+- Name: {user.name}
+- Age: {user.age}
 - Goal: {goal}
 - Level: {level}
 - Equipment: {equipment}
