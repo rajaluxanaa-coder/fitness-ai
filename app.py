@@ -175,6 +175,8 @@ class Post(db.Model):
     likes = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+    user=db.relationship('User',backref='posts')
+
 
 class Challenge(db.Model):
     """User challenges"""
@@ -830,6 +832,9 @@ def decline_friend_request():
 def create_post():
     try:
         data = request.json
+        if 'user_id' not in session:
+            return jsonify({'success': False, 'error': 'Not logged in'})
+        
         post = Post(
             user_id=session['user_id'],
             content=data.get('content'),
@@ -844,6 +849,8 @@ def create_post():
     except Exception as e:
         print(f"Error creating post: {str(e)}")
         return jsonify({'success': False, 'error': str(e)})
+
+
 
 @app.route('/like-post', methods=['POST'])
 def like_post():

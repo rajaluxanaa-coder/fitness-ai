@@ -465,26 +465,50 @@
             }
         }
         
-        async function createPost() {
-            const content = document.getElementById('postContent').value;
-            
-            if (!content) {
-                alert('Please enter something to post');
-                return;
-            }
-            
+    async function createPost() {
+        const content = document.getElementById('postContent').value;
+        
+        if (!content.trim()) {
+            alert('Please enter something to post');
+            return;
+        }
+        
+        // Show loading state
+        const btn = event.target;
+        const originalText = btn.innerText;
+        btn.innerText = 'Posting...';
+        btn.disabled = true;
+        
+        try {
             const response = await fetch('/create-post', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({content: content, type: 'update'})
+                body: JSON.stringify({
+                    content: content,
+                    type: 'update'
+                })
             });
             
             const data = await response.json();
+            
             if (data.success) {
+                alert('✅ Post created!');
                 document.getElementById('postContent').value = '';
-                location.reload();
+                location.reload(); // Refresh to show new post
+            } else {
+                alert('❌ Error: ' + (data.error || 'Unknown error'));
             }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ Failed to create post');
+        } finally {
+            btn.innerText = originalText;
+            btn.disabled = false;
         }
+    }
+    
+    // Make sure the button calls the function
+    document.querySelector('.create-post .btn').onclick = createPost;
         
         async function likePost(postId) {
             const response = await fetch('/like-post', {
