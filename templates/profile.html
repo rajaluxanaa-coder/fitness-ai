@@ -923,13 +923,26 @@ input:checked + .slider:before {
                 </div>
             </div>
 
-            <!-- Achievements -->
-            <div class="achievements" style="background: white; padding: 1.5rem; border-radius: 1rem;">
-                <h3><i class="fas fa-trophy"></i> Your Achievements</h3>
-                <div id="achievementsGrid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem;"></div>
-            </div>
+            <!-- Achievements Summary -->
+<div class="achievements-summary" style="background: white; border-radius: 1rem; padding: 1.5rem; margin-top: 1.5rem;">
+    <h3 style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+        <i class="fas fa-trophy" style="color: #6b46c1;"></i>
+        Your Achievements
+    </h3>
+    
+    <div id="achievementsSummary" style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <!-- Achievements will load here -->
+        <div style="text-align: center; color: #6b7280; padding: 1rem;">
+            <i class="fas fa-spinner fa-spin"></i> Loading achievements...
         </div>
-
+    </div>
+    
+    <div style="text-align: center; margin-top: 1rem;">
+        <a href="/achievements" style="color: #6b46c1; text-decoration: none; font-size: 0.9rem;">
+            View All Achievements <i class="fas fa-arrow-right"></i>
+        </a>
+    </div>
+</div>
         <!-- RIGHT PANEL -->
         <div class="right-panel">
             <!-- Meal Recommendations -->
@@ -1186,6 +1199,78 @@ async function saveSettings() {
     }
 }
 
+
+
+// Load achievements summary
+async function loadAchievementsSummary() {
+    try {
+        const response = await fetch('/get-achievements');
+        const data = await response.json();
+        
+        const container = document.getElementById('achievementsSummary');
+        
+        if (data.achievements && data.achievements.length > 0) {
+            // Get only earned achievements (limit to 3)
+            const earned = data.achievements.filter(a => a.earned).slice(0, 3);
+            
+            if (earned.length > 0) {
+                let html = '';
+                earned.forEach(achievement => {
+                    html += `
+                        <div style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem; background: #f3f4f6; border-radius: 0.5rem;">
+                            <div style="font-size: 2rem;">${achievement.icon}</div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: bold; color: #1f2937;">${achievement.name}</div>
+                                <div style="font-size: 0.85rem; color: #6b7280;">${achievement.description}</div>
+                            </div>
+                            <div style="font-size: 0.8rem; color: #6b46c1; background: #e5e7eb; padding: 0.25rem 0.5rem; border-radius: 1rem;">
+                                ${achievement.date}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                // Add streak info
+                html += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: #f0f9ff; border-radius: 0.5rem; margin-top: 0.5rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span style="font-size: 1.5rem;">🔥</span>
+                            <span style="font-weight: bold;">${data.streak || 0} Day Streak</span>
+                        </div>
+                        <span style="color: #6b46c1; font-weight: bold;">${data.badge_count || 0} Badges</span>
+                    </div>
+                `;
+                
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 1.5rem; background: #f3f4f6; border-radius: 0.5rem;">
+                        <i class="fas fa-trophy" style="font-size: 3rem; color: #d1d5db; margin-bottom: 0.5rem;"></i>
+                        <p style="color: #6b7280;">No achievements yet. Complete workouts to earn badges!</p>
+                        <a href="/achievements" style="display: inline-block; margin-top: 0.5rem; color: #6b46c1;">View All Badges →</a>
+                    </div>
+                `;
+            }
+        } else {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 1.5rem; background: #f3f4f6; border-radius: 0.5rem;">
+                    <i class="fas fa-trophy" style="font-size: 3rem; color: #d1d5db; margin-bottom: 0.5rem;"></i>
+                    <p style="color: #6b7280;">No achievements yet. Complete workouts to earn badges!</p>
+                    <a href="/achievements" style="display: inline-block; margin-top: 0.5rem; color: #6b46c1;">View All Badges →</a>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error loading achievements:', error);
+        document.getElementById('achievementsSummary').innerHTML = `
+            <div style="text-align: center; color: #e53e3e; padding: 1rem;">
+                Failed to load achievements
+            </div>
+        `;
+    }
+}
+
+
 async function loadSettings() {
     try {
         const response = await fetch('/get-settings');
@@ -1280,6 +1365,7 @@ async function loadSettings() {
             loadRecentWorkouts();
             loadRecentMeals();
             loadMealRecommendations();
+            loadAchievementsSummary(); // Add this line
             
             // Refresh weather every 30 minutes
             setInterval(updateWeather, 1800000);
