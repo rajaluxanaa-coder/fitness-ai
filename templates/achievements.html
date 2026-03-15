@@ -296,7 +296,7 @@
     <div class="progress-bar">
         <div class="progress-fill" id="xpProgress" style="width: 0%;"></div>
     </div>
-    <div><span id="currentXP">0</span> / <span id="totalXP">0</span> XP to Level <span id="xpToNext">0</span></div>
+    <div><span id="currentXP">0</span> / <span id="totalXP">100</span> XP to Level <span id="xpToNext">1</span></div>
 </div>
 
 <!-- Stats Overview -->
@@ -447,6 +447,21 @@
         }
     }
 
+    async function loadLevelData() {
+    try {
+        const response = await fetch('/get-user-level');
+        const data = await response.json();
+        
+        document.getElementById('currentLevel').textContent = data.level;
+        document.getElementById('currentXP').textContent = data.current_xp;
+        document.getElementById('totalXP').textContent = '100';
+        document.getElementById('xpToNext').textContent = data.level + 1;
+        document.getElementById('xpProgress').style.width = data.progress + '%';
+    } catch (error) {
+        console.error('Error loading level:', error);
+    }
+}
+
     // Function to load challenges
     async function loadChallenges() {
         try {
@@ -590,6 +605,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         loadAchievements();
         loadChallenges();
+        loadLevelData();
     });
 </script>
 </html>
