@@ -662,6 +662,10 @@ ${event.type}
 
         // Initialize calendar
         document.addEventListener('DOMContentLoaded', function() {
+             const savedDarkMode = localStorage.getItem('darkMode');
+    if (savedDarkMode === 'enabled') {
+        document.body.classList.add('dark-mode');
+    }
             loadEvents();
             renderCalendar();
         });

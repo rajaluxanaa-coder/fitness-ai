@@ -523,6 +523,14 @@
                 likesSpan.innerText = parseInt(likesSpan.innerText) + 1;
             }
         }
+
+        // Apply dark mode on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const savedDarkMode = localStorage.getItem('darkMode');
+    if (savedDarkMode === 'enabled') {
+        document.body.classList.add('dark-mode');
+    }
+});
     </script>
 </body>
 </html>

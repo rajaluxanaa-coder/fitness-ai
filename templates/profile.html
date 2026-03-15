@@ -1148,16 +1148,30 @@ input:checked + .slider:before {
             document.getElementById('settingsPanel').classList.toggle('open');
         }
 
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
-            saveSettings();
-        }
+        // Dark mode toggle - REPLACE YOUR EXISTING FUNCTION WITH THIS
+function toggleDarkMode() {
+    const isDarkMode = document.body.classList.toggle('dark-mode');
+    localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+    
+    // Also save to user settings in database
+    saveSettings();
+}
+
+// Apply dark mode on page load - ADD THIS NEW FUNCTION
+function applyDarkMode() {
+    const savedDarkMode = localStorage.getItem('darkMode');
+    if (savedDarkMode === 'enabled') {
+        document.body.classList.add('dark-mode');
+        const toggle = document.getElementById('darkModeToggle');
+        if (toggle) toggle.checked = true;
+    }
+}
 
         // Save settings function
 async function saveSettings() {
     const settings = {
         notification_enabled: document.getElementById('notificationToggle').checked,
-        dark_mode: document.getElementById('darkModeToggle').checked,
+        dark_mode: document.body.classList.contains('dark-mode'),
         measurement_unit: document.getElementById('measurementUnit').value,
         workout_reminder_time: document.getElementById('workoutReminder').value,
         meal_reminder_time: document.getElementById('mealReminder').value,
@@ -1165,6 +1179,8 @@ async function saveSettings() {
         daily_calorie_goal: parseInt(document.getElementById('calorieGoal').value),
         profile_visibility: document.getElementById('profileVisibility').value
     };
+    
+    localStorage.setItem('darkMode',settings.dark_mode ? 'enabled' : 'disabled');
     
     // Show loading state
     const btn = document.querySelector('.save-settings-btn');
@@ -1361,7 +1377,12 @@ async function loadSettings() {
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
+                        // Then apply dark mode from localStorage
+
+            applyDarkMode();
             loadSettings();
+
+    
             updateWeather();
             refreshNutritionTip();
             loadAchievements();
@@ -1369,6 +1390,7 @@ async function loadSettings() {
             loadRecentMeals();
             loadMealRecommendations();
             loadAchievementsSummary(); // Add this line
+            loadUserLevel();
             
             // Refresh weather every 30 minutes
             setInterval(updateWeather, 1800000);

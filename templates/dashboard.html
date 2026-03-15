@@ -932,6 +932,13 @@ function updateProgress() {
     // Load saved data on page load
     document.addEventListener('DOMContentLoaded', function() {
         // Load saved stats from localStorage
+
+        // Apply dark mode on page load
+    const savedDarkMode = localStorage.getItem('darkMode');
+    if (savedDarkMode === 'enabled') {
+        document.body.classList.add('dark-mode');
+    }
+
         const savedWorkouts = localStorage.getItem('workoutsDone');
         const savedCalories = localStorage.getItem('caloriesBurned');
         const savedMinutes = localStorage.getItem('totalMinutes');
