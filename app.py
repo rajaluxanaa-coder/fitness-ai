@@ -1758,7 +1758,37 @@ def get_analytics_data():
     
     
     
+@app.route('/get-user-level')
+def get_user_level():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not logged in'}), 401
     
+    user_id = session['user_id']
+    
+    # Get user data
+    workouts = WorkoutLog.query.filter_by(user_id=user_id).all()
+    meals = MealLog.query.filter_by(user_id=user_id).all()
+    
+    # Calculate XP (10 per workout, 5 per meal)
+    total_xp = len(workouts) * 10 + len(meals) * 5
+    
+    # Calculate level (every 100 XP = 1 level)
+    level = (total_xp // 100) + 1  # Start at level 1
+    current_level_xp = total_xp % 100
+    next_level_xp = 100 - current_level_xp
+    
+    # Calculate level progress percentage
+    progress_percent = (current_level_xp / 100) * 100
+    
+    return jsonify({
+        'level': level,
+        'current_xp': current_level_xp,
+        'next_level_xp': next_level_xp,
+        'progress': progress_percent,
+        'total_xp': total_xp,
+        'workouts': len(workouts),
+        'meals': len(meals)
+    })
 
 
 @app.route('/debug-workouts')

@@ -842,7 +842,10 @@ input:checked + .slider:before {
                 </div>
                 <input type="file" id="profilePicInput" style="display: none;" accept="image/*">
                 <h2>{{ user.name }}</h2>
-                <p style="color: #6b46c1;">{{ user.fitness_level }} • Level {{ user.level or '1' }}</p>
+<p style="color: #6b46c1;">
+    {{ user.fitness_level|capitalize }} • 
+    <span id="userLevel">Level <span id="levelValue">1</span></span>
+</p>
             </div>
 
             <div class="quick-actions">
