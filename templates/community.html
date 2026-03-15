@@ -159,6 +159,19 @@
             padding: 1.5rem;
         }
         
+        .create-post {
+            margin-bottom: 2rem;
+        }
+        
+        .create-post textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            resize: vertical;
+        }
+        
         .post {
             border-bottom: 1px solid #e5e7eb;
             padding: 1rem 0;
@@ -183,6 +196,11 @@
             font-weight: bold;
         }
         
+        .post-content {
+            margin: 0.5rem 0;
+            line-height: 1.6;
+        }
+        
         .post-actions {
             display: flex;
             gap: 1rem;
@@ -195,6 +213,13 @@
             border: none;
             cursor: pointer;
             color: #6b7280;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .post-actions button:hover {
+            color: #6b46c1;
         }
         
         .btn {
@@ -204,6 +229,12 @@
             padding: 0.5rem 1rem;
             border-radius: 0.5rem;
             cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
         }
         
         .btn-success { background: #38a169; }
@@ -232,6 +263,22 @@
             align-items: center;
             justify-content: center;
         }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #6b7280;
+        }
+        
+        .alert {
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .alert-success { background: #d1fae5; color: #065f46; }
+        .alert-error { background: #fee2e2; color: #991b1b; }
         
         @media (max-width: 768px) {
             .main-grid {
@@ -278,88 +325,72 @@
                 <h3 style="margin-bottom: 1rem;">Find Friends</h3>
                 <div class="search-box">
                     <input type="email" id="searchEmail" placeholder="Search by email...">
-                    <button class="btn" onclick="alert('Friend request feature coming soon!')">Add</button>
+                    <button class="btn" onclick="sendFriendRequest()">Add Friend</button>
                 </div>
+                <div id="searchResult"></div>
                 
                 <h3 style="margin: 2rem 0 1rem;">Friend Requests</h3>
-                {% for req in friend_requests %}
-                <div class="friend-card">
-                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                        <div class="friend-avatar">{{ req.name[0]|upper }}</div>
-                        <strong>{{ req.name }}</strong>
+                <div id="friendRequests">
+                    {% for request, sender in friend_requests %}
+                    <div class="friend-card" id="request-{{ request.id }}">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                            <div class="friend-avatar">{{ sender.name[0]|upper }}</div>
+                            <strong>{{ sender.name }}</strong>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-success btn-sm" onclick="acceptRequest({{ request.id }})">✓ Accept</button>
+                            <button class="btn btn-danger btn-sm" onclick="declineRequest({{ request.id }})">✗ Decline</button>
+                        </div>
                     </div>
-                    <div style="display: flex; gap: 0.5rem;">
-                        <button class="btn btn-success btn-sm">✓ Accept</button>
-                        <button class="btn btn-danger btn-sm">✗ Decline</button>
-                    </div>
+                    {% else %}
+                    <p style="color: #6b7280;">No pending requests</p>
+                    {% endfor %}
                 </div>
-                {% else %}
-                <p style="color: #6b7280;">No pending requests</p>
-                {% endfor %}
                 
                 <h3 style="margin: 2rem 0 1rem;">My Friends</h3>
-                {% for friend in friends %}
-                <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem;">
-                    <div class="friend-avatar">{{ friend.name[0]|upper }}</div>
-                    <span>{{ friend.name }}</span>
+                <div id="friendsList">
+                    {% for friend in friends %}
+                    <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem;">
+                        <div class="friend-avatar">{{ friend.name[0]|upper }}</div>
+                        <span>{{ friend.name }}</span>
+                    </div>
+                    {% else %}
+                    <p style="color: #6b7280;">No friends yet</p>
+                    {% endfor %}
                 </div>
-                {% else %}
-                <p style="color: #6b7280;">No friends yet</p>
-                {% endfor %}
             </div>
             
             <!-- Main Feed -->
             <div class="feed">
-                <h3 style="margin-bottom: 1rem;">Activity Feed</h3>
+                <!-- Create Post -->
+                <div class="create-post">
+                    <textarea id="postContent" placeholder="Share your fitness progress..." rows="3"></textarea>
+                    <button class="btn" onclick="createPost()" style="width: 100%;">Post Update</button>
+                </div>
                 
-                {% if posts %}
-                    {% for post in posts %}
-                    <div class="post">
+                <h3 style="margin-bottom: 1rem;">Activity Feed</h3>
+                <div id="postsFeed">
+                    {% for post, post_user in posts %}
+                    <div class="post" id="post-{{ post.id }}">
                         <div class="post-header">
-                            <div class="post-avatar">{{ user.name[0]|upper }}</div>
+                            <div class="post-avatar">{{ post_user.name[0]|upper }}</div>
                             <div>
-                                <strong>{{ user.name }}</strong>
-                                <span style="color: #6b7280;"> • {{ post.created_at.strftime('%b %d, %Y') }}</span>
+                                <strong>{{ post_user.name }}</strong>
+                                <span style="color: #6b7280; font-size: 0.9rem;"> • {{ post.created_at.strftime('%b %d, %Y') }}</span>
                             </div>
                         </div>
-                        <p>{{ post.content }}</p>
+                        <div class="post-content">{{ post.content }}</div>
                         <div class="post-actions">
-                            <button><i class="far fa-heart"></i> {{ post.likes }}</button>
+                            <button onclick="likePost({{ post.id }})">
+                                <i class="far fa-heart"></i> <span id="likes-{{ post.id }}">{{ post.likes }}</span>
+                            </button>
                             <button><i class="far fa-comment"></i> 0</button>
                         </div>
                     </div>
+                    {% else %}
+                    <p style="color: #6b7280; text-align: center;">No posts yet. Be the first to share!</p>
                     {% endfor %}
-                {% else %}
-                    <!-- Sample posts if no real posts exist -->
-                    <div class="post">
-                        <div class="post-header">
-                            <div class="post-avatar">{{ user.name[0]|upper }}</div>
-                            <div>
-                                <strong>{{ user.name }}</strong>
-                                <span style="color: #6b7280;"> • Just now</span>
-                            </div>
-                        </div>
-                        <p>💪 Just completed an amazing workout! 300 calories burned.</p>
-                        <div class="post-actions">
-                            <button><i class="far fa-heart"></i> 5</button>
-                            <button><i class="far fa-comment"></i> 2</button>
-                        </div>
-                    </div>
-                    <div class="post">
-                        <div class="post-header">
-                            <div class="post-avatar">{{ user.name[0]|upper }}</div>
-                            <div>
-                                <strong>{{ user.name }}</strong>
-                                <span style="color: #6b7280;"> • 2 hours ago</span>
-                            </div>
-                        </div>
-                        <p>🥗 Logged a healthy meal: Grilled Chicken Salad (350 cal)</p>
-                        <div class="post-actions">
-                            <button><i class="far fa-heart"></i> 3</button>
-                            <button><i class="far fa-comment"></i> 1</button>
-                        </div>
-                    </div>
-                {% endif %}
+                </div>
             </div>
         </div>
         
@@ -379,5 +410,95 @@
             {% endfor %}
         </div>
     </div>
+
+    <script>
+        async function sendFriendRequest() {
+            const email = document.getElementById('searchEmail').value;
+            const resultDiv = document.getElementById('searchResult');
+            
+            if (!email) {
+                resultDiv.innerHTML = '<div class="alert alert-error">Please enter an email</div>';
+                return;
+            }
+            
+            const response = await fetch('/send-friend-request', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({email: email})
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                resultDiv.innerHTML = '<div class="alert alert-success">✅ Friend request sent!</div>';
+                document.getElementById('searchEmail').value = '';
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                resultDiv.innerHTML = `<div class="alert alert-error">❌ ${data.error}</div>`;
+            }
+        }
+        
+        async function acceptRequest(requestId) {
+            const response = await fetch('/accept-friend-request', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({request_id: requestId})
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                document.getElementById(`request-${requestId}`).remove();
+                location.reload();
+            }
+        }
+        
+        async function declineRequest(requestId) {
+            const response = await fetch('/decline-friend-request', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({request_id: requestId})
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                document.getElementById(`request-${requestId}`).remove();
+            }
+        }
+        
+        async function createPost() {
+            const content = document.getElementById('postContent').value;
+            
+            if (!content) {
+                alert('Please enter something to post');
+                return;
+            }
+            
+            const response = await fetch('/create-post', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({content: content, type: 'update'})
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                document.getElementById('postContent').value = '';
+                location.reload();
+            }
+        }
+        
+        async function likePost(postId) {
+            const response = await fetch('/like-post', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({post_id: postId})
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                const likesSpan = document.getElementById(`likes-${postId}`);
+                likesSpan.innerText = parseInt(likesSpan.innerText) + 1;
+            }
+        }
+    </script>
 </body>
 </html>

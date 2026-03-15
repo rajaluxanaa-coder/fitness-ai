@@ -689,46 +689,33 @@ def community():
     if not user:
         return redirect(url_for('index'))
     
-    # Get friend requests (with error handling)
-    try:
-        friend_requests = db.session.query(User).join(
-            FriendRequest, 
-            (FriendRequest.sender_id == User.id) & 
-            (FriendRequest.receiver_id == user_id) &
-            (FriendRequest.status == 'pending')
-        ).all()
-    except:
-        # If FriendRequest table doesn't exist, return empty list
-        friend_requests = []
+    # Get friend requests (pending requests sent to current user)
+    friend_requests = db.session.query(FriendRequest, User).join(
+        User, FriendRequest.sender_id == User.id
+    ).filter(
+        FriendRequest.receiver_id == user_id,
+        FriendRequest.status == 'pending'
+    ).all()
     
-    # Get friends (with error handling)
-    try:
-        friends = db.session.query(User).join(
-            Friend,
-            ((Friend.user_id == user_id) & (Friend.friend_id == User.id)) |
-            ((Friend.friend_id == user_id) & (Friend.user_id == User.id))
-        ).filter(Friend.status == 'accepted').all()
-    except:
-        # If Friend table doesn't exist, return empty list
-        friends = []
+    # Get friends list
+    friends = db.session.query(User).join(
+        Friend,
+        ((Friend.user_id == user_id) & (Friend.friend_id == User.id)) |
+        ((Friend.friend_id == user_id) & (Friend.user_id == User.id))
+    ).filter(Friend.status == 'accepted').all()
     
-    # Get posts (with error handling)
-    try:
-        posts = Post.query.order_by(Post.created_at.desc()).limit(20).all()
-    except:
-        # If Post table doesn't exist, return empty list
-        posts = []
+    # Get posts with user info
+    posts = db.session.query(Post, User).join(
+        User, Post.user_id == User.id
+    ).order_by(Post.created_at.desc()).limit(20).all()
     
-    # Get leaderboard (with error handling)
-    try:
-        from sqlalchemy import func
-        leaderboard = db.session.query(
-            User, 
-            func.count(WorkoutLog.id).label('workout_count'),
-            func.sum(WorkoutLog.calories_burned).label('total_calories')
-        ).outerjoin(WorkoutLog, User.id == WorkoutLog.user_id).group_by(User.id).order_by(func.count(WorkoutLog.id).desc()).limit(10).all()
-    except:
-        leaderboard = []
+    # Get leaderboard
+    from sqlalchemy import func
+    leaderboard = db.session.query(
+        User, 
+        func.count(WorkoutLog.id).label('workout_count'),
+        func.sum(WorkoutLog.calories_burned).label('total_calories')
+    ).outerjoin(WorkoutLog, User.id == WorkoutLog.user_id).group_by(User.id).order_by(func.count(WorkoutLog.id).desc()).limit(10).all()
     
     return render_template('community.html', 
                          user=user,
@@ -738,7 +725,7 @@ def community():
                          leaderboard=leaderboard)
 
 
-                         
+
     
 
 
@@ -746,77 +733,136 @@ def community():
     
 @app.route('/send-friend-request', methods=['POST'])
 def send_friend_request():
-    data = request.json
-    receiver_email = data.get('email')
-    
-    receiver = User.query.filter_by(email=receiver_email).first()
-    if not receiver:
-        return jsonify({'success': False, 'error': 'User not found'})
-    
-    # Check if request already exists
-    existing = FriendRequest.query.filter_by(
-        sender_id=session['user_id'], 
-        receiver_id=receiver.id
-    ).first()
-    
-    if existing:
-        return jsonify({'success': False, 'error': 'Friend request already sent'})
-    
-    request = FriendRequest(
-        sender_id=session['user_id'],
-        receiver_id=receiver.id
-    )
-    db.session.add(request)
-    db.session.commit()
-    
-    return jsonify({'success': True})
+    try:
+        data = request.json
+        receiver_email = data.get('email')
+        
+        # Find user by email
+        receiver = User.query.filter_by(email=receiver_email).first()
+        if not receiver:
+            return jsonify({'success': False, 'error': 'User not found'})
+        
+        # Check if trying to add self
+        if receiver.id == session['user_id']:
+            return jsonify({'success': False, 'error': 'You cannot add yourself as friend'})
+        
+        # Check if already friends
+        existing_friend = Friend.query.filter(
+            ((Friend.user_id == session['user_id']) & (Friend.friend_id == receiver.id)) |
+            ((Friend.friend_id == session['user_id']) & (Friend.user_id == receiver.id))
+        ).first()
+        
+        if existing_friend:
+            return jsonify({'success': False, 'error': 'Already friends'})
+        
+        # Check if request already sent
+        existing_request = FriendRequest.query.filter_by(
+            sender_id=session['user_id'],
+            receiver_id=receiver.id,
+            status='pending'
+        ).first()
+        
+        if existing_request:
+            return jsonify({'success': False, 'error': 'Friend request already sent'})
+        
+        # Create friend request
+        friend_request = FriendRequest(
+            sender_id=session['user_id'],
+            receiver_id=receiver.id,
+            status='pending'
+        )
+        db.session.add(friend_request)
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'Friend request sent!'})
+        
+    except Exception as e:
+        print(f"Error sending friend request: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/accept-friend-request', methods=['POST'])
 def accept_friend_request():
-    data = request.json
-    sender_id = data.get('sender_id')
-    
-    # Update request status
-    req = FriendRequest.query.filter_by(
-        sender_id=sender_id,
-        receiver_id=session['user_id']
-    ).first()
-    
-    if req:
-        req.status = 'accepted'
+    try:
+        data = request.json
+        request_id = data.get('request_id')
         
-        # Create friend relationship
+        # Get the friend request
+        friend_request = FriendRequest.query.get(request_id)
+        if not friend_request:
+            return jsonify({'success': False, 'error': 'Request not found'})
+        
+        # Update request status
+        friend_request.status = 'accepted'
+        
+        # Create friendship
         friend = Friend(
-            user_id=session['user_id'],
-            friend_id=sender_id,
+            user_id=friend_request.sender_id,
+            friend_id=friend_request.receiver_id,
             status='accepted'
         )
         db.session.add(friend)
         db.session.commit()
         
-    return jsonify({'success': True})
+        return jsonify({'success': True})
+        
+    except Exception as e:
+        print(f"Error accepting friend request: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/decline-friend-request', methods=['POST'])
+def decline_friend_request():
+    try:
+        data = request.json
+        request_id = data.get('request_id')
+        
+        friend_request = FriendRequest.query.get(request_id)
+        if friend_request:
+            friend_request.status = 'declined'
+            db.session.commit()
+        
+        return jsonify({'success': True})
+        
+    except Exception as e:
+        print(f"Error declining friend request: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/create-post', methods=['POST'])
 def create_post():
-    data = request.json
-    post = Post(
-        user_id=session['user_id'],
-        content=data.get('content'),
-        type=data.get('type', 'update')
-    )
-    db.session.add(post)
-    db.session.commit()
-    return jsonify({'success': True})
+    try:
+        data = request.json
+        post = Post(
+            user_id=session['user_id'],
+            content=data.get('content'),
+            type=data.get('type', 'update'),
+            likes=0
+        )
+        db.session.add(post)
+        db.session.commit()
+        
+        return jsonify({'success': True})
+        
+    except Exception as e:
+        print(f"Error creating post: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/like-post', methods=['POST'])
 def like_post():
-    data = request.json
-    post = Post.query.get(data.get('post_id'))
-    if post:
-        post.likes += 1
-        db.session.commit()
-    return jsonify({'success': True})
+    try:
+        data = request.json
+        post = Post.query.get(data.get('post_id'))
+        if post:
+            post.likes += 1
+            db.session.commit()
+        
+        return jsonify({'success': True})
+        
+    except Exception as e:
+        print(f"Error liking post: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)})
 
+
+
+    
 @app.route('/log-workout', methods=['POST'])
 def log_workout():
     try:
