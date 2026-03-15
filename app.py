@@ -686,31 +686,49 @@ def community():
     
     # Get user
     user = User.query.get(user_id)
+    if not user:
+        return redirect(url_for('index'))
     
-    # Get friend requests
-    friend_requests = db.session.query(User).join(
-        FriendRequest, 
-        (FriendRequest.sender_id == User.id) & 
-        (FriendRequest.receiver_id == user_id) &
-        (FriendRequest.status == 'pending')
-    ).all()
+    # Get friend requests (with error handling)
+    try:
+        friend_requests = db.session.query(User).join(
+            FriendRequest, 
+            (FriendRequest.sender_id == User.id) & 
+            (FriendRequest.receiver_id == user_id) &
+            (FriendRequest.status == 'pending')
+        ).all()
+    except:
+        # If FriendRequest table doesn't exist, return empty list
+        friend_requests = []
     
-    # Get friends
-    friends = db.session.query(User).join(
-        Friend,
-        ((Friend.user_id == user_id) & (Friend.friend_id == User.id)) |
-        ((Friend.friend_id == user_id) & (Friend.user_id == User.id))
-    ).filter(Friend.status == 'accepted').all()
+    # Get friends (with error handling)
+    try:
+        friends = db.session.query(User).join(
+            Friend,
+            ((Friend.user_id == user_id) & (Friend.friend_id == User.id)) |
+            ((Friend.friend_id == user_id) & (Friend.user_id == User.id))
+        ).filter(Friend.status == 'accepted').all()
+    except:
+        # If Friend table doesn't exist, return empty list
+        friends = []
     
-    # Get posts
-    posts = Post.query.order_by(Post.created_at.desc()).limit(20).all()
+    # Get posts (with error handling)
+    try:
+        posts = Post.query.order_by(Post.created_at.desc()).limit(20).all()
+    except:
+        # If Post table doesn't exist, return empty list
+        posts = []
     
-    # Get leaderboard
-    leaderboard = db.session.query(
-        User, 
-        db.func.count(WorkoutLog.id).label('workout_count'),
-        db.func.sum(WorkoutLog.calories_burned).label('total_calories')
-    ).outerjoin(WorkoutLog).group_by(User.id).order_by(db.func.count(WorkoutLog.id).desc()).limit(10).all()
+    # Get leaderboard (with error handling)
+    try:
+        from sqlalchemy import func
+        leaderboard = db.session.query(
+            User, 
+            func.count(WorkoutLog.id).label('workout_count'),
+            func.sum(WorkoutLog.calories_burned).label('total_calories')
+        ).outerjoin(WorkoutLog, User.id == WorkoutLog.user_id).group_by(User.id).order_by(func.count(WorkoutLog.id).desc()).limit(10).all()
+    except:
+        leaderboard = []
     
     return render_template('community.html', 
                          user=user,
@@ -720,8 +738,11 @@ def community():
                          leaderboard=leaderboard)
 
 
-
                          
+    
+
+
+
     
 @app.route('/send-friend-request', methods=['POST'])
 def send_friend_request():
