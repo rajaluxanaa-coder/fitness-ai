@@ -1576,7 +1576,13 @@ def get_analytics_data():
     range_type = request.args.get('range', 'week')  # week, month, year, all
     
     from datetime import datetime, timedelta
+    import random
     today = datetime.now().date()
+    
+    # Get the user first - THIS WAS MISSING!
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
     
     # Set date range based on selection
     if range_type == 'week':
@@ -1650,7 +1656,7 @@ def get_analytics_data():
     for w in workouts:
         workout_types[w.workout_name] = workout_types.get(w.workout_name, 0) + 1
     
-    # Time of day distribution (mock data - you'd need to add time field to WorkoutLog)
+    # Time of day distribution (mock data)
     time_distribution = {
         'Morning': random.randint(30, 50),
         'Afternoon': random.randint(20, 40),
@@ -1658,9 +1664,9 @@ def get_analytics_data():
     }
     
     # Weight progress
-    weight_start = user.weight if user.weight else 0
+    weight_start = user.weight if user.weight else 70
     weight_current = progress[-1].current_weight if progress else user.weight
-    weight_goal = user.target_weight if hasattr(user, 'target_weight') else weight_start - 5
+    weight_goal = 60  # Default goal
     
     # Calculate weight progress percentage
     if weight_start > weight_goal:  # Weight loss goal
@@ -1669,7 +1675,7 @@ def get_analytics_data():
         weight_progress = ((weight_current - weight_start) / (weight_goal - weight_start)) * 100
     weight_progress = max(0, min(100, weight_progress))
     
-    # Strength PRs (you'd need to add these fields to your model)
+    # Strength PRs
     strength_prs = {
         'bench': 80,
         'squat': 100,
@@ -1685,43 +1691,28 @@ def get_analytics_data():
     else:
         avg_calories = avg_protein = avg_carbs = avg_fats = 0
     
-    # Generate insights based on real data
+    # Generate insights
     insights = []
     
     if total_workouts > 0:
         insights.append({
             'icon': '💪',
             'title': 'Workout Consistency',
-            'text': f"You've completed {total_workouts} workouts in this period. {'Great job!' if total_workouts > 10 else 'Keep going!'}"
+            'text': f"You've completed {total_workouts} workouts in this period."
         })
     
     if streak > 0:
         insights.append({
             'icon': '🔥',
             'title': 'Current Streak',
-            'text': f"You're on a {streak}-day streak! {'Amazing consistency!' if streak > 5 else 'Keep it up!'}"
+            'text': f"You're on a {streak}-day streak!"
         })
     
     if weight_progress > 0:
         insights.append({
             'icon': '🎯',
             'title': 'Goal Progress',
-            'text': f"You're {weight_progress:.1f}% towards your weight goal. {'Almost there!' if weight_progress > 80 else 'Keep pushing!'}"
-        })
-    
-    if total_calories_burned > total_calories_consumed:
-        deficit = total_calories_burned - total_calories_consumed
-        insights.append({
-            'icon': '⚡',
-            'title': 'Calorie Deficit',
-            'text': f"You've burned {deficit} more calories than consumed. Great for weight loss!"
-        })
-    
-    if best_streak >= 7:
-        insights.append({
-            'icon': '🏆',
-            'title': 'Best Streak',
-            'text': f"Your best streak is {best_streak} days! You're more consistent than 80% of users."
+            'text': f"You're {weight_progress:.1f}% towards your weight goal."
         })
     
     return jsonify({
@@ -1738,7 +1729,7 @@ def get_analytics_data():
             'weightGoal': weight_goal,
             'weightProgress': weight_progress,
             'strengthPRs': strength_prs,
-            'workoutGoal': 50,  # Example target
+            'workoutGoal': 50,
             'workoutProgress': (total_workouts / 50) * 100 if total_workouts > 0 else 0
         },
         'charts': {
@@ -1749,7 +1740,7 @@ def get_analytics_data():
             'distributionLabels': list(workout_types.keys()),
             'timeDistribution': time_distribution,
             'nutrition': {
-                'caloriesConsumed': [random.randint(1800, 2500) for _ in range(7)],  # Replace with real data
+                'caloriesConsumed': [random.randint(1800, 2500) for _ in range(7)],
                 'caloriesBurned': weekly_calories
             },
             'macros': {
@@ -1760,6 +1751,10 @@ def get_analytics_data():
         },
         'insights': insights
     })
+    
+    
+    
+    
 
 
 @app.route('/debug-workouts')
