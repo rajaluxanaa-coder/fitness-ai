@@ -675,6 +675,8 @@ def analytics():
     return render_template('analytics.html', user=user)
 
 
+
+
 @app.route('/community')
 def community():
     if 'user_id' not in session:
@@ -682,12 +684,8 @@ def community():
     
     user_id = session['user_id']
     
-    # Get leaderboard data (top users by workout count)
-    leaderboard = db.session.query(
-        User, 
-        db.func.count(WorkoutLog.id).label('workout_count'),
-        db.func.sum(WorkoutLog.calories_burned).label('total_calories')
-    ).join(WorkoutLog).group_by(User.id).order_by(db.func.count(WorkoutLog.id).desc()).limit(10).all()
+    # Get user
+    user = User.query.get(user_id)
     
     # Get friend requests
     friend_requests = db.session.query(User).join(
@@ -704,16 +702,27 @@ def community():
         ((Friend.friend_id == user_id) & (Friend.user_id == User.id))
     ).filter(Friend.status == 'accepted').all()
     
-    # Get activity feed
-    posts = db.session.query(Post).join(User).order_by(Post.created_at.desc()).limit(20).all()
+    # Get posts
+    posts = Post.query.order_by(Post.created_at.desc()).limit(20).all()
+    
+    # Get leaderboard
+    leaderboard = db.session.query(
+        User, 
+        db.func.count(WorkoutLog.id).label('workout_count'),
+        db.func.sum(WorkoutLog.calories_burned).label('total_calories')
+    ).outerjoin(WorkoutLog).group_by(User.id).order_by(db.func.count(WorkoutLog.id).desc()).limit(10).all()
     
     return render_template('community.html', 
-                         user=User.query.get(user_id),
-                         leaderboard=leaderboard,
+                         user=user,
                          friend_requests=friend_requests,
                          friends=friends,
-                         posts=posts)
+                         posts=posts,
+                         leaderboard=leaderboard)
 
+
+
+                         
+    
 @app.route('/send-friend-request', methods=['POST'])
 def send_friend_request():
     data = request.json

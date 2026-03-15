@@ -17,10 +17,9 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 2rem;
-            padding-top: 100px; /* Account for fixed navbar */
+            padding-top: 100px;
         }
         
-        /* Navbar Styles */
         .navbar {
             background: white;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -53,7 +52,6 @@
             text-decoration: none;
             color: #4b5563;
             font-weight: 500;
-            transition: color 0.3s;
         }
         
         .nav-links a:hover {
@@ -70,7 +68,6 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-weight: bold;
         }
         
         .container {
@@ -122,7 +119,7 @@
             background: white;
             border-radius: 1rem;
             padding: 1.5rem;
-            margin-bottom: 1.5rem;
+            margin-top: 1.5rem;
         }
         
         .leaderboard-item {
@@ -149,10 +146,10 @@
         .rank-2 { background: silver; color: #1f2937; }
         .rank-3 { background: #cd7f32; color: white; }
         
-        .friend-request {
+        .friend-card {
             background: #f3f4f6;
-            padding: 1rem;
             border-radius: 0.5rem;
+            padding: 1rem;
             margin-bottom: 1rem;
         }
         
@@ -186,11 +183,6 @@
             font-weight: bold;
         }
         
-        .post-content {
-            margin: 0.5rem 0;
-            line-height: 1.5;
-        }
-        
         .post-actions {
             display: flex;
             gap: 1rem;
@@ -203,13 +195,6 @@
             border: none;
             cursor: pointer;
             color: #6b7280;
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-        
-        .post-actions button:hover {
-            color: #6b46c1;
         }
         
         .btn {
@@ -219,21 +204,10 @@
             padding: 0.5rem 1rem;
             border-radius: 0.5rem;
             cursor: pointer;
-            font-size: 0.9rem;
         }
         
-        .btn-sm {
-            padding: 0.25rem 0.5rem;
-            font-size: 0.8rem;
-        }
-        
-        .btn-success {
-            background: #38a169;
-        }
-        
-        .btn-danger {
-            background: #e53e3e;
-        }
+        .btn-success { background: #38a169; }
+        .btn-danger { background: #e53e3e; }
         
         .search-box {
             display: flex;
@@ -248,14 +222,6 @@
             border-radius: 0.5rem;
         }
         
-        .friend-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        
         .friend-avatar {
             width: 30px;
             height: 30px;
@@ -265,32 +231,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9rem;
-        }
-        
-        .create-post {
-            margin-bottom: 1.5rem;
-        }
-        
-        .create-post textarea {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid #e5e7eb;
-            border-radius: 0.5rem;
-            margin-bottom: 0.5rem;
-            resize: vertical;
-        }
-        
-        .post-type {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .post-type label {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
         }
         
         @media (max-width: 768px) {
@@ -301,7 +241,6 @@
     </style>
 </head>
 <body>
-    <!-- Navbar -->
     <nav class="navbar">
         <div class="logo">
             <i class="fas fa-dumbbell"></i>
@@ -312,7 +251,7 @@
             <a href="/profile">Profile</a>
             <a href="/analytics">📊 Analytics</a>
             <a href="/achievements">🏆 Achievements</a>
-            <a href="/community">👥 Community</a>
+            <a href="/community" style="color: #6b46c1;">👥 Community</a>
             <a href="/goals">🎯 Goals</a>
             <a href="/calendar">📅 Calendar</a>
             <a href="/music">🎵 Music</a>
@@ -339,188 +278,106 @@
                 <h3 style="margin-bottom: 1rem;">Find Friends</h3>
                 <div class="search-box">
                     <input type="email" id="searchEmail" placeholder="Search by email...">
-                    <button class="btn" onclick="sendFriendRequest()">Add Friend</button>
+                    <button class="btn" onclick="alert('Friend request feature coming soon!')">Add</button>
                 </div>
-                <div id="searchResult" style="margin-bottom: 1rem; font-size: 0.9rem;"></div>
                 
-                {% if friend_requests %}
-                <h3 style="margin: 2rem 0 1rem;">Friend Requests ({{ friend_requests|length }})</h3>
+                <h3 style="margin: 2rem 0 1rem;">Friend Requests</h3>
                 {% for req in friend_requests %}
-                <div class="friend-request" id="request-{{ req.id }}">
+                <div class="friend-card">
                     <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
                         <div class="friend-avatar">{{ req.name[0]|upper }}</div>
                         <strong>{{ req.name }}</strong>
                     </div>
                     <div style="display: flex; gap: 0.5rem;">
-                        <button class="btn btn-success btn-sm" onclick="acceptRequest({{ req.id }})">✓ Accept</button>
-                        <button class="btn btn-danger btn-sm" onclick="declineRequest({{ req.id }})">✗ Decline</button>
+                        <button class="btn btn-success btn-sm">✓ Accept</button>
+                        <button class="btn btn-danger btn-sm">✗ Decline</button>
                     </div>
                 </div>
+                {% else %}
+                <p style="color: #6b7280;">No pending requests</p>
                 {% endfor %}
-                {% endif %}
                 
-                <h3 style="margin: 2rem 0 1rem;">My Friends ({{ friends|length }})</h3>
-                <div style="max-height: 200px; overflow-y: auto;">
-                    {% for friend in friends %}
-                    <div class="friend-item">
-                        <div class="friend-avatar">{{ friend.name[0]|upper }}</div>
-                        <span>{{ friend.name }}</span>
-                    </div>
-                    {% else %}
-                    <p style="color: #6b7280; text-align: center;">No friends yet</p>
-                    {% endfor %}
+                <h3 style="margin: 2rem 0 1rem;">My Friends</h3>
+                {% for friend in friends %}
+                <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem;">
+                    <div class="friend-avatar">{{ friend.name[0]|upper }}</div>
+                    <span>{{ friend.name }}</span>
                 </div>
+                {% else %}
+                <p style="color: #6b7280;">No friends yet</p>
+                {% endfor %}
             </div>
             
             <!-- Main Feed -->
             <div class="feed">
-                <!-- Create Post -->
-                <div class="create-post">
-                    <textarea id="postContent" placeholder="Share your fitness progress..." rows="3"></textarea>
-                    <div class="post-type">
-                        <label>
-                            <input type="radio" name="postType" value="update" checked> 📝 Update
-                        </label>
-                        <label>
-                            <input type="radio" name="postType" value="workout"> 💪 Workout
-                        </label>
-                        <label>
-                            <input type="radio" name="postType" value="meal"> 🥗 Meal
-                        </label>
-                        <label>
-                            <input type="radio" name="postType" value="achievement"> 🏆 Achievement
-                        </label>
-                    </div>
-                    <button class="btn" onclick="createPost()" style="width: 100%;">Post Update</button>
-                </div>
-                
                 <h3 style="margin-bottom: 1rem;">Activity Feed</h3>
                 
-                {% for post in posts %}
-                <div class="post" id="post-{{ post.id }}">
-                    <div class="post-header">
-                        <div class="post-avatar">{{ post.user.name[0]|upper }}</div>
-                        <div>
-                            <strong>{{ post.user.name }}</strong>
-                            <span style="color: #6b7280; font-size: 0.9rem;"> • {{ post.created_at.strftime('%b %d, %Y at %I:%M %p') }}</span>
+                {% if posts %}
+                    {% for post in posts %}
+                    <div class="post">
+                        <div class="post-header">
+                            <div class="post-avatar">{{ post.user.name[0]|upper }}</div>
+                            <div>
+                                <strong>{{ post.user.name }}</strong>
+                                <span style="color: #6b7280;"> • {{ post.created_at.strftime('%b %d, %Y') }}</span>
+                            </div>
+                        </div>
+                        <p>{{ post.content }}</p>
+                        <div class="post-actions">
+                            <button><i class="far fa-heart"></i> {{ post.likes }}</button>
+                            <button><i class="far fa-comment"></i> 0</button>
                         </div>
                     </div>
-                    <div class="post-content">
-                        {% if post.type == 'workout' %}
-                            <span style="background: #f3f4f6; padding: 0.25rem 0.5rem; border-radius: 1rem; font-size: 0.8rem;">💪 Workout</span>
-                        {% elif post.type == 'meal' %}
-                            <span style="background: #f3f4f6; padding: 0.25rem 0.5rem; border-radius: 1rem; font-size: 0.8rem;">🥗 Meal</span>
-                        {% elif post.type == 'achievement' %}
-                            <span style="background: #f3f4f6; padding: 0.25rem 0.5rem; border-radius: 1rem; font-size: 0.8rem;">🏆 Achievement</span>
-                        {% endif %}
-                        <p style="margin-top: 0.5rem;">{{ post.content }}</p>
-                    </div>
-                    <div class="post-actions">
-                        <button onclick="likePost({{ post.id }})">
-                            <i class="far fa-heart"></i> <span id="likes-{{ post.id }}">{{ post.likes }}</span>
-                        </button>
-                        <button><i class="far fa-comment"></i> 0</button>
-                        <button><i class="far fa-share-square"></i> Share</button>
-                    </div>
-                </div>
+                    {% endfor %}
                 {% else %}
-                <p style="text-align: center; color: #6b7280; padding: 2rem;">No posts yet. Be the first to share!</p>
-                {% endfor %}
+                    <!-- Sample posts if no real posts exist -->
+                    <div class="post">
+                        <div class="post-header">
+                            <div class="post-avatar">{{ user.name[0]|upper }}</div>
+                            <div>
+                                <strong>{{ user.name }}</strong>
+                                <span style="color: #6b7280;"> • Just now</span>
+                            </div>
+                        </div>
+                        <p>💪 Just completed an amazing workout! 300 calories burned.</p>
+                        <div class="post-actions">
+                            <button><i class="far fa-heart"></i> 5</button>
+                            <button><i class="far fa-comment"></i> 2</button>
+                        </div>
+                    </div>
+                    <div class="post">
+                        <div class="post-header">
+                            <div class="post-avatar">{{ user.name[0]|upper }}</div>
+                            <div>
+                                <strong>{{ user.name }}</strong>
+                                <span style="color: #6b7280;"> • 2 hours ago</span>
+                            </div>
+                        </div>
+                        <p>🥗 Logged a healthy meal: Grilled Chicken Salad (350 cal)</p>
+                        <div class="post-actions">
+                            <button><i class="far fa-heart"></i> 3</button>
+                            <button><i class="far fa-comment"></i> 1</button>
+                        </div>
+                    </div>
+                {% endif %}
             </div>
         </div>
         
         <!-- Leaderboard -->
-        <div class="leaderboard" style="margin-top: 1.5rem;">
-            <h3 style="margin-bottom: 1rem;">🏆 Weekly Leaderboard</h3>
-            {% for user, workout_count, total_calories in leaderboard %}
+        <div class="leaderboard">
+            <h3 style="margin-bottom: 1rem;">🏆 Leaderboard</h3>
+            {% for user_data, workout_count, total_calories in leaderboard %}
             <div class="leaderboard-item">
-                <div class="rank rank-{% if loop.index == 1 %}1{% elif loop.index == 2 %}2{% elif loop.index == 3 %}3{% endif %}">{{ loop.index }}</div>
+                <div class="rank rank-{{ loop.index }}">{{ loop.index }}</div>
                 <div style="flex: 1;">
-                    <strong>{{ user.name }}</strong>
+                    <strong>{{ user_data.name }}</strong>
                     <span style="color: #6b7280;"> • {{ workout_count }} workouts • {{ total_calories|int }} cal</span>
                 </div>
-                <span style="color: #6b46c1;">🔥 {{ workout_count }} days</span>
             </div>
             {% else %}
-            <p style="text-align: center; color: #6b7280;">No data yet</p>
+            <p style="color: #6b7280;">No data yet</p>
             {% endfor %}
         </div>
     </div>
-    
-    <script>
-        function sendFriendRequest() {
-            const email = document.getElementById('searchEmail').value;
-            if (!email) return;
-            
-            fetch('/send-friend-request', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({email: email})
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('searchResult').innerHTML = '<span style="color: #38a169;">✅ Friend request sent!</span>';
-                    document.getElementById('searchEmail').value = '';
-                } else {
-                    document.getElementById('searchResult').innerHTML = '<span style="color: #e53e3e;">❌ ' + data.error + '</span>';
-                }
-            });
-        }
-        
-        function acceptRequest(senderId) {
-            fetch('/accept-friend-request', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({sender_id: senderId})
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('request-' + senderId).remove();
-                    location.reload(); // Refresh to update friends list
-                }
-            });
-        }
-        
-        function declineRequest(senderId) {
-            document.getElementById('request-' + senderId).remove();
-        }
-        
-        function createPost() {
-            const content = document.getElementById('postContent').value;
-            const type = document.querySelector('input[name="postType"]:checked').value;
-            
-            if (!content) return;
-            
-            fetch('/create-post', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({content: content, type: type})
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('postContent').value = '';
-                    location.reload(); // Refresh to show new post
-                }
-            });
-        }
-        
-        function likePost(postId) {
-            fetch('/like-post', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({post_id: postId})
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const likesSpan = document.getElementById('likes-' + postId);
-                    likesSpan.innerText = parseInt(likesSpan.innerText) + 1;
-                }
-            });
-        }
-    </script>
 </body>
 </html>
