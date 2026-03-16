@@ -11,7 +11,7 @@
 
   ### 🎯 *Your Personal AI Fitness Coach*
 
-  [🌐 Live Demo](https://fitness-ai-dsqq.onrender.com) • 
+  [🌐 Live Demo](https://fitness-ai-dsgq.onrender.com/) • 
   [📖 Documentation](#) • 
   [🐛 Report Bug](https://github.com/rajaluxanaa-coder/fitness-ai/issues)
 
