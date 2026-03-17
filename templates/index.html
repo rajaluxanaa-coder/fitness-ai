@@ -42,6 +42,9 @@
         body { 
             background: #f9fafb; 
         }
+        html{
+            scroll-behavior:smooth;
+        }
         .navbar {
             background: white;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -191,6 +194,68 @@
             font-size: 2rem;
             color: #6b46c1;
         }
+        .about{
+            padding: 5rem 2rem;
+            background: #f9fafb;
+        }
+        .about-container{
+            max-width:1200px;
+            margin: 0 auto;
+        }
+        .about h2{
+            font-size: 2.5rem;
+            color: #6b46c1;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 3rem;
+            text-align: left;
+        }
+        .about-grid h3 {
+            color: #6b46c1;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        .about-grid p {
+            color: #4b5563;
+            line-height: 1.8;
+        }
+        .team-section {
+            margin-top: 4rem;
+            text-align: center;
+        }
+        .team-section h3 {
+            color: #6b46c1;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+        }
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+        .team-member {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .team-member i {
+            font-size: 3rem;
+            color: #6b46c1;
+            margin-bottom: 1rem;
+        }
+        .team-member h4 {
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+        .team-member p {
+            color: #6b7280;
+        }
         .modal {
             display: none;
             position: fixed;
@@ -324,8 +389,18 @@
             .features-grid {
                 grid-template-columns: 1fr;
             }
+            .about-grid {
+                grid-template-columns: 1fr;
+            }
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
             .hero h1 {
                 font-size: 2rem;
+            }
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
             }
         }
 
@@ -355,7 +430,7 @@
         <span>FitAI</span>
     </div>
     <div class="nav-links">
-        <a href="/">Home</a>
+        <a href="#home">Home</a>
         <a href="#features">Features</a>
         <a href="#about">About</a>
     </div>
@@ -366,7 +441,7 @@
 </nav>
     <!-- Hero Section -->
     <!-- Hero Section - Updated with more content -->
-<div class="hero">
+<div class="hero" id="hero">
     <div class="hero-content">
         <div>
             <h1>Your Personal AI Fitness Coach</h1>
@@ -492,7 +567,7 @@
 </div>
 
     <!-- Features Section -->
-    <div class="features">
+    <div class="features" id="features">
         <h2>Why Choose FitAI?</h2>
         <div class="features-grid">
             <div class="feature-card">
@@ -518,6 +593,31 @@
             </div>
         </div>
     </div>
+
+
+    <!-- About Section with id="about" -->
+    <div class="about" id="about">
+        <div class="about-container">
+            <h2>About FitAI</h2>
+            <div class="about-grid">
+                <div>
+                    <h3>Our Mission</h3>
+                    <p>FitAI was created to make personalized fitness accessible to everyone. Using cutting-edge AI technology, we generate custom workout plans tailored to your unique needs, goals, and available equipment. No more generic routines - every plan is as unique as you are.</p>
+                </div>
+                <div>
+                    <h3>The Technology</h3>
+                    <p>Powered by Groq's Llama 3.3 AI model, FitAI analyzes your fitness level, available equipment, and personal goals to create optimized 5-day workout schedules. Our intelligent system learns from your progress and adapts recommendations over time.</p>
+                </div>
+            </div>
+           
+        </div>
+    </div>
+
+
+
+   
+
+
 
     <!-- Sign In Modal (with OTP) -->
     <div id="signInModal" class="modal">
