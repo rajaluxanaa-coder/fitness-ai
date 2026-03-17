@@ -1815,6 +1815,20 @@ def init_db():
         db.create_all()
         print("✅ Database tables created/verified!")
 
+
+# Add this with your other routes (around line 300-400)
+
+@app.route('/check-email', methods=['POST'])
+def check_email():
+    data = request.json
+    email = data.get('email')
+    
+    user = User.query.filter_by(email=email).first()
+    return jsonify({'exists': user is not None})
+
+
+    
+
 # Your existing code at the bottom should look like this:
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
