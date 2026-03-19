@@ -2,8 +2,7 @@
 
 <div align="center">
 
-[🌐 Live Demo](https://fitness-ai-dsgq.onrender.com)  •
-[🐛 Report Bug](issues/)
+[🌐 Live Demo](https://fitness-ai-dsgq.onrender.com) 
 
 </div>
 
