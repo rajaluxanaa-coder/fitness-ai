@@ -1098,11 +1098,12 @@ def get_achievements():
     
     # 10 Workouts
     if workout_count >= 10:
+        tenth_workout_date=workouts[9].date.strftime('%b %d , %Y') if len(workouts)>=10 else 'Recent'
         achievements.append({
             'name': 'Getting Stronger',
             'icon': '💪',
             'description': 'Completed 10 workouts',
-            'date': 'Recent',
+            'date': tenth_workout_date,
             'earned': True
         })
     
@@ -1144,11 +1145,12 @@ def get_achievements():
     
     # Healthy Eater
     if len(meals) >= 5:
+        fifth_meal_date=meals[4].date.strftime('%b %d , %Y') if len(meals)>=5 else 'Recent'
         achievements.append({
             'name': 'Healthy Eater',
             'icon': '🥗',
             'description': 'Logged 5 meals',
-            'date': 'Recent',
+            'date': fifth_meal_date,
             'earned': True
         })
     
