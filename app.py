@@ -1720,6 +1720,13 @@ def get_analytics_data():
             'title': 'Goal Progress',
             'text': f"You're {weight_progress:.1f}% towards your weight goal."
         })
+
+    # Calculate REAL daily calories consumed from meals
+    daily_calories_consumed = []
+    for i in range(6, -1, -1):
+        day = today - timedelta(days=i)
+        day_meals = [m for m in meals if m.date == day]
+        daily_calories_consumed.append(sum(m.calories for m in day_meals))
     
     return jsonify({
         'stats': {
@@ -1746,7 +1753,7 @@ def get_analytics_data():
             'distributionLabels': list(workout_types.keys()),
             'timeDistribution': time_distribution,
             'nutrition': {
-                'caloriesConsumed': [random.randint(1800, 2500) for _ in range(7)],
+                'caloriesConsumed': daily_calories_consumed,
                 'caloriesBurned': weekly_calories
             },
             'macros': {
@@ -1757,6 +1764,9 @@ def get_analytics_data():
         },
         'insights': insights
     })
+
+
+    
     
     
     
