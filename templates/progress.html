@@ -319,6 +319,22 @@
                 responsive: true,
                 plugins: {
                     legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1,           // Show 1, 2, 3...
+                            precision: 0,           // No decimals
+                            callback: function(value) {
+                                return Number.isInteger(value) ? value : null;
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Number of Workouts'
+                        }
+                    }
                 }
             }
         });
