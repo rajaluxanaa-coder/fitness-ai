@@ -1197,6 +1197,25 @@ function updateProgress() {
     let calories = parseInt(document.getElementById('caloriesBurned').innerText.replace(',', '')) || 0;
     let totalMinutes = parseInt(document.getElementById('totalMinutes').innerText) || 0;
 
+
+    // UPDATE HEIGHT IF PROVIDED ← ADD THIS BLOCK
+    if (currentHeight && currentHeight > 100 && currentHeight < 250) {
+        document.getElementById('bmiHeight').innerText = currentHeight;
+        
+        // Save to database
+        fetch('/update-height', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({height: currentHeight})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                console.log('Height update failed');
+            }
+        });
+    }
+
     // Update weight if provided
     if (currentWeight) {
         document.getElementById('currentWeight').innerText = currentWeight + ' kg';
@@ -1244,6 +1263,8 @@ function updateProgress() {
         document.getElementById('totalMinutes').innerText = totalMinutes;
         localStorage.setItem('totalMinutes', totalMinutes);
     }
+
+    calculateBMI();
 
     // Send to server
     fetch('/update-progress', {
