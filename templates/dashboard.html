@@ -896,6 +896,11 @@ body.dark-mode .alert-error {
             <div id="progressAlert" class="hidden"></div>
 
             <div class="form-group">
+                <label for="currentHeight">Height (cm)</label>
+                <input type="number" id="currentHeight" step="0.1" placeholder="Enter your current height" value="{{ user.height}}">
+            </div>
+
+            <div class="form-group">
                 <label for="currentWeight">Current Weight (kg)</label>
                 <input type="number" id="currentWeightInput" step="0.1" placeholder="Enter your current weight">
             </div>
@@ -1282,6 +1287,45 @@ function updateProgress() {
         }
     }
 
+
+
+    // Update height function
+function updateHeight() {
+    const newHeight = document.getElementById('currentHeight').value;
+    if (newHeight && newHeight > 100 && newHeight < 250) {
+        // Update display
+        document.getElementById('bmiHeight').innerText = newHeight;
+        
+        // Save to database
+        fetch('/update-height', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({height: newHeight})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('✅ Height updated successfully!');
+                calculateBMI(); // Recalculate BMI
+            }
+        });
+    } else {
+        alert('Height must be between 100 and 250 cm');
+    }
+}
+
+function editHeight() {
+    const currentHeight = document.getElementById('bmiHeight').innerText;
+    const newHeight = prompt('Enter your height in cm:', currentHeight);
+    if (newHeight) {
+        document.getElementById('currentHeight').value = newHeight;
+        updateHeight();
+    }
+}
+
+
+
+
     // Load saved data on page load
     document.addEventListener('DOMContentLoaded', function() {
         // Load saved stats from localStorage
@@ -1318,6 +1362,17 @@ function updateProgress() {
         }
         calculateBMI();
         updateQuickTip();
+
+        // 👇 ADD THESE LINES 👇
+    // Set initial height value in progress modal if exists
+    const heightInput = document.getElementById('currentHeight');
+    if (heightInput && !heightInput.value) {
+        const currentHeight = document.getElementById('bmiHeight').innerText;
+        if (currentHeight && currentHeight !== '--') {
+            heightInput.value = currentHeight;
+        }
+    }
+
     });
 </script>
 </body>
