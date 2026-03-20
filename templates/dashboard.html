@@ -648,11 +648,21 @@ body.dark-mode .alert-error {
 
 
         <!-- Quick Tips -->
-        <div style="background: white; padding: 1.5rem; border-radius: 0.75rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-            <h3 style="margin-bottom: 1rem;"><i class="fas fa-lightbulb" style="color: #6b46c1; margin-right: 0.5rem;"></i>Today's Fitness Tip</h3>
-            <p style="color: #4b5563;">"Consistency is more important than intensity. Show up every day, even if it's just for 15 minutes!"</p>
-        </div>
+<div style="background: white; padding: 1.5rem; border-radius: 0.75rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    <h3 style="margin-bottom: 1rem;">
+        <i class="fas fa-lightbulb" style="color: #6b46c1; margin-right: 0.5rem;"></i>
+        Today's Fitness Tip
+        <button onclick="updateQuickTip()" style="float: right; background: none; border: none; color: #6b46c1; cursor: pointer;" title="New Tip">
+            <i class="fas fa-sync-alt"></i>
+        </button>
+    </h3>
+    <p id="quickTipText" style="color: #4b5563; transition: opacity 0.3s;">
+        "Consistency is more important than intensity. Show up every day, even if it's just for 15 minutes!"
+    </p>
+    <div style="margin-top: 0.75rem; font-size: 0.75rem; color: #9ca3af;">
+        <i class="fas fa-clock"></i> New tip every 30 seconds
     </div>
+</div>
 
     
 
@@ -920,6 +930,54 @@ body.dark-mode .alert-error {
     </div>
 
     <script>
+
+
+
+    // Dynamic Fitness Tips
+const fitnessTips = [
+    { tip: "💧 Drink 2-3 liters of water daily for optimal hydration and performance.", category: "hydration" },
+    { tip: "😴 Get 7-8 hours of sleep for better muscle recovery and growth.", category: "recovery" },
+    { tip: "🍗 Eat protein within 30 minutes after workout for best muscle repair.", category: "nutrition" },
+    { tip: "🏋️ Consistency is more important than intensity. Show up every day!", category: "motivation" },
+    { tip: "📱 Track your workouts to see progress and stay motivated.", category: "tracking" },
+    { tip: "🧘 Stretch for 5-10 minutes after every workout to prevent injury.", category: "recovery" },
+    { tip: "🥗 Eat colorful vegetables for essential vitamins and minerals.", category: "nutrition" },
+    { tip: "🔥 Warm up for 5-10 minutes before exercise to prevent injury.", category: "safety" },
+    { tip: "💪 Progressive overload: gradually increase weight or reps to get stronger.", category: "strength" },
+    { tip: "🎯 Set SMART goals - Specific, Measurable, Achievable, Relevant, Time-bound.", category: "goals" },
+    { tip: "🏃 Mix cardio and strength training for overall fitness.", category: "workout" },
+    { tip: "🥑 Healthy fats like avocado and nuts are essential for hormone function.", category: "nutrition" },
+    { tip: "📸 Take progress photos every 2 weeks to see visual changes.", category: "tracking" },
+    { tip: "🧠 Listen to your body. Rest when needed to prevent overtraining.", category: "recovery" },
+    { tip: "🏆 Celebrate small victories to stay motivated!", category: "motivation" },
+    { tip: "🍌 Eat a banana 30 minutes before workout for natural energy.", category: "nutrition" },
+    { tip: "🧘 Deep breathing reduces stress and improves workout focus.", category: "wellness" },
+    { tip: "📅 Plan your workouts ahead to stay consistent.", category: "planning" }
+];
+
+let currentTipIndex = Math.floor(Math.random() * fitnessTips.length);
+
+function updateQuickTip() {
+    const tipContainer = document.getElementById('quickTipText');
+    if (tipContainer) {
+        const randomIndex = Math.floor(Math.random() * fitnessTips.length);
+        currentTipIndex = randomIndex;
+        tipContainer.innerHTML = fitnessTips[randomIndex].tip;
+        
+        // Optional: Add fade animation
+        tipContainer.style.opacity = '0';
+        setTimeout(() => {
+            tipContainer.style.opacity = '1';
+        }, 100);
+    }
+}
+
+// Change tip every 30 seconds
+setInterval(updateQuickTip, 30000);
+
+
+
+
     // Profile Panel
     function toggleProfilePanel() {
         const panel = document.getElementById('profilePanel');
@@ -1259,6 +1317,7 @@ function updateProgress() {
             document.getElementById('progressFill').style.width = progressPercent + '%';
         }
         calculateBMI();
+        updateQuickTip();
     });
 </script>
 </body>
