@@ -497,6 +497,19 @@ body.dark-mode .alert-error {
     background: #991b1b;
     color: #fee2e2;
 }
+
+/* BMI Card Styles */
+.bmi-card {
+    transition: transform 0.3s;
+}
+
+.bmi-card:hover {
+    transform: translateY(-2px);
+}
+
+#bmiProgress {
+    transition: width 0.5s ease;
+}
     </style>
 </head>
 <body>
@@ -642,6 +655,55 @@ body.dark-mode .alert-error {
     </div>
 
     
+
+
+
+    <!-- BMI Card -->
+<div class="bmi-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 1rem; padding: 1.5rem; margin-bottom: 2rem; color: white;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+        <div>
+            <h3 style="margin-bottom: 0.5rem;">📊 Your BMI</h3>
+            <div style="font-size: 3rem; font-weight: bold;" id="bmiValue">--</div>
+            <div id="bmiCategory" style="font-size: 1.1rem; margin-top: 0.25rem;">---</div>
+        </div>
+        <div style="text-align: center;">
+            <div style="font-size: 0.9rem; opacity: 0.8;">Height: <span id="bmiHeight">{{ user.height }} cm</span></div>
+            <div style="font-size: 0.9rem; opacity: 0.8;">Weight: <span id="bmiWeight">{{ user.weight }} kg</span></div>
+            <div style="margin-top: 0.5rem;">
+                <i class="fas fa-heartbeat" style="font-size: 2rem;"></i>
+            </div>
+        </div>
+    </div>
+    
+    <!-- BMI Progress Bar -->
+    <div style="margin-top: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.25rem;">
+            <span>Underweight</span>
+            <span>Normal</span>
+            <span>Overweight</span>
+            <span>Obese</span>
+        </div>
+        <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 4px; overflow: hidden;">
+            <div id="bmiProgress" style="width: 0%; height: 100%; background: #ffd700; border-radius: 4px;"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.7rem; margin-top: 0.25rem;">
+            <span>18.5</span>
+            <span>25</span>
+            <span>30</span>
+            <span>35+</span>
+        </div>
+    </div>
+    
+    <!-- BMI Tip -->
+    <div id="bmiTip" style="margin-top: 1rem; font-size: 0.85rem; background: rgba(255,255,255,0.2); padding: 0.5rem 1rem; border-radius: 0.5rem;">
+        💡 Enter your height and weight to calculate your BMI
+    </div>
+</div>
+
+
+
+
+
 
             
             <!-- Enhanced Workout Generator Modal -->
@@ -989,6 +1051,72 @@ Goal: ${goal} | Level: ${level}
         alert.classList.remove('hidden');
     }
 
+
+
+// BMI Calculation Function
+function calculateBMI() {
+    const heightCm = parseFloat(document.getElementById('bmiHeight').innerText);
+    const weightKg = parseFloat(document.getElementById('bmiWeight').innerText);
+    
+    if (heightCm && weightKg && heightCm > 0 && weightKg > 0) {
+        const heightM = heightCm / 100;
+        const bmi = weightKg / (heightM * heightM);
+        const bmiRounded = bmi.toFixed(1);
+        
+        // Update BMI value
+        document.getElementById('bmiValue').innerText = bmiRounded;
+        
+        // Determine BMI category and color
+        let category = '';
+        let tip = '';
+        let progressPercent = 0;
+        
+        if (bmi < 18.5) {
+            category = '🔵 Underweight';
+            tip = '💡 Try to gain weight with healthy, nutrient-rich foods and strength training.';
+            progressPercent = (bmi / 18.5) * 33;
+        } else if (bmi >= 18.5 && bmi < 25) {
+            category = '🟢 Normal Weight';
+            tip = '🎉 Great job! Maintain your healthy weight with balanced diet and regular exercise.';
+            progressPercent = 33 + ((bmi - 18.5) / 6.5) * 34;
+        } else if (bmi >= 25 && bmi < 30) {
+            category = '🟠 Overweight';
+            tip = '💪 Focus on regular exercise and a balanced diet to reach your healthy weight.';
+            progressPercent = 67 + ((bmi - 25) / 5) * 33;
+        } else {
+            category = '🔴 Obese';
+            tip = '🏃 Consult a healthcare provider for a personalized weight management plan.';
+            progressPercent = 100;
+        }
+        
+        document.getElementById('bmiCategory').innerHTML = category;
+        document.getElementById('bmiTip').innerHTML = tip;
+        document.getElementById('bmiProgress').style.width = Math.min(progressPercent, 100) + '%';
+        
+        // Set progress bar color based on category
+        if (bmi >= 18.5 && bmi < 25) {
+            document.getElementById('bmiProgress').style.background = '#38a169';
+        } else if (bmi >= 25 && bmi < 30) {
+            document.getElementById('bmiProgress').style.background = '#ed8936';
+        } else if (bmi >= 30) {
+            document.getElementById('bmiProgress').style.background = '#e53e3e';
+        } else {
+            document.getElementById('bmiProgress').style.background = '#4299e1';
+        }
+        
+        return bmiRounded;
+    }
+    return null;
+}
+
+// Update BMI when weight changes (call this after progress updates)
+function updateBMIAfterProgress() {
+    calculateBMI();
+}
+
+
+
+
     // Update Progress Function - FIXED
     // Enhanced Generate Workout Function
 
@@ -1010,6 +1138,9 @@ function updateProgress() {
     if (currentWeight) {
         document.getElementById('currentWeight').innerText = currentWeight + ' kg';
         localStorage.setItem('currentWeight', currentWeight);
+
+        document.getElementById('bmiWeight').innerText = currentWeight;
+        calculateBMI();
         
         // Calculate progress percentage
         const startWeight = parseFloat(document.getElementById('startWeight').innerText) || 0;
@@ -1076,6 +1207,9 @@ function updateProgress() {
     });
 }
 
+
+
+
     // Close modals when clicking outside
     window.onclick = function(event) {
         const workoutModal = document.getElementById('workoutModal');
@@ -1124,6 +1258,7 @@ function updateProgress() {
             document.getElementById('progressPercentage').innerText = progressPercent + '%';
             document.getElementById('progressFill').style.width = progressPercent + '%';
         }
+        calculateBMI();
     });
 </script>
 </body>
