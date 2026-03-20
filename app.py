@@ -1838,7 +1838,22 @@ def check_email():
     user = User.query.filter_by(email=email).first()
     return jsonify({'exists': user is not None})
 
-
+@app.route('/update-height', methods=['POST'])
+def update_height():
+    try:
+        data = request.json
+        user_id = session['user_id']
+        new_height = data.get('height')
+        
+        user = User.query.get(user_id)
+        if user and 100 <= new_height <= 250:
+            user.height = new_height
+            db.session.commit()
+            return jsonify({'success': True})
+        
+        return jsonify({'success': False, 'error': 'Invalid height'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
     
 
 # Your existing code at the bottom should look like this:
