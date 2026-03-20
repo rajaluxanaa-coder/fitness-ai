@@ -56,7 +56,7 @@ class User(db.Model):
     age = db.Column(db.Integer)
     weight = db.Column(db.Float)
     height = db.Column(db.Float)
-    goal_weight=db.Column(db.Float,default=70)
+    #goal_weight=db.Column(db.Float,default=70)
     fitness_level = db.Column(db.String(50))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
