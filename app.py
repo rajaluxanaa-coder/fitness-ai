@@ -56,6 +56,7 @@ class User(db.Model):
     age = db.Column(db.Integer)
     weight = db.Column(db.Float)
     height = db.Column(db.Float)
+    goal_weight=db.Column(db.Float,default=70)
     fitness_level = db.Column(db.String(50))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -1766,7 +1767,22 @@ def get_analytics_data():
     })
 
 
-    
+@app.route('/update-goal-weight', methods=['POST'])
+def update_goal_weight():
+    try:
+        data = request.json
+        user_id = session['user_id']
+        new_goal_weight = data.get('goal_weight')
+        
+        user = User.query.get(user_id)
+        if user and 20 <= new_goal_weight <= 300:
+            user.goal_weight = new_goal_weight
+            db.session.commit()
+            return jsonify({'success': True})
+        
+        return jsonify({'success': False, 'error': 'Invalid goal weight'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
     
     
     

@@ -631,12 +631,14 @@ body.dark-mode .alert-error {
         </div>
         <div style="text-align: center;">
             <div style="font-size: 0.875rem; color: #6b7280;">Current Weight</div>
-            <div style="font-weight: bold;" id="currentWeight">{{ user.weight if user and user.weight else '0' }} kg</div>
+            <div style="font-weight: bold;" id="progressCurrentWeight">{{ user.weight if user and user.weight else '0' }} kg</div>
         </div>
         <div style="text-align: center;">
             <div style="font-size: 0.875rem; color: #6b7280;">Goal Weight</div>
             <div style="font-weight: bold;" id="goalWeight">
-                {% if user and user.weight %}
+                {% if user and user.goal_weight %}
+                    {{ user.goal_weight }}
+                {% elif user and user.weight %}
                     {{ (user.weight - 5) if user.weight > 60 else (user.weight + 3) }} kg
                 {% else %}
                     0 kg
@@ -904,6 +906,13 @@ body.dark-mode .alert-error {
                 <label for="currentWeight">Current Weight (kg)</label>
                 <input type="number" id="currentWeightInput" step="0.1" placeholder="Enter your current weight">
             </div>
+
+            <!-- 👇 ADD GOAL WEIGHT FIELD HERE 👇 -->
+        <div class="form-group">
+            <label for="goalWeightInput">Goal Weight (kg)</label>
+            <input type="number" id="goalWeightInput" step="0.1" placeholder="Enter your goal weight" value="{{ user.goal_weight or '' }}">
+            <small style="color: #6b7280;">Set your target weight to track progress</small>
+        </div>
 
             <div class="form-group">
                 <label for="workoutsCompleted">Workouts Completed Today</label>
@@ -1188,6 +1197,7 @@ function updateBMIAfterProgress() {
 function updateProgress() {
     const currentHeight= document.getElementById('currentHeight').value;
     const currentWeight = document.getElementById('currentWeightInput').value;
+    const goalWeight = document.getElementById('goalWeightInput').value;
     const workoutsCompleted = document.getElementById('workoutsCompleted').value;
     const caloriesBurned = document.getElementById('caloriesBurnedInput').value;
     const minutes = document.getElementById('minutesInput').value;
@@ -1217,9 +1227,29 @@ function updateProgress() {
         });
     }
 
+    // Update goal weight 👈 ADD THIS BLOCK
+    if (goalWeight && goalWeight > 20 && goalWeight < 300) {
+        document.getElementById('goalWeight').innerText = goalWeight + ' kg';
+        
+        // Save to database
+        fetch('/update-goal-weight', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({goal_weight: goalWeight})
+        });
+    }
+
+
     // Update weight if provided
     if (currentWeight) {
         document.getElementById('currentWeight').innerText = currentWeight + ' kg';
+
+        // 👇 ALSO UPDATE PROGRESS SECTION WEIGHT 👇
+    const progressWeight = document.getElementById('progressCurrentWeight');
+    if (progressWeight) {
+        progressWeight.innerText = currentWeight + ' kg';
+    }
+
         localStorage.setItem('currentWeight', currentWeight);
 
         document.getElementById('bmiWeight').innerText = currentWeight;
