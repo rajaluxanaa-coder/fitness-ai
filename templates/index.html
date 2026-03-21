@@ -403,13 +403,30 @@
                 justify-content: center;
             }
             .nav-links a{
+                position: relative;
                 text-decoration: none;
                 color: #4b5563;
                 font-weight: 500;
+                padding-bottom: 5px;
+            }
+
+            .nav-links a::after{
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 0;
+                height: 2px;
+                background: #6b46c1;
+                transition: width 0.3s;
+            }
+            .nav-links a:hover::after{
+                width: 100%;
             }
             .nav-links a:hover{
                 color:#6b46c1;
             }
+
         }
 
         .spinner {
