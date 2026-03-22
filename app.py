@@ -1870,7 +1870,34 @@ def update_height():
         return jsonify({'success': False, 'error': 'Invalid height'})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
+
+
+
+
+        
     
+@app.route('/get-user-stats')
+def get_user_stats():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not logged in'}), 401
+    
+    user_id = session['user_id']
+    
+    # Get workouts from database
+    workouts = WorkoutLog.query.filter_by(user_id=user_id).all()
+    total_workouts = len(workouts)
+    total_calories = sum(w.calories_burned for w in workouts)
+    total_minutes = sum(w.duration for w in workouts)
+    
+    return jsonify({
+        'workouts': total_workouts,
+        'calories': total_calories,
+        'minutes': total_minutes
+    })
+
+
+
+
 
 # Your existing code at the bottom should look like this:
 if __name__ == '__main__':

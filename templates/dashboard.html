@@ -945,6 +945,24 @@ body.dark-mode .alert-error {
 
     <script>
 
+// Load user stats from database (not localStorage)
+async function loadUserStats() {
+    try {
+        const response = await fetch('/get-user-stats');
+        const data = await response.json();
+        
+        document.getElementById('workoutsDone').innerText = data.workouts || 0;
+        document.getElementById('caloriesBurned').innerText = (data.calories || 0).toLocaleString();
+        document.getElementById('totalMinutes').innerText = data.minutes || 0;
+        
+        // Also save to localStorage for quick access (optional)
+        localStorage.setItem('workoutsDone', data.workouts || 0);
+        localStorage.setItem('caloriesBurned', data.calories || 0);
+        localStorage.setItem('totalMinutes', data.minutes || 0);
+    } catch (error) {
+        console.error('Error loading stats:', error);
+    }
+}
 
 
     // Dynamic Fitness Tips
@@ -1308,6 +1326,7 @@ function updateProgress() {
     })
     .then(response => response.json())
     .then(data => {
+        loadUserStats();
         showProgressAlert('Progress updated successfully! ✅', 'success');
         setTimeout(() => {
             closeProgressModal();
@@ -1388,17 +1407,17 @@ function editHeight() {
         document.body.classList.add('dark-mode');
     }
 
-        const savedWorkouts = localStorage.getItem('workoutsDone');
-        const savedCalories = localStorage.getItem('caloriesBurned');
-        const savedMinutes = localStorage.getItem('totalMinutes');
-        const savedWeight = localStorage.getItem('currentWeight');
+        //const savedWorkouts = localStorage.getItem('workoutsDone');
+        //const savedCalories = localStorage.getItem('caloriesBurned');
+        //const savedMinutes = localStorage.getItem('totalMinutes');
+        //const savedWeight = localStorage.getItem('currentWeight');
         
-        if (savedWorkouts) document.getElementById('workoutsDone').innerText = savedWorkouts;
-        if (savedCalories) document.getElementById('caloriesBurned').innerText = savedCalories;
-        if (savedMinutes) document.getElementById('totalMinutes').innerText = savedMinutes;
-        if (savedWeight) {
-            document.getElementById('currentWeight').innerText = savedWeight + ' kg';
-        }
+        //if (savedWorkouts) document.getElementById('workoutsDone').innerText = savedWorkouts;
+        //if (savedCalories) document.getElementById('caloriesBurned').innerText = savedCalories;
+        //if (savedMinutes) document.getElementById('totalMinutes').innerText = savedMinutes;
+        //if (savedWeight) {
+        //    document.getElementById('currentWeight').innerText = savedWeight + ' kg';
+        //}
         
         // Calculate progress percentage
         const startWeight = parseFloat(document.getElementById('startWeight').innerText) || 0;
@@ -1412,6 +1431,8 @@ function editHeight() {
             document.getElementById('progressPercentage').innerText = progressPercent + '%';
             document.getElementById('progressFill').style.width = progressPercent + '%';
         }
+
+        loadUserStats();
         calculateBMI();
         updateQuickTip();
 
