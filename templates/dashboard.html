@@ -947,9 +947,11 @@ body.dark-mode .alert-error {
 
 // Load user stats from database (not localStorage)
 async function loadUserStats() {
+    console.log("loadUserStats() called");
     try {
         const response = await fetch('/get-user-stats');
         const data = await response.json();
+        console.log("Stats data received:",data);
         
         document.getElementById('workoutsDone').innerText = data.workouts || 0;
         document.getElementById('caloriesBurned').innerText = (data.calories || 0).toLocaleString();
