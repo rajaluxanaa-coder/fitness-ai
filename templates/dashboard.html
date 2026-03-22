@@ -952,6 +952,11 @@ async function loadUserStats() {
         const response = await fetch('/get-user-stats');
         const data = await response.json();
         console.log("Stats data received:",data);
+
+        // Also save to localStorage for quick access (optional)
+        localStorage.setItem('workoutsDone', data.workouts || 0);
+        localStorage.setItem('caloriesBurned', data.calories || 0);
+        localStorage.setItem('totalMinutes', data.minutes || 0);
         
         document.getElementById('workoutsDone').innerText = data.workouts || 0;
         document.getElementById('caloriesBurned').innerText = (data.calories || 0).toLocaleString();
@@ -1295,21 +1300,21 @@ function updateProgress() {
     if (workoutsCompleted && workoutsCompleted > 0) {
         workoutsDone += parseInt(workoutsCompleted);
         document.getElementById('workoutsDone').innerText = workoutsDone;
-        //localStorage.setItem('workoutsDone', workoutsDone);
+        localStorage.setItem('workoutsDone', workoutsDone);
     }
 
     // Update calories if provided
     if (caloriesBurned && caloriesBurned > 0) {
         calories += parseInt(caloriesBurned);
         document.getElementById('caloriesBurned').innerText = calories.toLocaleString();
-        //localStorage.setItem('caloriesBurned', calories);
+        localStorage.setItem('caloriesBurned', calories);
     }
 
     // Update minutes if provided
     if (minutes && minutes > 0) {
         totalMinutes += parseInt(minutes);
         document.getElementById('totalMinutes').innerText = totalMinutes;
-        //localStorage.setItem('totalMinutes', totalMinutes);
+        localStorage.setItem('totalMinutes', totalMinutes);
     }
 
     calculateBMI();
