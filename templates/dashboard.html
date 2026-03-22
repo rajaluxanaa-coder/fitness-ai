@@ -1401,6 +1401,9 @@ function editHeight() {
 
     // Load saved data on page load
     document.addEventListener('DOMContentLoaded', function() {
+
+        loadUserStats();
+        
         // Load saved stats from localStorage
 
         // Apply dark mode on page load
@@ -1434,7 +1437,7 @@ function editHeight() {
             document.getElementById('progressFill').style.width = progressPercent + '%';
         }
 
-        loadUserStats();
+        
         calculateBMI();
         updateQuickTip();
 
