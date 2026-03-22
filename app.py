@@ -1874,7 +1874,7 @@ def update_height():
 
 
 
-        
+
     
 @app.route('/get-user-stats')
 def get_user_stats():
@@ -1888,6 +1888,8 @@ def get_user_stats():
     total_workouts = len(workouts)
     total_calories = sum(w.calories_burned for w in workouts)
     total_minutes = sum(w.duration for w in workouts)
+
+    print(f"User {user_id}: Workouts={total_workouts}, Calories={total_calories}, Minutes={total_minutes}")
     
     return jsonify({
         'workouts': total_workouts,
