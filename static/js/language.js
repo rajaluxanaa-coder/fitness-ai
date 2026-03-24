@@ -158,9 +158,10 @@ function applyTranslations() {
     }
 }
 
-// Change language (called from settings)
+// Add this to your static/js/language.js
 function changeLanguage(lang) {
     loadTranslations(lang);
+    updateActiveLanguageButton();
 }
 
 // Update active button in settings panel

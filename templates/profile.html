@@ -623,9 +623,9 @@ body.dark-mode .lang-select-btn {
             <div class="setting-desc">Choose your preferred language for the entire app</div>
         </div>
         <div class="language-buttons">
-            <button onclick="changeLanguage('en')" class="lang-select-btn" id="langEn">🇬🇧 English</button>
-            <button onclick="changeLanguage('hi')" class="lang-select-btn" id="langHi">🇮🇳 हिन्दी</button>
-            <button onclick="changeLanguage('ta')" class="lang-select-btn" id="langTa">🇮🇳 தமிழ்</button>
+            <button type="button" onclick="changeLanguage('en')" class="lang-select-btn" id="langEn">🇬🇧 English</button>
+            <button type="button" onclick="changeLanguage('hi')" class="lang-select-btn" id="langHi">🇮🇳 हिन्दी</button>
+            <button type="button" onclick="changeLanguage('ta')" class="lang-select-btn" id="langTa">🇮🇳 தமிழ்</button>
         </div>
     </div>
 </div>
@@ -1445,6 +1445,8 @@ async function loadSettings() {
             loadMealRecommendations();
             loadAchievementsSummary(); // Add this line
             loadUserLevel();
+
+            updateActiveLanguageButton();
             
             // Refresh weather every 30 minutes
             setInterval(updateWeather, 1800000);
