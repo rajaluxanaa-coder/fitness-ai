@@ -668,8 +668,14 @@ body.dark-mode .alert-error {
                 const data = await response.json();
                 
                 if (data.success) {
+                    // ✅ Refresh daily totals instead of redirecting
+            await loadDailyTotals();
+            
+            // ✅ Clear the form
+            document.getElementById('mealForm').reset();
+            document.getElementById('mealDate').value = new Date().toISOString().split('T')[0];
+            
                     alert('✅ Meal logged successfully!');
-                    window.location.href = '/progress';
                 } else {
                     alert('❌ Failed to log meal. Please try again.');
                     btn.innerHTML = originalText;
@@ -678,6 +684,7 @@ body.dark-mode .alert-error {
             } catch (error) {
                 console.error('Error:', error);
                 alert('❌ Error logging meal. Please try again.');
+            }finally{
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             }
