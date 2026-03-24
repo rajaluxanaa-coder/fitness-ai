@@ -1900,6 +1900,17 @@ def get_user_stats():
 
 
 
+@app.route('/video-library')
+def video_library():
+    if 'user_id' not in session:
+        return redirect(url_for('index'))
+    
+    user = User.query.get(session['user_id'])
+    return render_template('video_library.html', user=user)
+
+    
+
+
 
 # Your existing code at the bottom should look like this:
 if __name__ == '__main__':

@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Library - FitAI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            padding-top: 100px;
+        }
+        
+        /* Navbar Styles */
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #6b46c1;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #4b5563;
+            font-weight: 500;
+        }
+        
+        .nav-links a:hover {
+            color: #6b46c1;
+        }
+        
+        .profile-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #6b46c1;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        /* Category Filter */
+        .category-filter {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .category-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 2rem;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .category-btn.active {
+            background: white;
+            color: #6b46c1;
+        }
+        
+        .category-btn:hover {
+            background: white;
+            color: #6b46c1;
+        }
+        
+        /* Video Grid */
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+        
+        .video-card {
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+        
+        .video-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .video-thumbnail {
+            position: relative;
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .play-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(107, 70, 193, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            transition: transform 0.3s;
+        }
+        
+        .video-card:hover .play-icon {
+            transform: scale(1.1);
+        }
+        
+        .video-duration {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.8rem;
+        }
+        
+        .video-info {
+            padding: 1rem;
+        }
+        
+        .video-title {
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+        }
+        
+        .video-desc {
+            color: #6b7280;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .video-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.8rem;
+            color: #9ca3af;
+        }
+        
+        /* Video Modal */
+        .video-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .video-modal.show {
+            display: flex;
+        }
+        
+        .video-modal-content {
+            max-width: 900px;
+            width: 90%;
+            background: black;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+        
+        .video-modal-header {
+            background: #1f2937;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+        
+        .video-modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .video-player {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+        }
+        
+        .video-player iframe {
+            width: 100%;
+            height: 100%;
+        }
+        
+        @media (max-width: 768px) {
+            .video-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-dumbbell"></i>
+            <span>FitAI</span>
+        </div>
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/profile">Profile</a>
+            <a href="/analytics">📊 Analytics</a>
+            <a href="/achievements">🏆 Achievements</a>
+            <a href="/community">👥 Community</a>
+            <a href="/goals">🎯 Goals</a>
+            <a href="/calendar">📅 Calendar</a>
+            <a href="/music">🎵 Music</a>
+            <a href="/video-library" style="color: #6b46c1;">🎬 Videos</a>
+        </div>
+        <div class="profile-circle" onclick="window.location.href='/profile'">
+            {{ user.name[0]|upper }}
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>
+                <i class="fas fa-video"></i>
+                Exercise Video Library
+            </h1>
+            <a href="/dashboard" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Dashboard
+            </a>
+        </div>
+
+        <!-- Category Filter -->
+        <div class="category-filter">
+            <button class="category-btn active" data-category="all">All</button>
+            <button class="category-btn" data-category="upper">Upper Body</button>
+            <button class="category-btn" data-category="lower">Lower Body</button>
+            <button class="category-btn" data-category="core">Core & Abs</button>
+            <button class="category-btn" data-category="cardio">Cardio</button>
+            <button class="category-btn" data-category="yoga">Yoga & Stretching</button>
+        </div>
+
+        <!-- Video Grid -->
+        <div class="video-grid" id="videoGrid"></div>
+    </div>
+
+    <!-- Video Modal -->
+    <div id="videoModal" class="video-modal">
+        <div class="video-modal-content">
+            <div class="video-modal-header">
+                <h3 id="modalTitle">Exercise Video</h3>
+                <button class="video-modal-close" onclick="closeVideoModal()">&times;</button>
+            </div>
+            <div class="video-player">
+                <iframe id="videoFrame" src="" frameborder="0" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Video Library Database
+        const videos = [
+            // Upper Body
+            {
+                id: 1,
+                title: "Perfect Push-up Form",
+                description: "Learn proper push-up technique for chest and triceps",
+                category: "upper",
+                duration: "2:30",
+                thumbnail: "https://i.ytimg.com/vi/IODxDxX7oi4/hqdefault.jpg",
+                videoId: "IODxDxX7oi4"
+            },
+            {
+                id: 2,
+                title: "Dumbbell Rows",
+                description: "Build a stronger back with proper rowing technique",
+                category: "upper",
+                duration: "3:15",
+                thumbnail: "https://i.ytimg.com/vi/9EF6r9iPY8M/hqdefault.jpg",
+                videoId: "9EF6r9iPY8M"
+            },
+            {
+                id: 3,
+                title: "Shoulder Press",
+                description: "Develop strong shoulders safely",
+                category: "upper",
+                duration: "2:45",
+                thumbnail: "https://i.ytimg.com/vi/gjXIlSQMp4U/hqdefault.jpg",
+                videoId: "gjXIlSQMp4U"
+            },
+            {
+                id: 4,
+                title: "Bicep Curls",
+                description: "Perfect form for bigger arms",
+                category: "upper",
+                duration: "2:20",
+                thumbnail: "https://i.ytimg.com/vi/av7-8igSXTs/hqdefault.jpg",
+                videoId: "av7-8igSXTs"
+            },
+            // Lower Body
+            {
+                id: 5,
+                title: "Proper Squat Form",
+                description: "Master the king of leg exercises",
+                category: "lower",
+                duration: "4:00",
+                thumbnail: "https://i.ytimg.com/vi/aclHkVaku9U/hqdefault.jpg",
+                videoId: "aclHkVaku9U"
+            },
+            {
+                id: 6,
+                title: "Lunges Technique",
+                description: "Build strong legs with perfect lunges",
+                category: "lower",
+                duration: "2:50",
+                thumbnail: "https://i.ytimg.com/vi/QOVaHwm-Q6U/hqdefault.jpg",
+                videoId: "QOVaHwm-Q6U"
+            },
+            {
+                id: 7,
+                title: "Deadlift Form",
+                description: "Safe deadlift technique for back and legs",
+                category: "lower",
+                duration: "3:30",
+                thumbnail: "https://i.ytimg.com/vi/op9kVnSsoVQ/hqdefault.jpg",
+                videoId: "op9kVnSsoVQ"
+            },
+            // Core
+            {
+                id: 8,
+                title: "Plank Tutorial",
+                description: "Build a strong core with proper plank",
+                category: "core",
+                duration: "2:15",
+                thumbnail: "https://i.ytimg.com/vi/pSHjTRCQxIw/hqdefault.jpg",
+                videoId: "pSHjTRCQxIw"
+            },
+            {
+                id: 9,
+                title: "Russian Twists",
+                description: "Target obliques with Russian twists",
+                category: "core",
+                duration: "2:00",
+                thumbnail: "https://i.ytimg.com/vi/wkD8rjkopSg/hqdefault.jpg",
+                videoId: "wkD8rjkopSg"
+            },
+            {
+                id: 10,
+                title: "Leg Raises",
+                description: "Lower ab exercise technique",
+                category: "core",
+                duration: "1:45",
+                thumbnail: "https://i.ytimg.com/vi/JB2oyawG9KI/hqdefault.jpg",
+                videoId: "JB2oyawG9KI"
+            },
+            // Cardio
+            {
+                id: 11,
+                title: "Burpees Tutorial",
+                description: "Full body cardio exercise",
+                category: "cardio",
+                duration: "2:30",
+                thumbnail: "https://i.ytimg.com/vi/TU8QYVW0gDU/hqdefault.jpg",
+                videoId: "TU8QYVW0gDU"
+            },
+            {
+                id: 12,
+                title: "Mountain Climbers",
+                description: "High intensity cardio move",
+                category: "cardio",
+                duration: "1:50",
+                thumbnail: "https://i.ytimg.com/vi/1XJL6y4x3BU/hqdefault.jpg",
+                videoId: "1XJL6y4x3BU"
+            },
+            // Yoga
+            {
+                id: 13,
+                title: "Sun Salutation",
+                description: "Full body yoga flow",
+                category: "yoga",
+                duration: "5:00",
+                thumbnail: "https://i.ytimg.com/vi/xY50iWtdyO0/hqdefault.jpg",
+                videoId: "xY50iWtdyO0"
+            },
+            {
+                id: 14,
+                title: "Downward Dog",
+                description: "Basic yoga pose for flexibility",
+                category: "yoga",
+                duration: "2:20",
+                thumbnail: "https://i.ytimg.com/vi/1HdFwCqyVZk/hqdefault.jpg",
+                videoId: "1HdFwCqyVZk"
+            }
+        ];
+
+        let currentVideo = null;
+
+        function renderVideos(category = 'all') {
+            const filtered = category === 'all' ? videos : videos.filter(v => v.category === category);
+            const grid = document.getElementById('videoGrid');
+            
+            grid.innerHTML = filtered.map(video => `
+                <div class="video-card" onclick="openVideo(${video.id})">
+                    <div class="video-thumbnail" style="background-image: url('${video.thumbnail}'); background-size: cover;">
+                        <div class="play-icon">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="video-duration">${video.duration}</div>
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">${video.title}</div>
+                        <div class="video-desc">${video.description}</div>
+                        <div class="video-meta">
+                            <span><i class="fas fa-tag"></i> ${video.category}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openVideo(id) {
+            currentVideo = videos.find(v => v.id === id);
+            if (currentVideo) {
+                document.getElementById('modalTitle').innerText = currentVideo.title;
+                document.getElementById('videoFrame').src = `https://www.youtube.com/embed/${currentVideo.videoId}?autoplay=1`;
+                document.getElementById('videoModal').classList.add('show');
+            }
+        }
+
+        function closeVideoModal() {
+            document.getElementById('videoModal').classList.remove('show');
+            document.getElementById('videoFrame').src = '';
+        }
+
+        // Category filter
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderVideos(btn.getAttribute('data-category'));
+            });
+        });
+
+        // Close modal on escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeVideoModal();
+            }
+        });
+
+        // Initial render
+        renderVideos();
+    </script>
+</body>
+</html>
