@@ -447,6 +447,40 @@
     background: rgba(45, 45, 45, 0.9);
     color: white;
 }
+
+/* Language Settings */
+.language-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.lang-select-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.lang-select-btn.active {
+    background: #6b46c1;
+    color: white;
+    border-color: #6b46c1;
+}
+
+.lang-select-btn:hover {
+    background: #6b46c1;
+    color: white;
+    border-color: #6b46c1;
+}
+
+body.dark-mode .lang-select-btn {
+    background: #374151;
+    color: white;
+    border-color: #4b5563;
+}
     </style>
 </head>
 <body>
@@ -580,6 +614,22 @@
         </div>
     </div>
     
+    <!-- Inside settings panel -->
+<div class="settings-section">
+    <h3><i class="fas fa-language"></i> Language / भाषा / மொழி</h3>
+    <div class="setting-item">
+        <div class="setting-info">
+            <div class="setting-label">Select Language</div>
+            <div class="setting-desc">Choose your preferred language for the entire app</div>
+        </div>
+        <div class="language-buttons">
+            <button onclick="changeLanguage('en')" class="lang-select-btn" id="langEn">🇬🇧 English</button>
+            <button onclick="changeLanguage('hi')" class="lang-select-btn" id="langHi">🇮🇳 हिन्दी</button>
+            <button onclick="changeLanguage('ta')" class="lang-select-btn" id="langTa">🇮🇳 தமிழ்</button>
+        </div>
+    </div>
+</div>
+
     <button class="save-settings-btn" onclick="saveSettings()">
         <i class="fas fa-save"></i> Save All Settings
     </button>
