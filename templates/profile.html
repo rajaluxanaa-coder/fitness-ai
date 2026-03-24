@@ -1429,6 +1429,31 @@ async function loadSettings() {
             alert('Meal logged successfully!');
         }
 
+
+        // Language Functions - Add these inside your <script> tag
+function changeLanguage(lang) {
+    console.log("Changing language to:", lang);
+    localStorage.setItem('language', lang);
+    location.reload();
+}
+
+function updateActiveLanguageButton() {
+    const currentLang = localStorage.getItem('language') || 'en';
+    const langEn = document.getElementById('langEn');
+    const langHi = document.getElementById('langHi');
+    const langTa = document.getElementById('langTa');
+    
+    if (langEn) {
+        langEn.classList.remove('active');
+        langHi.classList.remove('active');
+        langTa.classList.remove('active');
+        
+        if (currentLang === 'en') langEn.classList.add('active');
+        if (currentLang === 'hi') langHi.classList.add('active');
+        if (currentLang === 'ta') langTa.classList.add('active');
+    }
+}
+
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
                         // Then apply dark mode from localStorage
