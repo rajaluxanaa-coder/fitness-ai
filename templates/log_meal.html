@@ -20,7 +20,7 @@
         }
         
         .container {
-            max-width: 700px;
+            max-width: 800px;
             margin: 0 auto;
         }
         
@@ -57,6 +57,7 @@
             color: #11998e;
         }
         
+        /* Daily Progress Card */
         .stats-card {
             background: white;
             border-radius: 1rem;
@@ -112,45 +113,114 @@
             transition: width 0.3s;
         }
         
-        .quick-meals {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-        
-        .meal-card {
+        /* Country Selection */
+        .country-section {
             background: white;
             border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .country-title {
+            color: #11998e;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .country-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .country-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 2rem;
+            background: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .country-btn:hover {
+            background: #11998e;
+            color: white;
+            border-color: #11998e;
+        }
+        
+        .country-btn.active {
+            background: #11998e;
+            color: white;
+            border-color: #11998e;
+        }
+        
+        /* Meals Grid */
+        .meals-section {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: none;
+        }
+        
+        .meals-section.show {
+            display: block;
+        }
+        
+        .meals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .meal-option {
+            background: #f9fafb;
+            border-radius: 0.75rem;
             padding: 1rem;
-            text-align: center;
             cursor: pointer;
             transition: all 0.3s;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: 2px solid transparent;
         }
         
-        .meal-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(17, 153, 142, 0.3);
+        .meal-option:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            background: #f3f4f6;
         }
         
-        .meal-emoji {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
+        .meal-option.selected {
+            border-color: #11998e;
+            background: #e0f2fe;
         }
         
         .meal-name {
-            font-weight: 600;
+            font-weight: bold;
             color: #1f2937;
             margin-bottom: 0.25rem;
         }
         
-        .meal-calories {
+        .meal-cal {
             color: #11998e;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 600;
         }
         
+        .meal-macros {
+            color: #6b7280;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+        
+        /* Form Card */
         .form-card {
             background: white;
             border-radius: 1rem;
@@ -200,29 +270,17 @@
             border: 2px solid #e5e7eb;
             border-radius: 0.5rem;
             font-size: 1rem;
-            transition: all 0.3s;
         }
         
-        input:focus, select:focus, textarea:focus {
+        input:focus, select:focus {
             outline: none;
             border-color: #11998e;
-            box-shadow: 0 0 0 3px rgba(17, 153, 142, 0.1);
         }
         
         .macro-inputs {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 0.5rem;
-        }
-        
-        .macro-input {
-            text-align: center;
-        }
-        
-        .macro-unit {
-            color: #6b7280;
-            font-size: 0.8rem;
-            margin-top: 0.25rem;
         }
         
         .btn-primary {
@@ -235,7 +293,7 @@
             font-weight: 600;
             cursor: pointer;
             width: 100%;
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: transform 0.3s;
             margin-top: 1rem;
             display: flex;
             align-items: center;
@@ -243,60 +301,11 @@
             gap: 0.5rem;
         }
         
-        .btn-primary:hover:not(:disabled) {
+        .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(17, 153, 142, 0.3);
-        }
-        
-        .btn-primary:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-        
-        .btn-secondary {
-            background: #e5e7eb;
-            color: #1f2937;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            margin-top: 1rem;
-            display: inline-block;
-            text-decoration: none;
-        }
-        
-        .btn-secondary:hover {
-            background: #d1d5db;
-        }
-        
-        @keyframes slideIn {
-            from {
-                transform: translateY(20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-        
-        .animate {
-            animation: slideIn 0.5s ease-out;
-        }
-        
-        .spinner {
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
         }
         
         @media (max-width: 640px) {
-            .quick-meals {
-                grid-template-columns: repeat(2, 1fr);
-            }
             .form-grid {
                 grid-template-columns: 1fr;
             }
@@ -307,167 +316,6 @@
                 grid-template-columns: 1fr;
             }
         }
-
-        /* Dark mode styles */
-body.dark-mode {
-    background: #1a1a1a;
-    color: #e5e7eb;
-}
-
-body.dark-mode .navbar {
-    background: #2d2d2d;
-    color: white;
-}
-
-body.dark-mode .nav-links a {
-    color: #ddd;
-}
-
-body.dark-mode .nav-links a:hover {
-    color: #6b46c1;
-}
-
-body.dark-mode .card,
-body.dark-mode .sidebar,
-body.dark-mode .feed,
-body.dark-mode .chart-card,
-body.dark-mode .stat-card,
-body.dark-mode .goal-card,
-body.dark-mode .post,
-body.dark-mode .modal-content,
-body.dark-mode .settings-panel,
-body.dark-mode .left-sidebar,
-body.dark-mode .main-content,
-body.dark-mode .right-panel {
-    background: #2d2d2d;
-    color: #e5e7eb;
-    border-color: #4b5563;
-}
-
-body.dark-mode h1, 
-body.dark-mode h2, 
-body.dark-mode h3, 
-body.dark-mode h4,
-body.dark-mode .stat-value,
-body.dark-mode .goal-title,
-body.dark-mode .post-title,
-body.dark-mode .badge-name {
-    color: #f3f4f6;
-}
-
-body.dark-mode p,
-body.dark-mode .stat-label,
-body.dark-mode .post-meta,
-body.dark-mode .timeline-date,
-body.dark-mode .friend-name {
-    color: #9ca3af;
-}
-
-body.dark-mode input,
-body.dark-mode select,
-body.dark-mode textarea {
-    background: #374151;
-    border-color: #4b5563;
-    color: #e5e7eb;
-}
-
-body.dark-mode input:focus,
-body.dark-mode select:focus,
-body.dark-mode textarea:focus {
-    border-color: #6b46c1;
-}
-
-body.dark-mode .btn-outline {
-    border-color: #6b46c1;
-    color: #6b46c1;
-}
-
-body.dark-mode .btn-outline:hover {
-    background: #6b46c1;
-    color: white;
-}
-
-body.dark-mode .btn-secondary {
-    background: #374151;
-    color: #e5e7eb;
-    border-color: #4b5563;
-}
-
-body.dark-mode .btn-secondary:hover {
-    background: #4b5563;
-}
-
-body.dark-mode .progress-bar {
-    background: #4b5563;
-}
-
-body.dark-mode .progress-fill {
-    background: linear-gradient(90deg, #6b46c1, #38a169);
-}
-
-body.dark-mode .badge-card {
-    background: #374151;
-    color: #e5e7eb;
-}
-
-body.dark-mode .badge-card.locked {
-    opacity: 0.3;
-}
-
-body.dark-mode .friend-card,
-body.dark-mode .friend-item,
-body.dark-mode .post-item,
-body.dark-mode .timeline-item {
-    background: #374151;
-    border-color: #4b5563;
-}
-
-body.dark-mode .water-tracker {
-    background: #1e3a5f;
-}
-
-body.dark-mode .nutrition-tip {
-    background: #1f2937;
-}
-
-body.dark-mode .leaderboard-item {
-    border-color: #4b5563;
-}
-
-body.dark-mode .rank {
-    background: #4b5563;
-    color: #e5e7eb;
-}
-
-body.dark-mode .rank-1 { background: #b45309; }
-body.dark-mode .rank-2 { background: #6b7280; }
-body.dark-mode .rank-3 { background: #92400e; }
-
-body.dark-mode ::-webkit-calendar-picker-indicator {
-    filter: invert(1);
-}
-
-body.dark-mode .close-btn {
-    color: #9ca3af;
-}
-
-body.dark-mode .close-btn:hover {
-    color: #f3f4f6;
-}
-
-body.dark-mode hr {
-    border-color: #4b5563;
-}
-
-body.dark-mode .alert-success {
-    background: #065f46;
-    color: #d1fae5;
-}
-
-body.dark-mode .alert-error {
-    background: #991b1b;
-    color: #fee2e2;
-}
     </style>
 </head>
 <body>
@@ -483,7 +331,7 @@ body.dark-mode .alert-error {
         </div>
         
         <!-- Daily Progress Card -->
-        <div class="stats-card animate">
+        <div class="stats-card">
             <div class="stats-title">
                 <i class="fas fa-chart-line"></i> Today's Progress
             </div>
@@ -507,37 +355,33 @@ body.dark-mode .alert-error {
             </div>
         </div>
         
-        <!-- Quick Meal Templates -->
-        <h3 style="color: white; margin-bottom: 1rem;">
-            <i class="fas fa-bolt"></i> Quick Add
-        </h3>
-        <div class="quick-meals">
-            <div class="meal-card" data-type="breakfast" data-name="Oatmeal" data-calories="300" data-protein="12" data-carbs="45" data-fats="6">
-                <div class="meal-emoji">🥣</div>
-                <div class="meal-name">Oatmeal</div>
-                <div class="meal-calories">300 cal</div>
-            </div>
-            <div class="meal-card" data-type="lunch" data-name="Grilled Chicken" data-calories="350" data-protein="35" data-carbs="20" data-fats="8">
-                <div class="meal-emoji">🍗</div>
-                <div class="meal-name">Chicken</div>
-                <div class="meal-calories">350 cal</div>
-            </div>
-            <div class="meal-card" data-type="dinner" data-name="Salmon" data-calories="400" data-protein="30" data-carbs="15" data-fats="22">
-                <div class="meal-emoji">🐟</div>
-                <div class="meal-name">Salmon</div>
-                <div class="meal-calories">400 cal</div>
-            </div>
-            <div class="meal-card" data-type="snack" data-name="Greek Yogurt" data-calories="150" data-protein="15" data-carbs="8" data-fats="5">
-                <div class="meal-emoji">🥛</div>
-                <div class="meal-name">Yogurt</div>
-                <div class="meal-calories">150 cal</div>
+        <!-- Country Selection -->
+        <div class="country-section">
+            <h3 class="country-title">
+                <i class="fas fa-globe"></i> Select Cuisine
+            </h3>
+            <div class="country-buttons" id="countryButtons">
+                <button class="country-btn" data-country="indian">🇮🇳 Indian</button>
+                <button class="country-btn" data-country="italian">🇮🇹 Italian</button>
+                <button class="country-btn" data-country="japanese">🇯🇵 Japanese</button>
+                <button class="country-btn" data-country="mexican">🇲🇽 Mexican</button>
+                <button class="country-btn" data-country="american">🇺🇸 American</button>
+                <button class="country-btn" data-country="thai">🇹🇭 Thai</button>
             </div>
         </div>
         
-        <!-- Main Form -->
-        <div class="form-card animate">
+        <!-- Meals Grid -->
+        <div class="meals-section" id="mealsSection">
+            <h3 class="country-title">
+                <i class="fas fa-utensils"></i> <span id="selectedCuisine">Indian</span> Cuisine Meals
+            </h3>
+            <div class="meals-grid" id="mealsGrid"></div>
+        </div>
+        
+        <!-- Manual Entry Form -->
+        <div class="form-card">
             <h2 class="form-title">
-                <i class="fas fa-pen"></i> Meal Details
+                <i class="fas fa-pen"></i> Or Enter Manually
             </h2>
             
             <form id="mealForm" onsubmit="logMeal(event)">
@@ -559,12 +403,12 @@ body.dark-mode .alert-error {
                     
                     <div class="form-group full-width">
                         <label><i class="fas fa-utensils"></i> Food Name</label>
-                        <input type="text" id="foodName" placeholder="e.g., Grilled Chicken Salad" required>
+                        <input type="text" id="foodName" placeholder="e.g., Butter Chicken" required>
                     </div>
                     
                     <div class="form-group">
                         <label><i class="fas fa-fire"></i> Calories</label>
-                        <input type="number" id="calories" min="0" placeholder="e.g., 350" required>
+                        <input type="number" id="calories" min="0" placeholder="Calories" required>
                     </div>
                     
                     <div class="form-group full-width">
@@ -594,45 +438,132 @@ body.dark-mode .alert-error {
     </div>
     
     <script>
-        // Daily totals for progress bars
-        let dailyTotals = { calories: 0, protein: 0 };
+        // Meal Database by Country
+        const mealsByCountry = {
+            indian: [
+                { name: "Butter Chicken", calories: 450, protein: 30, carbs: 20, fats: 25 },
+                { name: "Dal Makhani", calories: 300, protein: 15, carbs: 35, fats: 12 },
+                { name: "Biryani", calories: 500, protein: 25, carbs: 60, fats: 18 },
+                { name: "Chole Bhature", calories: 600, protein: 20, carbs: 70, fats: 25 },
+                { name: "Palak Paneer", calories: 350, protein: 18, carbs: 20, fats: 22 },
+                { name: "Idli Sambar", calories: 200, protein: 8, carbs: 40, fats: 3 },
+                { name: "Dosa", calories: 250, protein: 6, carbs: 45, fats: 5 },
+                { name: "Tandoori Chicken", calories: 350, protein: 40, carbs: 5, fats: 18 }
+            ],
+            italian: [
+                { name: "Margherita Pizza", calories: 800, protein: 28, carbs: 95, fats: 35 },
+                { name: "Spaghetti Carbonara", calories: 600, protein: 25, carbs: 70, fats: 25 },
+                { name: "Lasagna", calories: 700, protein: 35, carbs: 65, fats: 30 },
+                { name: "Risotto", calories: 550, protein: 15, carbs: 80, fats: 20 },
+                { name: "Caprese Salad", calories: 250, protein: 12, carbs: 10, fats: 18 },
+                { name: "Fettuccine Alfredo", calories: 650, protein: 20, carbs: 75, fats: 30 }
+            ],
+            japanese: [
+                { name: "Sushi Roll", calories: 350, protein: 15, carbs: 45, fats: 10 },
+                { name: "Ramen", calories: 550, protein: 25, carbs: 70, fats: 20 },
+                { name: "Teriyaki Chicken", calories: 400, protein: 35, carbs: 30, fats: 15 },
+                { name: "Tempura", calories: 450, protein: 12, carbs: 40, fats: 25 },
+                { name: "Miso Soup", calories: 50, protein: 3, carbs: 8, fats: 2 },
+                { name: "Donburi", calories: 500, protein: 28, carbs: 65, fats: 18 }
+            ],
+            mexican: [
+                { name: "Tacos", calories: 400, protein: 20, carbs: 35, fats: 20 },
+                { name: "Burrito", calories: 700, protein: 30, carbs: 80, fats: 25 },
+                { name: "Quesadilla", calories: 500, protein: 25, carbs: 40, fats: 25 },
+                { name: "Enchiladas", calories: 550, protein: 28, carbs: 50, fats: 28 },
+                { name: "Guacamole", calories: 150, protein: 2, carbs: 8, fats: 12 },
+                { name: "Chiles Rellenos", calories: 450, protein: 20, carbs: 35, fats: 25 }
+            ],
+            american: [
+                { name: "Burger", calories: 600, protein: 30, carbs: 45, fats: 35 },
+                { name: "Grilled Cheese", calories: 350, protein: 15, carbs: 30, fats: 20 },
+                { name: "Mac & Cheese", calories: 500, protein: 18, carbs: 55, fats: 25 },
+                { name: "BBQ Ribs", calories: 700, protein: 40, carbs: 30, fats: 45 },
+                { name: "Caesar Salad", calories: 400, protein: 18, carbs: 15, fats: 30 },
+                { name: "Pancakes", calories: 300, protein: 8, carbs: 45, fats: 10 }
+            ],
+            thai: [
+                { name: "Pad Thai", calories: 500, protein: 20, carbs: 65, fats: 18 },
+                { name: "Green Curry", calories: 450, protein: 25, carbs: 30, fats: 25 },
+                { name: "Tom Yum Soup", calories: 150, protein: 10, carbs: 15, fats: 5 },
+                { name: "Massaman Curry", calories: 550, protein: 28, carbs: 40, fats: 30 },
+                { name: "Som Tum", calories: 200, protein: 3, carbs: 30, fats: 8 },
+                { name: "Thai Fried Rice", calories: 450, protein: 15, carbs: 65, fats: 15 }
+            ]
+        };
         
+        let currentCountry = 'indian';
+        
+        // Load daily totals
         async function loadDailyTotals() {
             try {
                 const response = await fetch('/get-daily-totals');
                 const data = await response.json();
-                dailyTotals = data;
-                updateProgressBars();
+                updateProgressBars(data);
             } catch (error) {
                 console.error('Error loading daily totals:', error);
             }
         }
         
-        function updateProgressBars() {
+        function updateProgressBars(data) {
             const calorieGoal = 2000;
             const proteinGoal = 100;
             
-            const caloriesEl = document.getElementById('caloriesProgress');
-            const proteinEl = document.getElementById('proteinProgress');
-            const caloriesBar = document.getElementById('caloriesBar');
-            const proteinBar = document.getElementById('proteinBar');
-            
-            if (caloriesEl) caloriesEl.innerText = dailyTotals.calories;
-            if (caloriesBar) caloriesBar.style.width = Math.min(100, (dailyTotals.calories / calorieGoal * 100)) + '%';
-            if (proteinEl) proteinEl.innerText = dailyTotals.protein + 'g';
-            if (proteinBar) proteinBar.style.width = Math.min(100, (dailyTotals.protein / proteinGoal * 100)) + '%';
+            document.getElementById('caloriesProgress').innerText = data.calories || 0;
+            document.getElementById('caloriesBar').style.width = Math.min(100, ((data.calories || 0) / calorieGoal * 100)) + '%';
+            document.getElementById('proteinProgress').innerText = (data.protein || 0) + 'g';
+            document.getElementById('proteinBar').style.width = Math.min(100, ((data.protein || 0) / proteinGoal * 100)) + '%';
         }
         
-        function selectMeal(type, name, calories, protein, carbs, fats) {
-            document.getElementById('mealType').value = type;
+        // Country selection
+        function selectCountry(country) {
+            currentCountry = country;
+            
+            // Update active button
+            document.querySelectorAll('.country-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-country') === country) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Show meals section
+            document.getElementById('mealsSection').classList.add('show');
+            document.getElementById('selectedCuisine').innerText = country.charAt(0).toUpperCase() + country.slice(1);
+            
+            // Load meals
+            const meals = mealsByCountry[country] || [];
+            const mealsGrid = document.getElementById('mealsGrid');
+            
+            mealsGrid.innerHTML = meals.map(meal => `
+                <div class="meal-option" onclick="selectMeal('${meal.name}', ${meal.calories}, ${meal.protein}, ${meal.carbs}, ${meal.fats})">
+                    <div class="meal-name">${meal.name}</div>
+                    <div class="meal-cal">🔥 ${meal.calories} cal</div>
+                    <div class="meal-macros">🥩 ${meal.protein}g | 🍚 ${meal.carbs}g | 🧈 ${meal.fats}g</div>
+                </div>
+            `).join('');
+        }
+        
+        // Select a meal and fill form
+        function selectMeal(name, calories, protein, carbs, fats) {
             document.getElementById('foodName').value = name;
-            document.getElementById('calories').value = calories;
+
+document.getElementById('calories').value = calories;
             document.getElementById('protein').value = protein;
             document.getElementById('carbs').value = carbs;
             document.getElementById('fats').value = fats;
+            
+            // Highlight selected meal
+            document.querySelectorAll('.meal-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            // Scroll to form
+            document.querySelector('.form-card').scrollIntoView({ behavior: 'smooth' });
         }
         
-        // Log Meal Function
+        // Log meal function
         async function logMeal(event) {
             event.preventDefault();
             
@@ -646,17 +577,14 @@ body.dark-mode .alert-error {
                 date: document.getElementById('mealDate').value
             };
             
-            // Validate
-            if (!meal.meal_type || !meal.food_name || !meal.calories) {
-                alert('Please fill in all required fields');
+            if (!meal.food_name || !meal.calories) {
+                alert('Please enter food name and calories');
                 return;
             }
             
-            // Show loading state
             const btn = document.getElementById('submitBtn');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging...';
             btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging...';
             
             try {
                 const response = await fetch('/log-meal', {
@@ -668,64 +596,39 @@ body.dark-mode .alert-error {
                 const data = await response.json();
                 
                 if (data.success) {
-                    // ✅ Refresh daily totals instead of redirecting
-            await loadDailyTotals();
-            
-            // ✅ Clear the form
-            document.getElementById('mealForm').reset();
-            document.getElementById('mealDate').value = new Date().toISOString().split('T')[0];
-            
+                    await loadDailyTotals();
                     alert('✅ Meal logged successfully!');
+                    document.getElementById('mealForm').reset();
+                    document.getElementById('mealDate').value = new Date().toISOString().split('T')[0];
+                    document.getElementById('mealType').value = 'lunch';
                 } else {
-                    alert('❌ Failed to log meal. Please try again.');
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
+                    alert('❌ Failed to log meal');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('❌ Error logging meal. Please try again.');
-            }finally{
-                btn.innerHTML = originalText;
+                alert('❌ Error logging meal');
+            } finally {
                 btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i> Log Meal';
             }
         }
         
-        // Quick meal templates - attach click handlers
+        // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            applyDarkMode();
-            const mealCards = document.querySelectorAll('.meal-card');
-            mealCards.forEach(card => {
-                card.addEventListener('click', function() {
-                    const type = this.dataset.type || 'breakfast';
-                    const name = this.dataset.name || 'Oatmeal';
-                    const calories = parseInt(this.dataset.calories) || 300;
-                    const protein = parseInt(this.dataset.protein) || 10;
-                    const carbs = parseInt(this.dataset.carbs) || 30;
-                    const fats = parseInt(this.dataset.fats) || 5;
-                    
-                    selectMeal(type, name, calories, protein, carbs, fats);
-
-                    document.getElementById('mealType').value = type;
-            document.getElementById('foodName').value = name;
-            document.getElementById('calories').value = calories;
-            document.getElementById('protein').value = protein;
-            document.getElementById('carbs').value = carbs;
-            document.getElementById('fats').value = fats;
-            
-                    
-                    // Highlight selected card
-                    mealCards.forEach(c => c.style.border = 'none');
-                    this.style.border = '2px solid #11998e';
-                });
-            });
+            // Set today's date
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('mealDate').value = today;
             
             // Load daily totals
             loadDailyTotals();
-
-
-            // Set today's date
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('mealDate').value = today;
+            
+            // Set default country buttons
+            document.querySelectorAll('.country-btn').forEach(btn => {
+                btn.addEventListener('click', () => selectCountry(btn.getAttribute('data-country')));
+            });
+            
+            // Select Indian cuisine by default
+            selectCountry('indian');
         });
     </script>
 </body>
