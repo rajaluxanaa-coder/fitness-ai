@@ -1456,5 +1456,512 @@ function editHeight() {
 
     });
 </script>
+
+
+
+
+<!-- Timer Widget -->
+<div id="timerWidget" class="timer-widget">
+    <div class="timer-header" onclick="toggleTimerWidget()">
+        <i class="fas fa-clock"></i>
+        <span>Workout Tools</span>
+        <i class="fas fa-chevron-down" id="timerToggleIcon"></i>
+    </div>
+    <div class="timer-content" id="timerContent">
+        <!-- Tabs -->
+        <div class="timer-tabs">
+            <button class="timer-tab active" data-tab="stopwatch">⏱️ Stopwatch</button>
+            <button class="timer-tab" data-tab="timer">⏲️ Timer</button>
+            <button class="timer-tab" data-tab="clock">🕐 Clock</button>
+        </div>
+        
+        <!-- Stopwatch -->
+        <div class="timer-panel active" id="stopwatchPanel">
+            <div class="timer-display" id="stopwatchDisplay">00:00:00</div>
+            <div class="timer-buttons">
+                <button class="timer-btn start" onclick="startStopwatch()">▶ Start</button>
+                <button class="timer-btn pause" onclick="pauseStopwatch()" disabled>⏸ Pause</button>
+                <button class="timer-btn reset" onclick="resetStopwatch()">🔄 Reset</button>
+                <button class="timer-btn lap" onclick="recordLap()">⏱️ Lap</button>
+            </div>
+            <div class="lap-list" id="lapList"></div>
+        </div>
+        
+        <!-- Timer (Countdown) -->
+        <div class="timer-panel" id="timerPanel">
+            <div class="timer-input-group">
+                <input type="number" id="timerMinutes" placeholder="Min" min="0" max="99" value="1">
+                <span>:</span>
+                <input type="number" id="timerSeconds" placeholder="Sec" min="0" max="59" value="30">
+            </div>
+            <div class="timer-display" id="timerDisplay">01:30</div>
+            <div class="timer-buttons">
+                <button class="timer-btn start" onclick="startTimer()">▶ Start</button>
+                <button class="timer-btn pause" onclick="pauseTimer()" disabled>⏸ Pause</button>
+                <button class="timer-btn reset" onclick="resetTimer()">🔄 Reset</button>
+            </div>
+            <div id="timerAlert" class="timer-alert"></div>
+        </div>
+        
+        <!-- Clock -->
+        <div class="timer-panel" id="clockPanel">
+            <div class="clock-display" id="clockDisplay">--:--:--</div>
+            <div class="clock-date" id="clockDate">--</div>
+            <div class="clock-format">
+                <button class="clock-format-btn" onclick="toggleClockFormat()">24H</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Timer Widget Styles */
+.timer-widget {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 320px;
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    z-index: 1000;
+    transition: all 0.3s;
+}
+
+.timer-header {
+    background: linear-gradient(135deg, #6b46c1, #38a169);
+    color: white;
+    padding: 1rem;
+    border-radius: 1rem 1rem 0 0;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+}
+
+.timer-header i {
+    margin-right: 0.5rem;
+}
+
+.timer-content {
+    padding: 1rem;
+    display: none;
+}
+
+.timer-widget.open .timer-content {
+    display: block;
+}
+
+.timer-widget.open .timer-header i:last-child {
+    transform: rotate(180deg);
+}
+
+/* Tabs */
+.timer-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.timer-tab {
+    flex: 1;
+    padding: 0.5rem;
+    border: none;
+    background: #f3f4f6;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.timer-tab.active {
+    background: #6b46c1;
+    color: white;
+}
+
+.timer-panel {
+    display: none;
+}
+
+.timer-panel.active {
+    display: block;
+}
+
+/* Timer Display */
+.timer-display {
+    font-size: 3rem;
+    font-weight: bold;
+    text-align: center;
+    font-family: monospace;
+    color: #1f2937;
+    margin: 1rem 0;
+}
+
+.clock-display {
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-align: center;
+    font-family: monospace;
+    color: #1f2937;
+}
+
+.clock-date {
+    text-align: center;
+    color: #6b7280;
+    margin: 0.5rem 0;
+}
+
+/* Timer Input */
+.timer-input-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.timer-input-group input {
+    width: 80px;
+    padding: 0.5rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.5rem;
+    text-align: center;
+    font-size: 1.2rem;
+}
+
+.timer-input-group span {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Buttons */
+.timer-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.timer-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.timer-btn.start {
+    background: #38a169;
+    color: white;
+}
+
+.timer-btn.pause {
+    background: #e53e3e;
+    color: white;
+}
+
+.timer-btn.reset {
+    background: #6b7280;
+    color: white;
+}
+
+.timer-btn.lap {
+    background: #6b46c1;
+    color: white;
+}
+
+.timer-btn:hover {
+    transform: translateY(-2px);
+}
+
+.timer-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Lap List */
+.lap-list {
+    margin-top: 1rem;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.lap-item {
+    padding: 0.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    font-family: monospace;
+}
+
+/* Timer Alert */
+.timer-alert {
+    text-align: center;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    display: none;
+}
+
+.timer-alert.show {
+    display: block;
+    background: #fef3c7;
+    color: #d97706;
+}
+
+/* Dark Mode Support */
+body.dark-mode .timer-widget {
+    background: #2d2d2d;
+    color: white;
+}
+
+body.dark-mode .timer-display,
+body.dark-mode .clock-display {
+    color: white;
+}
+
+body.dark-mode .timer-tab {
+    background: #374151;
+    color: white;
+}
+
+body.dark-mode .timer-input-group input {
+    background: #374151;
+    border-color: #4b5563;
+    color: white;
+}
+</style>
+
+<script>
+// Timer Widget Functions
+let stopwatchInterval = null;
+let stopwatchTime = 0;
+let timerInterval = null;
+let timerRemaining = 0;
+let is24Hour = true;
+
+function toggleTimerWidget() {
+    const widget = document.getElementById('timerWidget');
+    widget.classList.toggle('open');
+}
+
+// Tab switching
+document.querySelectorAll('.timer-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        const tabName = tab.getAttribute('data-tab');
+        
+        // Update tabs
+        document.querySelectorAll('.timer-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        // Update panels
+        document.querySelectorAll('.timer-panel').forEach(panel => panel.classList.remove('active'));
+        document.getElementById(`${tabName}Panel`).classList.add('active');
+        
+        // Stop all timers when switching
+        if (stopwatchInterval) {
+            clearInterval(stopwatchInterval);
+            stopwatchInterval = null;
+        }
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+    });
+});
+
+// Stopwatch
+function formatStopwatch(ms) {
+    const hours = Math.floor(ms / 3600000);
+    const minutes = Math.floor((ms % 3600000) / 60000);
+    const seconds = Math.floor((ms % 60000) / 1000);
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+function updateStopwatchDisplay() {
+    document.getElementById('stopwatchDisplay').innerText = formatStopwatch(stopwatchTime);
+}
+
+function startStopwatch() {
+    if (stopwatchInterval) return;
+    const startTime = Date.now() - stopwatchTime;
+    stopwatchInterval = setInterval(() => {
+        stopwatchTime = Date.now() - startTime;
+        updateStopwatchDisplay();
+    }, 10);
+    
+    document.querySelector('#stopwatchPanel .start').disabled = true;
+    document.querySelector('#stopwatchPanel .pause').disabled = false;
+}
+
+function pauseStopwatch() {
+    if (stopwatchInterval) {
+        clearInterval(stopwatchInterval);
+        stopwatchInterval = null;
+    }
+    document.querySelector('#stopwatchPanel .start').disabled = false;
+    document.querySelector('#stopwatchPanel .pause').disabled = true;
+}
+
+function resetStopwatch() {
+    pauseStopwatch();
+    stopwatchTime = 0;
+    updateStopwatchDisplay();
+    document.getElementById('lapList').innerHTML = '';
+    document.querySelector('#stopwatchPanel .start').disabled = false;
+}
+
+function recordLap() {
+    const lapTime = formatStopwatch(stopwatchTime);
+    const lapNumber = document.querySelectorAll('.lap-item').length + 1;
+    const lapList = document.getElementById('lapList');
+    const lapItem = document.createElement('div');
+    lapItem.className = 'lap-item';
+    lapItem.innerHTML = `<span>Lap ${lapNumber}</span><span>${lapTime}</span>`;
+    lapList.insertBefore(lapItem, lapList.firstChild);
+}
+
+// Timer (Countdown)
+function formatTimer(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+function updateTimerDisplay() {
+    document.getElementById('timerDisplay').innerText = formatTimer(timerRemaining);
+}
+
+function startTimer() {
+    if (timerInterval) return;
+    
+    const minutes = parseInt(document.getElementById('timerMinutes').value) || 0;
+    const seconds = parseInt(document.getElementById('timerSeconds').value) || 0;
+    const totalSeconds = (minutes * 60) + seconds;
+    
+    if (totalSeconds === 0) {
+        alert('Please set a time');
+        return;
+    }
+    
+    if (timerRemaining === 0) {
+        timerRemaining = totalSeconds;
+    }
+    
+    updateTimerDisplay();
+    
+    timerInterval = setInterval(() => {
+        if (timerRemaining <= 0) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            document.getElementById('timerAlert').innerHTML = '⏰ Time\'s up! Great workout! 🎉';
+            document.getElementById('timerAlert').classList.add('show');
+            setTimeout(() => {
+                document.getElementById('timerAlert').classList.remove('show');
+            }, 3000);
+            // Play sound effect (optional)
+            playBeep();
+            document.querySelector('#timerPanel .start').disabled = false;
+            document.querySelector('#timerPanel .pause').disabled = true;
+            return;
+        }
+        timerRemaining--;
+        updateTimerDisplay();
+    }, 1000);
+    
+    document.querySelector('#timerPanel .start').disabled = true;
+    document.querySelector('#timerPanel .pause').disabled = false;
+}
+
+function pauseTimer() {
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+    document.querySelector('#timerPanel .start').disabled = false;
+    document.querySelector('#timerPanel .pause').disabled = true;
+}
+
+function resetTimer() {
+    pauseTimer();
+    timerRemaining = 0;
+    updateTimerDisplay();
+    document.getElementById('timerMinutes').value = 1;
+    document.getElementById('timerSeconds').value = 30;
+    document.querySelector('#timerPanel .start').disabled = false;
+}
+
+// Simple beep sound (using Web Audio API)
+function playBeep() {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    
+    oscillator.frequency.value = 880;
+    gainNode.gain.value = 0.3;
+    
+    oscillator.start();
+    setTimeout(() => {
+        oscillator.stop();
+        audioCtx.close();
+    }, 500);
+}
+
+// Clock
+function updateClock() {
+    const now = new Date();
+    let hours = now.getHours();
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const seconds = now.getSeconds().toString().padStart(2, '0');
+    let timeString;
+    
+    if (is24Hour) {
+        timeString = `${hours.toString().padStart(2, '0')}:${minutes}:${seconds}`;
+    } else {
+        const period = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12 || 12;
+        timeString = `${hours}:${minutes}:${seconds} ${period}`;
+    }
+    
+    document.getElementById('clockDisplay').innerText = timeString;
+    
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('clockDate').innerText = now.toLocaleDateString(undefined, options);
+}
+
+function toggleClockFormat() {
+    is24Hour = !is24Hour;
+    const btn = document.querySelector('.clock-format-btn');
+    btn.innerText = is24Hour ? '24H' : '12H';
+    updateClock();
+}
+
+// Start clock
+setInterval(updateClock, 1000);
+updateClock();
+
+// Add keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.code === 'KeyS') {
+        e.preventDefault();
+        startStopwatch();
+    }
+    if (e.ctrlKey && e.code === 'KeyT') {
+        e.preventDefault();
+        const timerPanel = document.getElementById('timerPanel');
+        if (timerPanel.classList.contains('active')) {
+            startTimer();
+        }
+    }
+});
+</script>
+
+
+
 </body>
 </html>
