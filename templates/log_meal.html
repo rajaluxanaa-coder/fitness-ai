@@ -704,6 +704,14 @@ body.dark-mode .alert-error {
                     const fats = parseInt(this.dataset.fats) || 5;
                     
                     selectMeal(type, name, calories, protein, carbs, fats);
+
+                    document.getElementById('mealType').value = type;
+            document.getElementById('foodName').value = name;
+            document.getElementById('calories').value = calories;
+            document.getElementById('protein').value = protein;
+            document.getElementById('carbs').value = carbs;
+            document.getElementById('fats').value = fats;
+            
                     
                     // Highlight selected card
                     mealCards.forEach(c => c.style.border = 'none');
@@ -713,6 +721,11 @@ body.dark-mode .alert-error {
             
             // Load daily totals
             loadDailyTotals();
+
+
+            // Set today's date
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('mealDate').value = today;
         });
     </script>
 </body>
