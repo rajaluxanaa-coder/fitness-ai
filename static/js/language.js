@@ -182,12 +182,14 @@ function updateActiveLanguageButton() {
 }
 
 // Observer to translate dynamically added content
+if(document.body){
 const observer = new MutationObserver(() => {
     if (currentLang !== 'en') {
         applyTranslations();
     }
 });
 observer.observe(document.body, { childList: true, subtree: true });
+}
 
 // Load language on page load
 document.addEventListener('DOMContentLoaded', () => {
