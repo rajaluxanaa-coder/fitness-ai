@@ -1434,6 +1434,25 @@ async function loadSettings() {
         }
 
 
+
+
+async function loadUserLevel() {
+    try {
+        const response = await fetch('/get-user-level');
+        const data = await response.json();
+        
+        // Update level display
+        const levelSpan = document.getElementById('levelValue');
+        if (levelSpan) {
+            levelSpan.textContent = data.level;
+        }
+        
+        console.log("User level loaded:", data);  // Debug
+    } catch (error) {
+        console.error('Error loading user level:', error);
+    }
+}
+
         // Language Functions - Add these inside your <script> tag
 function changeLanguage(lang) {
     console.log("changeLanguage called with:",lang);
@@ -1682,8 +1701,7 @@ function translatePage() {
             loadAchievementsSummary(); // Add this line
             loadUserLevel();
 
-            console.log("Calling translatePage...");  // ← ADD THIS
-            translatePage();
+            
             updateActiveLanguageButton();
             updateLanguageIndicator();
         
