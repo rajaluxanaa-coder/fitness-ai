@@ -1110,11 +1110,12 @@ def get_achievements():
     
     # 7-Day Streak
     if streak >= 7:
+        
         achievements.append({
             'name': '7-Day Streak',
             'icon': '🔥',
             'description': 'Worked out 7 days in a row',
-            'date': 'Current',
+            'date': datetime.now().date().strftime('%b %d, %Y'),
             'earned': True
         })
     else:
@@ -1132,7 +1133,7 @@ def get_achievements():
             'name': '30-Day Streak',
             'icon': '⚡',
             'description': 'Worked out 30 days straight',
-            'date': 'Champion!',
+            'date': 'Champion!' datetime.now().date().strftime('%b %d, %Y'),
             'earned': True
         })
     else:
