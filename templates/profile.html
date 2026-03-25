@@ -506,6 +506,10 @@ body.dark-mode .lang-select-btn {
     </div>
 </nav>
 
+<div id="languageIndicator" style="position: fixed; top: 80px; right: 20px; background: #6b46c1; color: white; padding: 5px 10px; border-radius: 20px; font-size: 12px; z-index: 999;">
+    🌐 <span id="currentLangText">English</span>
+</div>
+
     <!-- Settings Panel -->
 <div id="settingsPanel" class="settings-panel">
     <div class="settings-header">
@@ -1432,10 +1436,38 @@ async function loadSettings() {
 
         // Language Functions - Add these inside your <script> tag
 function changeLanguage(lang) {
-    console.log("Changing language to:", lang);
     localStorage.setItem('language', lang);
-    location.reload();
+    
+    // Show confirmation message
+    const messages = {
+        'en': 'Language changed to English. Reloading page...',
+        'hi': 'भाषा बदलकर हिंदी की गई। पृष्ठ पुनः लोड हो रहा है...',
+        'ta': 'மொழி தமிழுக்கு மாற்றப்பட்டது. பக்கம் மறுஏற்றம் ஆகிறது...'
+    };
+    
+    alert(messages[lang] || 'Language changed. Reloading page...');
+    
+    // Reload page after short delay
+    setTimeout(() => {
+        location.reload();
+    }, 500);
 }
+
+
+// Update language indicator
+function updateLanguageIndicator() {
+    const lang = localStorage.getItem('language') || 'en';
+    const langNames = {
+        'en': 'English',
+        'hi': 'हिन्दी',
+        'ta': 'தமிழ்'
+    };
+    const indicator = document.getElementById('currentLangText');
+    if (indicator) {
+        indicator.textContent = langNames[lang] || 'English';
+    }
+}
+
 
 function updateActiveLanguageButton() {
     const currentLang = localStorage.getItem('language') || 'en';
@@ -1472,6 +1504,7 @@ function updateActiveLanguageButton() {
             loadUserLevel();
 
             updateActiveLanguageButton();
+            updateLanguageIndicator();
             
             // Refresh weather every 30 minutes
             setInterval(updateWeather, 1800000);
