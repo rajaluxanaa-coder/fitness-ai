@@ -1133,7 +1133,7 @@ def get_achievements():
             'name': '30-Day Streak',
             'icon': '⚡',
             'description': 'Worked out 30 days straight',
-            'date': 'Champion!' datetime.now().date().strftime('%b %d, %Y'),
+            'date':  datetime.now().date().strftime('%b %d, %Y'),
             'earned': True
         })
     else:
