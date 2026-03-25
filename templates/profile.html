@@ -1486,6 +1486,88 @@ function updateActiveLanguageButton() {
     }
 }
 
+
+// Translate page based on selected language
+function translatePage() {
+    const lang = localStorage.getItem('language') || 'en';
+    
+    // Only translate if language is not English
+    if (lang === 'en') return;
+    
+    // Simple translation dictionary for testing
+    const translations = {
+        'hi': {
+            "Dashboard": "डैशबोर्ड",
+            "Profile": "प्रोफाइल",
+            "Analytics": "विश्लेषण",
+            "Achievements": "उपलब्धियाँ",
+            "Community": "समुदाय",
+            "Goals": "लक्ष्य",
+            "Calendar": "कैलेंडर",
+            "Music": "संगीत",
+            "Videos": "वीडियो",
+            "Settings": "सेटिंग्स",
+            "Logout": "लॉगआउट",
+            "Current Weight": "वर्तमान वजन",
+            "Workouts Done": "किए गए वर्कआउट",
+            "Calories Burned": "जली हुई कैलोरी",
+            "Minutes": "मिनट",
+            "Your Progress": "आपकी प्रगति",
+            "Update Progress": "प्रगति अपडेट करें",
+            "Goal Progress": "लक्ष्य प्रगति",
+            "Start Weight": "शुरुआती वजन",
+            "Goal Weight": "लक्ष्य वजन",
+            "Height": "ऊंचाई",
+            "Weight": "वजन",
+            "BMI": "बीएमआई"
+        },
+        'ta': {
+            "Dashboard": "டாஷ்போர்டு",
+            "Profile": "சுயவிவரம்",
+            "Analytics": "பகுப்பாய்வு",
+            "Achievements": "சாதனைகள்",
+            "Community": "சமூகம்",
+            "Goals": "இலக்குகள்",
+            "Calendar": "நாட்காட்டி",
+            "Music": "இசை",
+            "Videos": "வீடியோக்கள்",
+            "Settings": "அமைப்புகள்",
+            "Logout": "வெளியேறு",
+            "Current Weight": "தற்போதைய எடை",
+            "Workouts Done": "முடிக்கப்பட்ட பயிற்சிகள்",
+            "Calories Burned": "எரிந்த கலோரிகள்",
+            "Minutes": "நிமிடங்கள்",
+            "Your Progress": "உங்கள் முன்னேற்றம்",
+            "Update Progress": "முன்னேற்றத்தை புதுப்பிக்கவும்",
+            "Goal Progress": "இலக்கு முன்னேற்றம்",
+            "Start Weight": "தொடக்க எடை",
+            "Goal Weight": "இலக்கு எடை",
+            "Height": "உயரம்",
+            "Weight": "எடை",
+            "BMI": "பிஎம்ஐ"
+        }
+    };
+    
+    const dict = translations[lang];
+    if (!dict) return;
+    
+    // Translate all elements
+    document.querySelectorAll('h1, h2, h3, h4, p, span, button, a, label, div').forEach(element => {
+        const text = element.innerText.trim();
+        if (dict[text]) {
+            element.innerText = dict[text];
+        }
+    });
+    
+    // Also translate placeholders
+    document.querySelectorAll('input, textarea').forEach(input => {
+        if (input.placeholder && dict[input.placeholder]) {
+            input.placeholder = dict[input.placeholder];
+        }
+    });
+}
+
+
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
                         // Then apply dark mode from localStorage
@@ -1505,6 +1587,7 @@ function updateActiveLanguageButton() {
 
             updateActiveLanguageButton();
             updateLanguageIndicator();
+            translatePage();
             
             // Refresh weather every 30 minutes
             setInterval(updateWeather, 1800000);
