@@ -1489,17 +1489,21 @@ function updateActiveLanguageButton() {
 
 
 // Translate page based on selected language
+
+            
 function translatePage() {
-    console.log("translation page called");
+    console.log("translatePage called");
     const lang = localStorage.getItem('language') || 'en';
-    console.log("current language:",lang);
-    // Only translate if language is not English
+    console.log("Current language:", lang);
+    
     if (lang === 'en') return;
     
-    console.log("Translating to:",lang);
-    // Simple translation dictionary for testing
+    console.log("Translating to:", lang);
+    
+    // Expanded translation dictionary
     const translations = {
         'hi': {
+            // Navbar
             "Dashboard": "डैशबोर्ड",
             "Profile": "प्रोफाइल",
             "Analytics": "विश्लेषण",
@@ -1511,20 +1515,58 @@ function translatePage() {
             "Videos": "वीडियो",
             "Settings": "सेटिंग्स",
             "Logout": "लॉगआउट",
+            
+            // Stats
             "Current Weight": "वर्तमान वजन",
             "Workouts Done": "किए गए वर्कआउट",
             "Calories Burned": "जली हुई कैलोरी",
             "Minutes": "मिनट",
+            
+            // Progress
             "Your Progress": "आपकी प्रगति",
-            "Update Progress": "प्रगति अपडेट करें",
             "Goal Progress": "लक्ष्य प्रगति",
             "Start Weight": "शुरुआती वजन",
             "Goal Weight": "लक्ष्य वजन",
+            "Update Progress": "प्रगति अपडेट करें",
+            
+            // BMI
+            "Your BMI": "आपका बीएमआई",
             "Height": "ऊंचाई",
             "Weight": "वजन",
-            "BMI": "बीएमआई"
+            "Underweight": "कम वजन",
+            "Normal Weight": "सामान्य वजन",
+            "Overweight": "अधिक वजन",
+            "Obese": "मोटापा",
+            
+            // Widgets
+            "Water Intake": "पानी का सेवन",
+            "Today's Nutrition Tip": "आज का पोषण टिप",
+            "New Tip": "नया टिप",
+            "Quick Tips": "त्वरित सुझाव",
+            "Recommended Meals": "अनुशंसित भोजन",
+            "Recent Workouts": "हाल के वर्कआउट",
+            "Recent Meals": "हाल के भोजन",
+            "Your Achievements": "आपकी उपलब्धियाँ",
+            "View All Achievements": "सभी उपलब्धियाँ देखें",
+            
+            // Buttons
+            "Log Workout": "वर्कआउट लॉग करें",
+            "Log Meal": "भोजन लॉग करें",
+            "View Progress": "प्रगति देखें",
+            "Save All Settings": "सभी सेटिंग्स सहेजें",
+            
+            // Weather
+            "Current Weather": "वर्तमान मौसम",
+            "Humidity": "आर्द्रता",
+            
+            // Tips
+            "Form First: Always prioritize proper form over heavy weights": "पहले फॉर्म: भारी वजन से पहले सही फॉर्म को प्राथमिकता दें",
+            "Rest & Recovery: Get 7-8 hours of sleep for muscle growth": "आराम और रिकवरी: मांसपेशियों के विकास के लिए 7-8 घंटे की नींद लें",
+            "Stay Hydrated: Drink water before, during, and after workouts": "हाइड्रेटेड रहें: वर्कआउट से पहले, दौरान और बाद में पानी पिएं",
+            "Pre-Workout Fuel: Eat a banana 30 mins before workout": "वर्कआउट से पहले: वर्कआउट से 30 मिनट पहले केला खाएं"
         },
         'ta': {
+            // Navbar
             "Dashboard": "டாஷ்போர்டு",
             "Profile": "சுயவிவரம்",
             "Analytics": "பகுப்பாய்வு",
@@ -1536,30 +1578,73 @@ function translatePage() {
             "Videos": "வீடியோக்கள்",
             "Settings": "அமைப்புகள்",
             "Logout": "வெளியேறு",
+            
+            // Stats
             "Current Weight": "தற்போதைய எடை",
             "Workouts Done": "முடிக்கப்பட்ட பயிற்சிகள்",
             "Calories Burned": "எரிந்த கலோரிகள்",
             "Minutes": "நிமிடங்கள்",
+            
+            // Progress
             "Your Progress": "உங்கள் முன்னேற்றம்",
-            "Update Progress": "முன்னேற்றத்தை புதுப்பிக்கவும்",
             "Goal Progress": "இலக்கு முன்னேற்றம்",
             "Start Weight": "தொடக்க எடை",
             "Goal Weight": "இலக்கு எடை",
+            "Update Progress": "முன்னேற்றத்தை புதுப்பிக்கவும்",
+            
+            // BMI
+            "Your BMI": "உங்கள் பிஎம்ஐ",
             "Height": "உயரம்",
             "Weight": "எடை",
-            "BMI": "பிஎம்ஐ"
+            "Underweight": "குறைந்த எடை",
+            "Normal Weight": "சாதாரண எடை",
+            "Overweight": "அதிக எடை",
+            "Obese": "உடல் பருமன்",
+            
+            // Widgets
+            "Water Intake": "நீர் உட்கொள்ளல்",
+            "Today's Nutrition Tip": "இன்றைய ஊட்டச்சத்து குறிப்பு",
+            "New Tip": "புதிய குறிப்பு",
+            "Quick Tips": "விரைவு குறிப்புகள்",
+            "Recommended Meals": "பரிந்துரைக்கப்பட்ட உணவுகள்",
+            "Recent Workouts": "சமீபத்திய பயிற்சிகள்",
+            "Recent Meals": "சமீபத்திய உணவுகள்",
+            "Your Achievements": "உங்கள் சாதனைகள்",
+            "View All Achievements": "அனைத்து சாதனைகளையும் காண்க",
+            
+            // Buttons
+            "Log Workout": "பயிற்சியை பதிவு செய்யவும்",
+            "Log Meal": "உணவை பதிவு செய்யவும்",
+            "View Progress": "முன்னேற்றத்தை காண்க",
+            "Save All Settings": "அனைத்து அமைப்புகளையும் சேமிக்கவும்",
+            
+            // Weather
+            "Current Weather": "தற்போதைய வானிலை",
+            "Humidity": "ஈரப்பதம்",
+            
+            // Tips
+            "Form First: Always prioritize proper form over heavy weights": "முதலில் வடிவம்: கனரக எடைகளை விட சரியான வடிவத்திற்கு முன்னுரிமை கொடுங்கள்",
+            "Rest & Recovery: Get 7-8 hours of sleep for muscle growth": "ஓய்வு மற்றும் மீட்பு: தசை வளர்ச்சிக்கு 7-8 மணி நேரம் தூங்குங்கள்",
+            "Stay Hydrated: Drink water before, during, and after workouts": "நீரேற்றமாக இருங்கள்: பயிற்சிக்கு முன், போது மற்றும் பின் தண்ணீர் குடிக்கவும்",
+            "Pre-Workout Fuel: Eat a banana 30 mins before workout": "பயிற்சிக்கு முன்: பயிற்சிக்கு 30 நிமிடங்களுக்கு முன் வாழைப்பழம் சாப்பிடுங்கள்"
         }
     };
     
     const dict = translations[lang];
-    if (!dict) return;
+    if (!dict) {
+        console.log("No translations for language:", lang);
+        return;
+    }
+    
+    let translatedCount = 0;
     
     // Translate all elements
     document.querySelectorAll('h1, h2, h3, h4, p, span, button, a, label, div').forEach(element => {
-        const text = element.innerText.trim();
-        if (dict[text]) {
-            console.log('translating :"${text}" - "${dict[text]}"');
-            element.innerText = dict[text];
+        const originalText = element.innerText.trim();
+        if (originalText && dict[originalText]) {
+            console.log(`Translating: "${originalText}" → "${dict[originalText]}"`);
+            element.innerText = dict[originalText];
+            translatedCount++;
         }
     });
     
@@ -1569,7 +1654,11 @@ function translatePage() {
             input.placeholder = dict[input.placeholder];
         }
     });
+    
+    console.log(`Translated ${translatedCount} elements`);
 }
+    
+    
 
 
         // Initialize
