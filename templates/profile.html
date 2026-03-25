@@ -1682,10 +1682,11 @@ function translatePage() {
             loadAchievementsSummary(); // Add this line
             loadUserLevel();
 
-            updateActiveLanguageButton();
-            updateLanguageIndicator();
             console.log("Calling translatePage...");  // ← ADD THIS
             translatePage();
+            updateActiveLanguageButton();
+            updateLanguageIndicator();
+        
             
             // Refresh weather every 30 minutes
             setInterval(updateWeather, 1800000);
