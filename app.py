@@ -1110,12 +1110,12 @@ def get_achievements():
     
     # 7-Day Streak
     if streak >= 7:
-        
+        seventh_day_date = (workout_dates[0] - timedelta(days=streak - 7)).strftime('%b %d, %Y')
         achievements.append({
             'name': '7-Day Streak',
             'icon': '🔥',
             'description': 'Worked out 7 days in a row',
-            'date': datetime.now().date().strftime('%b %d, %Y'),
+            'date': seventh_day_date,
             'earned': True
         })
     else:
@@ -1129,11 +1129,12 @@ def get_achievements():
     
     # 30-Day Streak
     if streak >= 30:
+        thirtieth_day_date = (workout_dates[0] - timedelta(days=streak - 30)).strftime('%b %d, %Y')
         achievements.append({
             'name': '30-Day Streak',
             'icon': '⚡',
             'description': 'Worked out 30 days straight',
-            'date':  datetime.now().date().strftime('%b %d, %Y'),
+            'date':  thirtieth_day_date,
             'earned': True
         })
     else:
