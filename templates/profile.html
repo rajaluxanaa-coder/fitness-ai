@@ -1489,11 +1489,13 @@ function updateActiveLanguageButton() {
 
 // Translate page based on selected language
 function translatePage() {
+    console.log("translation page called");
     const lang = localStorage.getItem('language') || 'en';
-    
+    console.log("current language:",lang);
     // Only translate if language is not English
     if (lang === 'en') return;
     
+    console.log("Translating to:",lang);
     // Simple translation dictionary for testing
     const translations = {
         'hi': {
@@ -1555,6 +1557,7 @@ function translatePage() {
     document.querySelectorAll('h1, h2, h3, h4, p, span, button, a, label, div').forEach(element => {
         const text = element.innerText.trim();
         if (dict[text]) {
+            console.log('translating :"${text}" - "${dict[text]}"');
             element.innerText = dict[text];
         }
     });
