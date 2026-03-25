@@ -1436,6 +1436,7 @@ async function loadSettings() {
 
         // Language Functions - Add these inside your <script> tag
 function changeLanguage(lang) {
+    console.log("changeLanguage called with:",lang);
     localStorage.setItem('language', lang);
     
     // Show confirmation message
@@ -1573,6 +1574,10 @@ function translatePage() {
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
+
+
+            console.log("DOMContentLoaded - Page loaded");  // ← ADD THIS
+    console.log("Current language:", localStorage.getItem('language'));  // ← ADD THIS
                         // Then apply dark mode from localStorage
 
             applyDarkMode();
@@ -1590,6 +1595,7 @@ function translatePage() {
 
             updateActiveLanguageButton();
             updateLanguageIndicator();
+            console.log("Calling translatePage...");  // ← ADD THIS
             translatePage();
             
             // Refresh weather every 30 minutes
