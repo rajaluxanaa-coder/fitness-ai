@@ -346,6 +346,10 @@ body.dark-mode .chart-card,
 body.dark-mode .stat-card,
 body.dark-mode .goal-card,
 body.dark-mode .post,
+body.dark-mode .post-card,
+body.dark-mode .timeline-item,
+body.dark-mode .leaderboard-item,
+body.dark-mode .friend-card,
 body.dark-mode .modal-content,
 body.dark-mode .settings-panel,
 body.dark-mode .left-sidebar,
@@ -362,17 +366,22 @@ body.dark-mode h3,
 body.dark-mode h4,
 body.dark-mode .stat-value,
 body.dark-mode .goal-title,
+body.dark-mode .leaderboard-item strong,
 body.dark-mode .post-title,
 body.dark-mode .badge-name {
-    color: #f3f4f6;
+    color: #f3f4f6 !important;
 }
 
 body.dark-mode p,
+body.dark-mode span,
 body.dark-mode .stat-label,
+body.dark-mode .label,
+body.dark-mode .meal-name,
+body.dark-mode .meal-calories,
 body.dark-mode .post-meta,
 body.dark-mode .timeline-date,
 body.dark-mode .friend-name {
-    color: #9ca3af;
+    color: #9ca3af !important;
 }
 
 body.dark-mode input,
@@ -383,16 +392,43 @@ body.dark-mode textarea {
     color: #e5e7eb;
 }
 
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+    color: #6b7280;
+}
+
 body.dark-mode input:focus,
 body.dark-mode select:focus,
 body.dark-mode textarea:focus {
     border-color: #6b46c1;
 }
 
+/* Buttons */
+body.dark-mode .btn,
+body.dark-mode button:not(.close-btn):not(.profile-circle) {
+    background: #374151;
+    color: #e5e7eb;
+    border-color: #4b5563;
+}
+
+body.dark-mode .btn-primary,
+body.dark-mode button.btn-primary {
+    background: #6b46c1;
+    color: white;
+}
+
+body.dark-mode .btn-secondary,
+body.dark-mode button.btn-secondary {
+    background: #374151;
+    color: #e5e7eb;
+}
+
 body.dark-mode .btn-outline {
     border-color: #6b46c1;
     color: #6b46c1;
 }
+
+
 
 body.dark-mode .btn-outline:hover {
     background: #6b46c1;
@@ -423,7 +459,12 @@ body.dark-mode .badge-card {
 }
 
 body.dark-mode .badge-card.locked {
-    opacity: 0.3;
+    opacity: 0.4;
+}
+
+body.dark-mode .badge-date {
+    background: #4b5563;
+    color: #9ca3af;
 }
 
 body.dark-mode .friend-card,
@@ -434,13 +475,7 @@ body.dark-mode .timeline-item {
     border-color: #4b5563;
 }
 
-body.dark-mode .water-tracker {
-    background: #1e3a5f;
-}
 
-body.dark-mode .nutrition-tip {
-    background: #1f2937;
-}
 
 body.dark-mode .leaderboard-item {
     border-color: #4b5563;
@@ -480,6 +515,166 @@ body.dark-mode .alert-error {
     background: #991b1b;
     color: #fee2e2;
 }
+
+body.dark-mode a{
+    color: #9f7aea;
+}
+body.dark-mode a:hover{
+    color:#6b46c1;
+}
+
+/* Challenges */
+body.dark-mode .challenge-card,
+body.dark-mode .friend-request {
+    background: #374151;
+    color: #e5e7eb;
+}
+
+/* Goals */
+body.dark-mode .goal-card {
+    background: #2d2d2d;
+}
+
+/* Music Player */
+body.dark-mode .track-item {
+    background: #374151;
+    border-bottom-color: #4b5563;
+}
+
+body.dark-mode .track-item:hover {
+    background: #4b5563;
+}
+
+body.dark-mode .playlist-card {
+    background: #2d2d2d;
+    border-color: #4b5563;
+}
+
+body.dark-mode .playlist-card:hover {
+    background: #374151;
+}
+
+/* Community Feed */
+body.dark-mode .post {
+    background: #2d2d2d;
+    border-bottom-color: #4b5563;
+}
+
+body.dark-mode .post-avatar {
+    background: #6b46c1;
+}
+
+body.dark-mode .post-actions button {
+    color: #9ca3af;
+}
+
+body.dark-mode .post-actions button:hover {
+    color: #6b46c1;
+}
+
+
+/* Calendar */
+body.dark-mode .calendar-day {
+    background: #2d2d2d;
+    color: #e5e7eb;
+}
+
+body.dark-mode .calendar-day.other-month {
+    background: #1f2937;
+    opacity: 0.6;
+}
+
+body.dark-mode .weekday {
+    background: #374151;
+    color: #e5e7eb;
+}
+
+/* Weather Widget */
+body.dark-mode .weather-widget {
+    background: linear-gradient(135deg, #1e3a5f 0%, #1e1a3a 100%);
+}
+
+/* Nutrition Tip */
+body.dark-mode .nutrition-tip {
+    background: #1f2937;
+    color: #e5e7eb;
+    }
+
+/* Water Tracker */
+body.dark-mode .water-tracker {
+    background: #1e3a5f;
+}
+
+/* Quick Tips */
+body.dark-mode .tip-item {
+    background: #374151;
+    color: #e5e7eb;
+}
+
+/* Meal Recommendations */
+body.dark-mode .meal-recommendations div[style*="background: #f0f9ff"],
+body.dark-mode .meal-recommendations div[style*="background: #fef3c7"],
+body.dark-mode .meal-recommendations div[style*="background: #e0f2fe"] {
+    background: #2d2d2d !important;
+    border: 1px solid #4b5563;
+}
+
+/* Timer Widget */
+body.dark-mode .timer-widget {
+    background: #2d2d2d;
+    color: #e5e7eb;
+}
+
+body.dark-mode .timer-tab {
+    background: #374151;
+    color: #e5e7eb;
+}
+
+body.dark-mode .timer-tab.active {
+    background: #6b46c1;
+    color: white;
+}
+
+body.dark-mode .timer-display,
+body.dark-mode .clock-display {
+    color: white;
+}
+
+body.dark-mode .lap-item {
+    border-bottom-color: #4b5563;
+    color: #9ca3af;
+}
+
+/* Settings Panel */
+body.dark-mode .settings-panel {
+    background: #1f2937;
+}
+
+body.dark-mode .settings-header h2 {
+    color: white;
+}
+
+body.dark-mode .setting-label {
+    color: white;
+}
+
+body.dark-mode .setting-desc {
+    color: #9ca3af;
+}
+
+/* Modal */
+body.dark-mode .modal-content {
+    background: #1f2937;
+    color: #e5e7eb;
+}
+
+body.dark-mode .modal-header h2 {
+    color: white;
+}
+
+
+
+
     </style>
 </head>
 <body>
