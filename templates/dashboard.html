@@ -705,7 +705,7 @@ body.dark-mode .alert-error {
 </div>
     
 
-
+<br>
 
     <!-- BMI Card -->
 <div class="bmi-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 1rem; padding: 1.5rem; margin-bottom: 2rem; color: white;">
@@ -2167,6 +2167,41 @@ function generateMealRecommendations() {
         proteinMeal = mealDatabase.highProtein[Math.floor(Math.random() * mealDatabase.highProtein.length)];
     }
     
+    // Function to get correct icon based on meal type
+    function getMealIcon(mealName) {
+        // Vegetarian meals list
+        const vegMeals = ['Tofu', 'Lentil', 'Chickpea', 'Oatmeal', 'Greek Yogurt', 'Cottage Cheese', 
+                          'Edamame', 'Quinoa', 'Brown Rice', 'Sweet Potato', 'Banana', 'Apple', 
+                          'Dates', 'Pumpkin Seeds', 'Trail Mix', 'Energy Bar', 'Rice Cakes', 
+                          'Whole Grain Toast', 'Avocado', 'Chia Seed', 'Fruit Smoothie', 'Oat',
+                          'Berries', 'Honey', 'Almond Butter', 'Peanut Butter', 'Cinnamon',
+                          'Cereal', 'Milk', 'Porridge', 'Pudding', 'Smoothie Bowl', 'Muffins',
+                          'Bagel', 'Pasta', 'Tomato Sauce', 'Dried Fruit', 'Vegetables'];
+        
+        const isVeg = vegMeals.some(veg => mealName.includes(veg));
+        
+        if (isVeg) {
+            return '<i class="fas fa-leaf" style="color: #38a169; margin-right: 0.25rem;"></i>';
+        } else if (mealName.includes('Fish') || mealName.includes('Salmon') || mealName.includes('Tuna') || mealName.includes('Shrimp')) {
+            return '<i class="fas fa-fish" style="color: #3182ce; margin-right: 0.25rem;"></i>';
+        } else if (mealName.includes('Chicken') || mealName.includes('Turkey') || mealName.includes('Beef') || mealName.includes('Pork') || mealName.includes('Bison') || mealName.includes('Egg')) {
+            return '<i class="fas fa-drumstick-bite" style="color: #e53e3e; margin-right: 0.25rem;"></i>';
+        } else {
+            return '<i class="fas fa-utensils" style="color: #6b46c1; margin-right: 0.25rem;"></i>';
+        }
+    }
+    
+    // Function to get protein level indicator
+    function getProteinIndicator(protein) {
+        if (protein >= 30) {
+            return '💪 High Protein';
+        } else if (protein >= 15) {
+            return '👍 Good Protein';
+        } else {
+            return '🌱 Plant Protein';
+        }
+    }
+    
     // Get day of week for context
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
     const today = days[new Date().getDay()];
@@ -2184,39 +2219,39 @@ function generateMealRecommendations() {
         </div>
         
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
-            <div style="background: #f0f9ff; border-radius: 0.75rem; padding: 1rem; transition: all 0.3s;">
+            <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 0.75rem; padding: 1rem; transition: all 0.3s;">
                 <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                    <i class="fas fa-bicycle" style="color: #0284c7;"></i>
+                    ${getMealIcon(preMeal.name)}
                     <strong>Pre-Workout Fuel</strong>
-                    <span style="margin-left: auto; font-size: 0.7rem; background: #e0f2fe; padding: 0.2rem 0.5rem; border-radius: 1rem;">${preMeal.time}</span>
+                    <span style="margin-left: auto; font-size: 0.7rem; background: #bae6fd; padding: 0.2rem 0.5rem; border-radius: 1rem;">${preMeal.time}</span>
                 </div>
                 <div style="font-weight: bold; margin-bottom: 0.25rem;">${preMeal.name}</div>
                 <div style="font-size: 0.75rem; color: #6b7280;">
-                    🔥 ${preMeal.calories} cal | 🥩 ${preMeal.protein}g | 🍚 ${preMeal.carbs}g | 🧈 ${preMeal.fats}g
+                    🔥 ${preMeal.calories} cal | ${getProteinIndicator(preMeal.protein)} | 🍚 ${preMeal.carbs}g | 🧈 ${preMeal.fats}g
                 </div>
             </div>
             
-            <div style="background: #fef3c7; border-radius: 0.75rem; padding: 1rem; transition: all 0.3s;">
+            <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 0.75rem; padding: 1rem; transition: all 0.3s;">
                 <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                    <i class="fas fa-dumbbell" style="color: #d97706;"></i>
+                    ${getMealIcon(postMeal.name)}
                     <strong>Post-Workout Recovery</strong>
                     <span style="margin-left: auto; font-size: 0.7rem; background: #fed7aa; padding: 0.2rem 0.5rem; border-radius: 1rem;">${postMeal.time}</span>
                 </div>
                 <div style="font-weight: bold; margin-bottom: 0.25rem;">${postMeal.name}</div>
                 <div style="font-size: 0.75rem; color: #6b7280;">
-                    🔥 ${postMeal.calories} cal | 🥩 ${postMeal.protein}g | 🍚 ${postMeal.carbs}g | 🧈 ${postMeal.fats}g
+                    🔥 ${postMeal.calories} cal | ${getProteinIndicator(postMeal.protein)} | 🍚 ${postMeal.carbs}g | 🧈 ${postMeal.fats}g
                 </div>
             </div>
             
-            <div style="background: #e0f2fe; border-radius: 0.75rem; padding: 1rem; transition: all 0.3s;">
+            <div style="background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); border-radius: 0.75rem; padding: 1rem; transition: all 0.3s;">
                 <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                    <i class="fas fa-fire" style="color: #0284c7;"></i>
+                    ${getMealIcon(proteinMeal.name)}
                     <strong>High Protein Option</strong>
                     <span style="margin-left: auto; font-size: 0.7rem; background: #bae6fd; padding: 0.2rem 0.5rem; border-radius: 1rem;">${proteinMeal.time}</span>
                 </div>
                 <div style="font-weight: bold; margin-bottom: 0.25rem;">${proteinMeal.name}</div>
                 <div style="font-size: 0.75rem; color: #6b7280;">
-                    🔥 ${proteinMeal.calories} cal | 🥩 ${proteinMeal.protein}g | 🍚 ${proteinMeal.carbs}g | 🧈 ${proteinMeal.fats}g
+                    🔥 ${proteinMeal.calories} cal | ${getProteinIndicator(proteinMeal.protein)} | 🍚 ${proteinMeal.carbs}g | 🧈 ${proteinMeal.fats}g
                 </div>
             </div>
         </div>
@@ -2231,7 +2266,6 @@ function generateMealRecommendations() {
         </div>
     `;
 }
-
           
 // Refresh meal recommendations
 function refreshMealRecommendations() {
