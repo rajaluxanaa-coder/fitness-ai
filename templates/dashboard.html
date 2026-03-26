@@ -511,6 +511,23 @@ body.dark-mode .alert-error {
 #bmiProgress {
     transition: width 0.5s ease;
 }
+
+/* Meal Recommendations Styles */
+.meal-recommendations {
+    transition: transform 0.3s;
+}
+
+.meal-recommendations:hover {
+    transform: translateY(-2px);
+}
+
+#mealRecommendationsList > div {
+    transition: all 0.3s;
+}
+
+#mealRecommendationsList > div:hover {
+    transform: translateY(-2px);
+}
     </style>
 </head>
 <body>
@@ -667,7 +684,25 @@ body.dark-mode .alert-error {
         <i class="fas fa-clock"></i> New tip every 30 seconds
     </div>
 </div>
+<br>
 
+<!-- Meal Recommendations Based on Workout -->
+<div class="meal-recommendations" style="background: white; border-radius: 1rem; padding: 1.5rem; margin-top: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3 style="display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fas fa-utensils" style="color: #6b46c1;"></i>
+            Meal Recommendations for Your Workout
+        </h3>
+        <button onclick="refreshMealRecommendations()" style="background: none; border: none; color: #6b46c1; cursor: pointer;">
+            <i class="fas fa-sync-alt"></i> Refresh
+        </button>
+    </div>
+    <div id="mealRecommendationsList" style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <div style="text-align: center; color: #6b7280; padding: 1rem;">
+            <i class="fas fa-spinner fa-spin"></i> Loading meal recommendations...
+        </div>
+    </div>
+</div>
     
 
 
@@ -1959,6 +1994,254 @@ document.addEventListener('keydown', (e) => {
             startTimer();
         }
     }
+});
+
+
+// Enhanced Meal Database based on workout intensity
+const mealDatabase = {
+    // Pre-workout meals (energy boost) - 20 options
+    preWorkout: [
+        { name: "Banana with Peanut Butter", calories: 250, protein: 8, carbs: 35, fats: 10, time: "30-60 mins before" },
+        { name: "Oatmeal with Berries", calories: 300, protein: 10, carbs: 50, fats: 5, time: "1-2 hours before" },
+        { name: "Greek Yogurt with Honey", calories: 200, protein: 15, carbs: 25, fats: 4, time: "30-60 mins before" },
+        { name: "Apple Slices with Almond Butter", calories: 220, protein: 5, carbs: 30, fats: 9, time: "30-60 mins before" },
+        { name: "Whole Grain Toast with Avocado", calories: 280, protein: 7, carbs: 35, fats: 12, time: "1-2 hours before" },
+        { name: "Protein Smoothie with Banana", calories: 300, protein: 25, carbs: 40, fats: 5, time: "30-60 mins before" },
+        { name: "Dates with Almonds", calories: 180, protein: 4, carbs: 40, fats: 5, time: "15-30 mins before" },
+        { name: "Sweet Potato with Cinnamon", calories: 200, protein: 3, carbs: 45, fats: 1, time: "1-2 hours before" },
+        { name: "Rice Cakes with Avocado", calories: 220, protein: 5, carbs: 30, fats: 10, time: "30-60 mins before" },
+        { name: "Cottage Cheese with Berries", calories: 180, protein: 20, carbs: 15, fats: 5, time: "1 hour before" },
+        { name: "Whole Grain Cereal with Milk", calories: 280, protein: 12, carbs: 45, fats: 6, time: "1-2 hours before" },
+        { name: "Trail Mix", calories: 250, protein: 8, carbs: 25, fats: 15, time: "30-60 mins before" },
+        { name: "Energy Bar", calories: 220, protein: 10, carbs: 35, fats: 6, time: "30-60 mins before" },
+        { name: "Pumpkin Seeds", calories: 150, protein: 7, carbs: 10, fats: 12, time: "15-30 mins before" },
+        { name: "Hard Boiled Eggs", calories: 140, protein: 12, carbs: 1, fats: 10, time: "30-60 mins before" },
+        { name: "Banana Oat Muffins", calories: 200, protein: 6, carbs: 35, fats: 5, time: "1 hour before" },
+        { name: "Quinoa Porridge", calories: 260, protein: 8, carbs: 45, fats: 5, time: "1-2 hours before" },
+        { name: "Chia Seed Pudding", calories: 220, protein: 8, carbs: 20, fats: 12, time: "1 hour before" },
+        { name: "Fruit Smoothie Bowl", calories: 280, protein: 10, carbs: 50, fats: 6, time: "1 hour before" },
+        { name: "Peanut Butter Sandwich", calories: 320, protein: 12, carbs: 40, fats: 14, time: "1-2 hours before" }
+    ],
+    
+    // Post-workout meals (recovery) - 20 options
+    postWorkout: [
+        { name: "Grilled Chicken with Quinoa", calories: 450, protein: 40, carbs: 45, fats: 12, time: "Within 1 hour" },
+        { name: "Protein Smoothie with Banana", calories: 350, protein: 30, carbs: 45, fats: 5, time: "Within 30 mins" },
+        { name: "Salmon with Sweet Potato", calories: 500, protein: 35, carbs: 40, fats: 20, time: "Within 1-2 hours" },
+        { name: "Egg Scramble with Vegetables", calories: 320, protein: 25, carbs: 15, fats: 18, time: "Within 1 hour" },
+        { name: "Tuna Salad Sandwich", calories: 400, protein: 35, carbs: 40, fats: 12, time: "Within 1 hour" },
+        { name: "Chicken and Rice Bowl", calories: 480, protein: 42, carbs: 50, fats: 10, time: "Within 1 hour" },
+        { name: "Greek Yogurt Parfait", calories: 320, protein: 25, carbs: 35, fats: 10, time: "Within 30 mins" },
+        { name: "Turkey Wrap", calories: 380, protein: 32, carbs: 35, fats: 12, time: "Within 1 hour" },
+        { name: "Beef Stir-fry", calories: 420, protein: 38, carbs: 30, fats: 18, time: "Within 1 hour" },
+        { name: "Protein Pancakes", calories: 380, protein: 35, carbs: 40, fats: 10, time: "Within 1 hour" },
+        { name: "Tofu Scramble", calories: 300, protein: 25, carbs: 20, fats: 15, time: "Within 1 hour" },
+        { name: "Lentil Soup", calories: 280, protein: 18, carbs: 40, fats: 5, time: "Within 1-2 hours" },
+        { name: "Baked Salmon with Asparagus", calories: 450, protein: 38, carbs: 15, fats: 22, time: "Within 1-2 hours" },
+        { name: "Chickpea Salad", calories: 320, protein: 15, carbs: 40, fats: 12, time: "Within 1 hour" },
+        { name: "Cottage Cheese Bowl", calories: 250, protein: 28, carbs: 15, fats: 8, time: "Within 30 mins" },
+        { name: "Egg White Omelette", calories: 220, protein: 28, carbs: 8, fats: 8, time: "Within 30 mins" },
+        { name: "Chicken Caesar Salad", calories: 400, protein: 35, carbs: 15, fats: 22, time: "Within 1 hour" },
+        { name: "Quinoa Salad with Chickpeas", calories: 350, protein: 15, carbs: 50, fats: 10, time: "Within 1 hour" },
+        { name: "Turkey Burger", calories: 420, protein: 35, carbs: 40, fats: 15, time: "Within 1 hour" },
+        { name: "Fish Tacos", calories: 380, protein: 30, carbs: 40, fats: 12, time: "Within 1 hour" }
+    ],
+    
+    // High protein meals (muscle building) - 20 options
+    highProtein: [
+        { name: "Grilled Chicken Breast", calories: 350, protein: 45, carbs: 0, fats: 8, time: "Post-workout" },
+        { name: "Lean Beef Steak", calories: 400, protein: 50, carbs: 0, fats: 15, time: "Post-workout" },
+        { name: "Tofu Stir-fry", calories: 300, protein: 25, carbs: 20, fats: 12, time: "Anytime" },
+        { name: "Cottage Cheese with Berries", calories: 220, protein: 25, carbs: 15, fats: 8, time: "Snack" },
+        { name: "Protein Pancakes", calories: 380, protein: 35, carbs: 40, fats: 10, time: "Breakfast" },
+        { name: "Turkey Breast", calories: 320, protein: 40, carbs: 0, fats: 5, time: "Any meal" },
+        { name: "Salmon Fillet", calories: 420, protein: 40, carbs: 0, fats: 22, time: "Dinner" },
+        { name: "Egg White Omelette", calories: 180, protein: 30, carbs: 5, fats: 5, time: "Breakfast" },
+        { name: "Greek Yogurt", calories: 150, protein: 20, carbs: 8, fats: 5, time: "Snack" },
+        { name: "Protein Bar", calories: 200, protein: 20, carbs: 20, fats: 6, time: "Snack" },
+        { name: "Lean Pork Chop", calories: 350, protein: 42, carbs: 0, fats: 12, time: "Dinner" },
+        { name: "Shrimp Scampi", calories: 320, protein: 35, carbs: 15, fats: 12, time: "Dinner" },
+        { name: "Chicken Sausage", calories: 280, protein: 28, carbs: 5, fats: 15, time: "Any meal" },
+        { name: "Edamame", calories: 120, protein: 12, carbs: 10, fats: 5, time: "Snack" },
+        { name: "Lentil Pasta", calories: 350, protein: 25, carbs: 45, fats: 8, time: "Dinner" },
+        { name: "Seitan Stir-fry", calories: 280, protein: 30, carbs: 20, fats: 8, time: "Any meal" },
+        { name: "Canned Tuna", calories: 120, protein: 25, carbs: 0, fats: 2, time: "Snack" },
+        { name: "Whey Protein Shake", calories: 150, protein: 30, carbs: 5, fats: 2, time: "Post-workout" },
+        { name: "Bison Burger", calories: 380, protein: 38, carbs: 35, fats: 12, time: "Dinner" },
+        { name: "Chicken Liver", calories: 280, protein: 32, carbs: 5, fats: 12, time: "Any meal" }
+    ],
+    
+    // Energy meals (cardio days) - 10 options
+    energy: [
+        { name: "Oatmeal with Banana", calories: 350, protein: 12, carbs: 65, fats: 6, time: "Pre-cardio" },
+        { name: "Sweet Potato with Chicken", calories: 400, protein: 30, carbs: 55, fats: 8, time: "Post-cardio" },
+        { name: "Brown Rice with Veggies", calories: 320, protein: 8, carbs: 70, fats: 4, time: "Pre-cardio" },
+        { name: "Pasta with Tomato Sauce", calories: 380, protein: 12, carbs: 75, fats: 5, time: "Pre-cardio" },
+        { name: "Fruit Smoothie", calories: 250, protein: 8, carbs: 55, fats: 2, time: "Pre-cardio" },
+        { name: "Whole Wheat Bagel", calories: 280, protein: 11, carbs: 55, fats: 3, time: "Pre-cardio" },
+        { name: "Rice Cakes with Honey", calories: 150, protein: 3, carbs: 35, fats: 1, time: "Pre-cardio" },
+        { name: "Banana Oat Smoothie", calories: 300, protein: 10, carbs: 60, fats: 4, time: "Pre-cardio" },
+        { name: "Cereal with Milk", calories: 280, protein: 10, carbs: 50, fats: 5, time: "Pre-cardio" },
+        { name: "Dried Fruit Mix", calories: 200, protein: 4, carbs: 45, fats: 2, time: "Pre-cardio" }
+    ],
+    
+    // Recovery meals (after hard workouts) - 15 options
+    recovery: [
+        { name: "Salmon with Quinoa", calories: 480, protein: 38, carbs: 45, fats: 18, time: "Post-workout" },
+        { name: "Chicken and Vegetable Soup", calories: 280, protein: 30, carbs: 25, fats: 8, time: "Post-workout" },
+        { name: "Greek Yogurt Parfait", calories: 320, protein: 25, carbs: 35, fats: 10, time: "Post-workout" },
+        { name: "Beef Stir-fry", calories: 420, protein: 40, carbs: 30, fats: 18, time: "Post-workout" },
+        { name: "Tuna Pasta Salad", calories: 380, protein: 32, carbs: 45, fats: 12, time: "Post-workout" },
+        { name: "Turkey and Rice Bowl", calories: 420, protein: 38, carbs: 50, fats: 10, time: "Post-workout" },
+        { name: "Egg and Avocado Toast", calories: 350, protein: 20, carbs: 30, fats: 18, time: "Post-workout" },
+        { name: "Protein Pancakes", calories: 380, protein: 35, carbs: 40, fats: 10, time: "Post-workout" },
+        { name: "Chicken Burrito Bowl", calories: 480, protein: 40, carbs: 55, fats: 12, time: "Post-workout" },
+        { name: "Lentil and Quinoa Bowl", calories: 380, protein: 20, carbs: 60, fats: 8, time: "Post-workout" },
+        { name: "Baked Salmon", calories: 400, protein: 38, carbs: 0, fats: 22, time: "Post-workout" },
+        { name: "Sweet Potato and Eggs", calories: 350, protein: 18, carbs: 40, fats: 14, time: "Post-workout" },
+        { name: "Chicken Stir-fry", calories: 380, protein: 35, carbs: 30, fats: 12, time: "Post-workout" },
+        { name: "Cottage Cheese Bowl", calories: 250, protein: 28, carbs: 15, fats: 8, time: "Post-workout" },
+        { name: "Beef and Broccoli", calories: 380, protein: 35, carbs: 20, fats: 18, time: "Post-workout" }
+    ]
+};
+
+// Generate meal recommendations based on the 5-day schedule
+function generateMealRecommendations() {
+    const container = document.getElementById('mealRecommendationsList');
+    const savedSchedule = localStorage.getItem('currentSchedule');
+    
+    if (!savedSchedule) {
+        container.innerHTML = `
+            <div style="text-align: center; color: #6b7280; padding: 1rem; background: #f3f4f6; border-radius: 0.5rem;">
+                <i class="fas fa-dumbbell"></i> Generate a workout plan first to get personalized meal recommendations!
+            </div>
+        `;
+        return;
+    }
+    
+    // Analyze the schedule to determine workout intensity and type
+    const scheduleLower = savedSchedule.toLowerCase();
+    let workoutType = 'strength';
+    let intensity = 'medium';
+    let focusArea = 'full body';
+    
+    // Detect workout type from schedule
+    if (scheduleLower.includes('upper') || scheduleLower.includes('chest') || scheduleLower.includes('back')) {
+        workoutType = 'upper body';
+        focusArea = 'upper body';
+    } else if (scheduleLower.includes('lower') || scheduleLower.includes('leg') || scheduleLower.includes('squat')) {
+        workoutType = 'lower body';
+        focusArea = 'lower body';
+    } else if (scheduleLower.includes('cardio') || scheduleLower.includes('run') || scheduleLower.includes('hiit')) {
+        workoutType = 'cardio';
+        focusArea = 'cardio';
+    } else if (scheduleLower.includes('yoga') || scheduleLower.includes('stretch')) {
+        workoutType = 'recovery';
+        focusArea = 'flexibility';
+    } else if (scheduleLower.includes('full')) {
+        workoutType = 'full body';
+        focusArea = 'full body';
+    }
+    
+    // Detect intensity
+    if (scheduleLower.includes('advanced') || scheduleLower.includes('intense')) {
+        intensity = 'high';
+    } else if (scheduleLower.includes('beginner')) {
+        intensity = 'low';
+    }
+    
+    // Select meals based on workout type
+    let preMeal, postMeal, proteinMeal;
+    
+    if (workoutType === 'cardio') {
+        preMeal = mealDatabase.energy[Math.floor(Math.random() * mealDatabase.energy.length)];
+        postMeal = mealDatabase.postWorkout[Math.floor(Math.random() * mealDatabase.postWorkout.length)];
+        proteinMeal = mealDatabase.highProtein[Math.floor(Math.random() * mealDatabase.highProtein.length)];
+    } else if (intensity === 'high') {
+        preMeal = mealDatabase.preWorkout[Math.floor(Math.random() * mealDatabase.preWorkout.length)];
+        postMeal = mealDatabase.recovery[Math.floor(Math.random() * mealDatabase.recovery.length)];
+        proteinMeal = mealDatabase.highProtein[Math.floor(Math.random() * mealDatabase.highProtein.length)];
+    } else {
+        preMeal = mealDatabase.preWorkout[Math.floor(Math.random() * mealDatabase.preWorkout.length)];
+        postMeal = mealDatabase.postWorkout[Math.floor(Math.random() * mealDatabase.postWorkout.length)];
+        proteinMeal = mealDatabase.highProtein[Math.floor(Math.random() * mealDatabase.highProtein.length)];
+    }
+    
+    // Get day of week for context
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const today = days[new Date().getDay()];
+    
+    container.innerHTML = `
+        <div style="background: linear-gradient(135deg, #6b46c1 0%, #38a169 100%); border-radius: 0.75rem; padding: 1rem; margin-bottom: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <i class="fas fa-calendar-alt" style="color: white;"></i>
+                <strong style="color: white;">${today}'s ${workoutType.toUpperCase()} Workout</strong>
+                <span style="margin-left: auto; background: rgba(255,255,255,0.2); padding: 0.2rem 0.5rem; border-radius: 1rem; font-size: 0.75rem; color: white;">${intensity === 'high' ? '🔥 High Intensity' : intensity === 'low' ? '🌱 Beginner' : '💪 Moderate'}</span>
+            </div>
+            <div style="font-size: 0.85rem; color: rgba(255,255,255,0.9);">
+                Based on your ${focusArea} focused workout, here are your optimal meals
+            </div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+            <div style="background: #f0f9ff; border-radius: 0.75rem; padding: 1rem; transition: all 0.3s;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <i class="fas fa-bicycle" style="color: #0284c7;"></i>
+                    <strong>Pre-Workout Fuel</strong>
+                    <span style="margin-left: auto; font-size: 0.7rem; background: #e0f2fe; padding: 0.2rem 0.5rem; border-radius: 1rem;">${preMeal.time}</span>
+                </div>
+                <div style="font-weight: bold; margin-bottom: 0.25rem;">${preMeal.name}</div>
+                <div style="font-size: 0.75rem; color: #6b7280;">
+                    🔥 ${preMeal.calories} cal | 🥩 ${preMeal.protein}g | 🍚 ${preMeal.carbs}g | 🧈 ${preMeal.fats}g
+                </div>
+            </div>
+            
+            <div style="background: #fef3c7; border-radius: 0.75rem; padding: 1rem; transition: all 0.3s;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <i class="fas fa-dumbbell" style="color: #d97706;"></i>
+                    <strong>Post-Workout Recovery</strong>
+                    <span style="margin-left: auto; font-size: 0.7rem; background: #fed7aa; padding: 0.2rem 0.5rem; border-radius: 1rem;">${postMeal.time}</span>
+                </div>
+                <div style="font-weight: bold; margin-bottom: 0.25rem;">${postMeal.name}</div>
+                <div style="font-size: 0.75rem; color: #6b7280;">
+                    🔥 ${postMeal.calories} cal | 🥩 ${postMeal.protein}g | 🍚 ${postMeal.carbs}g | 🧈 ${postMeal.fats}g
+                </div>
+            </div>
+            
+            <div style="background: #e0f2fe; border-radius: 0.75rem; padding: 1rem; transition: all 0.3s;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <i class="fas fa-fire" style="color: #0284c7;"></i>
+                    <strong>High Protein Option</strong>
+                    <span style="margin-left: auto; font-size: 0.7rem; background: #bae6fd; padding: 0.2rem 0.5rem; border-radius: 1rem;">${proteinMeal.time}</span>
+                </div>
+                <div style="font-weight: bold; margin-bottom: 0.25rem;">${proteinMeal.name}</div>
+                <div style="font-size: 0.75rem; color: #6b7280;">
+                    🔥 ${proteinMeal.calories} cal | 🥩 ${proteinMeal.protein}g | 🍚 ${proteinMeal.carbs}g | 🧈 ${proteinMeal.fats}g
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 0.75rem; display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem;">
+            <div style="background: #f3f4f6; border-radius: 0.5rem; padding: 0.5rem; text-align: center; font-size: 0.75rem;">
+                <i class="fas fa-tint"></i> 💧 Drink 2-3L water today
+            </div>
+            <div style="background: #f3f4f6; border-radius: 0.5rem; padding: 0.5rem; text-align: center; font-size: 0.75rem;">
+                <i class="fas fa-clock"></i> ⏰ Eat within 1 hour after workout
+            </div>
+        </div>
+    `;
+}
+
+          
+// Refresh meal recommendations
+function refreshMealRecommendations() {
+    generateMealRecommendations();
+}
+
+// Wait for page to fully load
+document.addEventListener('DOMContentLoaded', function() {
+    // Call meal recommendations after page loads
+    generateMealRecommendations();
 });
 </script>
 
