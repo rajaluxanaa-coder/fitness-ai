@@ -639,7 +639,70 @@ body.dark-mode .modal-header h2 {
     color: white;
 }
 
+/* ===== DARK MODE FIX ===== */
+body.dark-mode .stat-card {
+    background: #2d2d2d;
+    border: 1px solid #4b5563;
+}
 
+body.dark-mode .stat-card .value {
+    color: #ffffff !important;
+}
+
+body.dark-mode .stat-card .label {
+    color: #9ca3af !important;
+}
+
+body.dark-mode .progress-card {
+    background: #2d2d2d;
+    border: 1px solid #4b5563;
+}
+
+body.dark-mode .progress-card h2 {
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode .progress-card .progress-bar-label span {
+    color: #9ca3af !important;
+}
+
+body.dark-mode .progress-card div[style*="font-weight: bold"] {
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode #currentWeight,
+body.dark-mode #workoutsDone,
+body.dark-mode #caloriesBurned,
+body.dark-mode #totalMinutes,
+body.dark-mode #startWeight,
+body.dark-mode #goalWeight,
+body.dark-mode #progressPercentage {
+    color: #ffffff !important;
+}
+
+body.dark-mode .update-btn {
+    background: #6b46c1;
+    color: white;
+}
+
+body.dark-mode .generate-btn {
+    background: #6b46c1;
+    color: white;
+}
+
+/* For charts in dark mode */
+body.dark-mode .chart-card {
+    background: #2d2d2d;
+    border: 1px solid #4b5563;
+}
+
+body.dark-mode .chart-card h3 {
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode .chart-card canvas {
+    filter: brightness(0.9);
+}
 
 
     </style>

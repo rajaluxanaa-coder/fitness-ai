@@ -690,7 +690,56 @@ body.dark-mode .modal-header h2 {
     color: white;
 }
 
+/* ===== DARK MODE FIX FOR DASHBOARD ===== */
+body.dark-mode .stat-card {
+    background: #2d2d2d;
+    border: 1px solid #4b5563;
+}
 
+body.dark-mode .stat-card .value {
+    color: #ffffff !important;
+}
+
+body.dark-mode .stat-card .label {
+    color: #9ca3af !important;
+}
+
+body.dark-mode .progress-card {
+    background: #2d2d2d;
+    border: 1px solid #4b5563;
+}
+
+body.dark-mode .progress-card h2 {
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode .progress-card .progress-bar-label span {
+    color: #9ca3af !important;
+}
+
+body.dark-mode .progress-card div[style*="font-weight: bold"] {
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode #currentWeight,
+body.dark-mode #workoutsDone,
+body.dark-mode #caloriesBurned,
+body.dark-mode #totalMinutes,
+body.dark-mode #startWeight,
+body.dark-mode #goalWeight,
+body.dark-mode #progressPercentage {
+    color: #ffffff !important;
+}
+
+body.dark-mode .update-btn {
+    background: #6b46c1;
+    color: white;
+}
+
+body.dark-mode .generate-btn {
+    background: #6b46c1;
+    color: white;
+}
 
 
 /* BMI Card Styles */
@@ -2192,112 +2241,135 @@ document.addEventListener('keydown', (e) => {
 
 
 // Enhanced Meal Database based on workout intensity
+
+    
 const mealDatabase = {
-    // Pre-workout meals (energy boost) - 20 options
+    // Pre-workout meals (energy boost) - Indian & International options
     preWorkout: [
-        { name: "Banana with Peanut Butter", calories: 250, protein: 8, carbs: 35, fats: 10, time: "30-60 mins before" },
-        { name: "Oatmeal with Berries", calories: 300, protein: 10, carbs: 50, fats: 5, time: "1-2 hours before" },
-        { name: "Greek Yogurt with Honey", calories: 200, protein: 15, carbs: 25, fats: 4, time: "30-60 mins before" },
-        { name: "Apple Slices with Almond Butter", calories: 220, protein: 5, carbs: 30, fats: 9, time: "30-60 mins before" },
-        { name: "Whole Grain Toast with Avocado", calories: 280, protein: 7, carbs: 35, fats: 12, time: "1-2 hours before" },
-        { name: "Protein Smoothie with Banana", calories: 300, protein: 25, carbs: 40, fats: 5, time: "30-60 mins before" },
-        { name: "Dates with Almonds", calories: 180, protein: 4, carbs: 40, fats: 5, time: "15-30 mins before" },
-        { name: "Sweet Potato with Cinnamon", calories: 200, protein: 3, carbs: 45, fats: 1, time: "1-2 hours before" },
-        { name: "Rice Cakes with Avocado", calories: 220, protein: 5, carbs: 30, fats: 10, time: "30-60 mins before" },
-        { name: "Cottage Cheese with Berries", calories: 180, protein: 20, carbs: 15, fats: 5, time: "1 hour before" },
-        { name: "Whole Grain Cereal with Milk", calories: 280, protein: 12, carbs: 45, fats: 6, time: "1-2 hours before" },
-        { name: "Trail Mix", calories: 250, protein: 8, carbs: 25, fats: 15, time: "30-60 mins before" },
-        { name: "Energy Bar", calories: 220, protein: 10, carbs: 35, fats: 6, time: "30-60 mins before" },
-        { name: "Pumpkin Seeds", calories: 150, protein: 7, carbs: 10, fats: 12, time: "15-30 mins before" },
-        { name: "Hard Boiled Eggs", calories: 140, protein: 12, carbs: 1, fats: 10, time: "30-60 mins before" },
-        { name: "Banana Oat Muffins", calories: 200, protein: 6, carbs: 35, fats: 5, time: "1 hour before" },
-        { name: "Quinoa Porridge", calories: 260, protein: 8, carbs: 45, fats: 5, time: "1-2 hours before" },
-        { name: "Chia Seed Pudding", calories: 220, protein: 8, carbs: 20, fats: 12, time: "1 hour before" },
-        { name: "Fruit Smoothie Bowl", calories: 280, protein: 10, carbs: 50, fats: 6, time: "1 hour before" },
-        { name: "Peanut Butter Sandwich", calories: 320, protein: 12, carbs: 40, fats: 14, time: "1-2 hours before" }
+        // Indian options
+        { name: "Ragi Porridge (Finger Millet)", calories: 220, protein: 8, carbs: 45, fats: 3, time: "1-2 hours before", type: "veg" },
+        { name: "Banana with Peanut Butter", calories: 250, protein: 8, carbs: 35, fats: 10, time: "30-60 mins before", type: "veg" },
+        { name: "Oats Upma", calories: 280, protein: 12, carbs: 48, fats: 6, time: "1-2 hours before", type: "veg" },
+        { name: "Sprouts Salad", calories: 180, protein: 12, carbs: 28, fats: 4, time: "1-2 hours before", type: "veg" },
+        { name: "Dates with Almonds", calories: 180, protein: 4, carbs: 40, fats: 5, time: "15-30 mins before", type: "veg" },
+        { name: "Poha (Flattened Rice)", calories: 250, protein: 6, carbs: 45, fats: 5, time: "1-2 hours before", type: "veg" },
+        { name: "Greek Yogurt with Honey", calories: 200, protein: 15, carbs: 25, fats: 4, time: "30-60 mins before", type: "veg" },
+        { name: "Apple Slices with Almond Butter", calories: 220, protein: 5, carbs: 30, fats: 9, time: "30-60 mins before", type: "veg" },
+        { name: "Sweet Potato with Cinnamon", calories: 200, protein: 3, carbs: 45, fats: 1, time: "1-2 hours before", type: "veg" },
+        { name: "Cottage Cheese with Berries", calories: 180, protein: 20, carbs: 15, fats: 5, time: "1 hour before", type: "veg" },
+        { name: "Ragi Dosa", calories: 260, protein: 8, carbs: 48, fats: 4, time: "1-2 hours before", type: "veg" },
+        { name: "Fruit Smoothie Bowl", calories: 280, protein: 10, carbs: 50, fats: 6, time: "1 hour before", type: "veg" },
+        { name: "Quinoa Vegetable Pulao", calories: 300, protein: 10, carbs: 55, fats: 5, time: "1-2 hours before", type: "veg" },
+        { name: "Peanut Butter Sandwich", calories: 320, protein: 12, carbs: 40, fats: 14, time: "1-2 hours before", type: "veg" },
+        { name: "Chia Seed Pudding", calories: 220, protein: 8, carbs: 20, fats: 12, time: "1 hour before", type: "veg" },
+        // Add these to preWorkout array
+{ name: "Banana Oat Energy Balls", calories: 180, protein: 6, carbs: 32, fats: 5, time: "30-60 mins before", type: "veg" },
+{ name: "Coconut Water with Chia Seeds", calories: 120, protein: 2, carbs: 28, fats: 3, time: "15-30 mins before", type: "veg" },
+{ name: "Besan Chilla (Gram Flour Pancake)", calories: 220, protein: 12, carbs: 28, fats: 8, time: "1-2 hours before", type: "veg" },
+{ name: "Almond Butter Dates", calories: 150, protein: 4, carbs: 28, fats: 6, time: "15-30 mins before", type: "veg" },
+{ name: "Millet Dosa", calories: 240, protein: 8, carbs: 42, fats: 5, time: "1-2 hours before", type: "veg" }
     ],
     
-    // Post-workout meals (recovery) - 20 options
+    // Post-workout meals (recovery) - Indian & International options
     postWorkout: [
-        { name: "Grilled Chicken with Quinoa", calories: 450, protein: 40, carbs: 45, fats: 12, time: "Within 1 hour" },
-        { name: "Protein Smoothie with Banana", calories: 350, protein: 30, carbs: 45, fats: 5, time: "Within 30 mins" },
-        { name: "Salmon with Sweet Potato", calories: 500, protein: 35, carbs: 40, fats: 20, time: "Within 1-2 hours" },
-        { name: "Egg Scramble with Vegetables", calories: 320, protein: 25, carbs: 15, fats: 18, time: "Within 1 hour" },
-        { name: "Tuna Salad Sandwich", calories: 400, protein: 35, carbs: 40, fats: 12, time: "Within 1 hour" },
-        { name: "Chicken and Rice Bowl", calories: 480, protein: 42, carbs: 50, fats: 10, time: "Within 1 hour" },
-        { name: "Greek Yogurt Parfait", calories: 320, protein: 25, carbs: 35, fats: 10, time: "Within 30 mins" },
-        { name: "Turkey Wrap", calories: 380, protein: 32, carbs: 35, fats: 12, time: "Within 1 hour" },
-        { name: "Beef Stir-fry", calories: 420, protein: 38, carbs: 30, fats: 18, time: "Within 1 hour" },
-        { name: "Protein Pancakes", calories: 380, protein: 35, carbs: 40, fats: 10, time: "Within 1 hour" },
-        { name: "Tofu Scramble", calories: 300, protein: 25, carbs: 20, fats: 15, time: "Within 1 hour" },
-        { name: "Lentil Soup", calories: 280, protein: 18, carbs: 40, fats: 5, time: "Within 1-2 hours" },
-        { name: "Baked Salmon with Asparagus", calories: 450, protein: 38, carbs: 15, fats: 22, time: "Within 1-2 hours" },
-        { name: "Chickpea Salad", calories: 320, protein: 15, carbs: 40, fats: 12, time: "Within 1 hour" },
-        { name: "Cottage Cheese Bowl", calories: 250, protein: 28, carbs: 15, fats: 8, time: "Within 30 mins" },
-        { name: "Egg White Omelette", calories: 220, protein: 28, carbs: 8, fats: 8, time: "Within 30 mins" },
-        { name: "Chicken Caesar Salad", calories: 400, protein: 35, carbs: 15, fats: 22, time: "Within 1 hour" },
-        { name: "Quinoa Salad with Chickpeas", calories: 350, protein: 15, carbs: 50, fats: 10, time: "Within 1 hour" },
-        { name: "Turkey Burger", calories: 420, protein: 35, carbs: 40, fats: 15, time: "Within 1 hour" },
-        { name: "Fish Tacos", calories: 380, protein: 30, carbs: 40, fats: 12, time: "Within 1 hour" }
+        // Indian options
+        { name: "Grilled Chicken with Quinoa", calories: 450, protein: 40, carbs: 45, fats: 12, time: "Within 1 hour", type: "nonveg" },
+        { name: "Paneer Butter Masala with Roti", calories: 480, protein: 28, carbs: 45, fats: 22, time: "Within 1-2 hours", type: "veg" },
+        { name: "Protein Smoothie with Banana", calories: 350, protein: 30, carbs: 45, fats: 5, time: "Within 30 mins", type: "veg" },
+        { name: "Chicken Biryani", calories: 520, protein: 35, carbs: 65, fats: 15, time: "Within 1-2 hours", type: "nonveg" },
+        { name: "Egg Scramble with Vegetables", calories: 320, protein: 25, carbs: 15, fats: 18, time: "Within 1 hour", type: "nonveg" },
+        { name: "Tofu Tikka with Rice", calories: 380, protein: 25, carbs: 50, fats: 12, time: "Within 1 hour", type: "veg" },
+        { name: "Chicken and Rice Bowl", calories: 480, protein: 42, carbs: 50, fats: 10, time: "Within 1 hour", type: "nonveg" },
+        { name: "Greek Yogurt Parfait", calories: 320, protein: 25, carbs: 35, fats: 10, time: "Within 30 mins", type: "veg" },
+        { name: "Fish Curry with Brown Rice", calories: 450, protein: 38, carbs: 45, fats: 15, time: "Within 1-2 hours", type: "nonveg" },
+        { name: "Protein Pancakes", calories: 380, protein: 35, carbs: 40, fats: 10, time: "Within 1 hour", type: "veg" },
+        { name: "Dal Makhani with Roti", calories: 420, protein: 18, carbs: 55, fats: 14, time: "Within 1-2 hours", type: "veg" },
+        { name: "Soya Chunk Biryani", calories: 380, protein: 28, carbs: 55, fats: 12, time: "Within 1-2 hours", type: "veg" },
+        { name: "Egg Curry with Rice", calories: 400, protein: 20, carbs: 50, fats: 16, time: "Within 1-2 hours", type: "nonveg" },
+        { name: "Chicken Salad Wrap", calories: 380, protein: 32, carbs: 35, fats: 12, time: "Within 1 hour", type: "nonveg" },
+        { name: "Quinoa Khichdi", calories: 350, protein: 15, carbs: 55, fats: 8, time: "Within 1 hour", type: "veg" },
+        // Add these to postWorkout array
+{ name: "Mushroom and Peas Pulao", calories: 320, protein: 12, carbs: 55, fats: 8, time: "Within 1 hour", type: "veg" },
+{ name: "Cottage Cheese (Paneer) Wrap", calories: 380, protein: 22, carbs: 40, fats: 14, time: "Within 1 hour", type: "veg" },
+{ name: "Chicken Tikka Roll", calories: 420, protein: 32, carbs: 38, fats: 16, time: "Within 1 hour", type: "nonveg" },
+{ name: "Egg Fried Rice", calories: 380, protein: 20, carbs: 48, fats: 14, time: "Within 1 hour", type: "nonveg" },
+{ name: "Vegetable and Tofu Stir-fry", calories: 320, protein: 22, carbs: 28, fats: 12, time: "Within 1 hour", type: "veg" }
     ],
     
-    // High protein meals (muscle building) - 20 options
+    // High protein meals (muscle building) - Indian & International options
     highProtein: [
-        { name: "Grilled Chicken Breast", calories: 350, protein: 45, carbs: 0, fats: 8, time: "Post-workout" },
-        { name: "Lean Beef Steak", calories: 400, protein: 50, carbs: 0, fats: 15, time: "Post-workout" },
-        { name: "Tofu Stir-fry", calories: 300, protein: 25, carbs: 20, fats: 12, time: "Anytime" },
-        { name: "Cottage Cheese with Berries", calories: 220, protein: 25, carbs: 15, fats: 8, time: "Snack" },
-        { name: "Protein Pancakes", calories: 380, protein: 35, carbs: 40, fats: 10, time: "Breakfast" },
-        { name: "Turkey Breast", calories: 320, protein: 40, carbs: 0, fats: 5, time: "Any meal" },
-        { name: "Salmon Fillet", calories: 420, protein: 40, carbs: 0, fats: 22, time: "Dinner" },
-        { name: "Egg White Omelette", calories: 180, protein: 30, carbs: 5, fats: 5, time: "Breakfast" },
-        { name: "Greek Yogurt", calories: 150, protein: 20, carbs: 8, fats: 5, time: "Snack" },
-        { name: "Protein Bar", calories: 200, protein: 20, carbs: 20, fats: 6, time: "Snack" },
-        { name: "Lean Pork Chop", calories: 350, protein: 42, carbs: 0, fats: 12, time: "Dinner" },
-        { name: "Shrimp Scampi", calories: 320, protein: 35, carbs: 15, fats: 12, time: "Dinner" },
-        { name: "Chicken Sausage", calories: 280, protein: 28, carbs: 5, fats: 15, time: "Any meal" },
-        { name: "Edamame", calories: 120, protein: 12, carbs: 10, fats: 5, time: "Snack" },
-        { name: "Lentil Pasta", calories: 350, protein: 25, carbs: 45, fats: 8, time: "Dinner" },
-        { name: "Seitan Stir-fry", calories: 280, protein: 30, carbs: 20, fats: 8, time: "Any meal" },
-        { name: "Canned Tuna", calories: 120, protein: 25, carbs: 0, fats: 2, time: "Snack" },
-        { name: "Whey Protein Shake", calories: 150, protein: 30, carbs: 5, fats: 2, time: "Post-workout" },
-        { name: "Bison Burger", calories: 380, protein: 38, carbs: 35, fats: 12, time: "Dinner" },
-        { name: "Chicken Liver", calories: 280, protein: 32, carbs: 5, fats: 12, time: "Any meal" }
-    ],
+        // Indian options - Vegetarian
+        { name: "Paneer Tikka", calories: 320, protein: 25, carbs: 12, fats: 18, time: "Post-workout", type: "veg" },
+        { name: "Grilled Chicken Breast", calories: 350, protein: 45, carbs: 0, fats: 8, time: "Post-workout", type: "nonveg" },
+        { name: "Soya Chunk Curry", calories: 280, protein: 30, carbs: 20, fats: 12, time: "Anytime", type: "veg" },
+        { name: "Cottage Cheese (Paneer)", calories: 220, protein: 25, carbs: 15, fats: 8, time: "Snack", type: "veg" },
+        { name: "Tandoori Chicken", calories: 350, protein: 40, carbs: 5, fats: 12, time: "Post-workout", type: "nonveg" },
+        { name: "Chana Masala (Chickpea)", calories: 280, protein: 15, carbs: 45, fats: 6, time: "Any meal", type: "veg" },
+        { name: "Turkey Breast", calories: 320, protein: 40, carbs: 0, fats: 5, time: "Any meal", type: "nonveg" },
+        { name: "Fish Fillet", calories: 380, protein: 35, carbs: 0, fats: 18, time: "Dinner", type: "nonveg" },
+        { name: "Egg White Omelette", calories: 180, protein: 30, carbs: 5, fats: 5, time: "Breakfast", type: "nonveg" },
+        { name: "Greek Yogurt", calories: 150, protein: 20, carbs: 8, fats: 5, time: "Snack", type: "veg" },
+        { name: "Rajma (Kidney Beans)", calories: 280, protein: 16, carbs: 48, fats: 4, time: "Any meal", type: "veg" },
+        { name: "Moong Dal Chilla", calories: 220, protein: 18, carbs: 30, fats: 6, time: "Breakfast", type: "veg" },
+        { name: "Tofu Bhurji", calories: 250, protein: 22, carbs: 12, fats: 14, time: "Any meal", type: "veg" },
+        { name: "Chicken Seekh Kebab", calories: 280, protein: 32, carbs: 8, fats: 14, time: "Post-workout", type: "nonveg" },
+        { name: "Protein Bar", calories: 200, protein: 20, carbs: 20, fats: 6, time: "Snack", type: "veg" },
+        
+// Add these to highProtein array
+{ name: "Chana Masala (Chickpea Curry)", calories: 280, protein: 15, carbs: 45, fats: 6, time: "Any meal", type: "veg" },
+{ name: "Sprouts Chaat", calories: 180, protein: 12, carbs: 28, fats: 4, time: "Snack", type: "veg" },
+{ name: "Grilled Paneer Skewers", calories: 280, protein: 22, carbs: 12, fats: 16, time: "Post-workout", type: "veg" },
+{ name: "Fish Tikka", calories: 320, protein: 35, carbs: 8, fats: 16, time: "Post-workout", type: "nonveg" },
+{ name: "Methi Thepla with Curd", calories: 260, protein: 12, carbs: 38, fats: 8, time: "Any meal", type: "veg" } 
+],
     
-    // Energy meals (cardio days) - 10 options
+    // Energy meals (cardio days) - Indian options
     energy: [
-        { name: "Oatmeal with Banana", calories: 350, protein: 12, carbs: 65, fats: 6, time: "Pre-cardio" },
-        { name: "Sweet Potato with Chicken", calories: 400, protein: 30, carbs: 55, fats: 8, time: "Post-cardio" },
-        { name: "Brown Rice with Veggies", calories: 320, protein: 8, carbs: 70, fats: 4, time: "Pre-cardio" },
-        { name: "Pasta with Tomato Sauce", calories: 380, protein: 12, carbs: 75, fats: 5, time: "Pre-cardio" },
-        { name: "Fruit Smoothie", calories: 250, protein: 8, carbs: 55, fats: 2, time: "Pre-cardio" },
-        { name: "Whole Wheat Bagel", calories: 280, protein: 11, carbs: 55, fats: 3, time: "Pre-cardio" },
-        { name: "Rice Cakes with Honey", calories: 150, protein: 3, carbs: 35, fats: 1, time: "Pre-cardio" },
-        { name: "Banana Oat Smoothie", calories: 300, protein: 10, carbs: 60, fats: 4, time: "Pre-cardio" },
-        { name: "Cereal with Milk", calories: 280, protein: 10, carbs: 50, fats: 5, time: "Pre-cardio" },
-        { name: "Dried Fruit Mix", calories: 200, protein: 4, carbs: 45, fats: 2, time: "Pre-cardio" }
+        { name: "Oatmeal with Banana", calories: 350, protein: 12, carbs: 65, fats: 6, time: "Pre-cardio", type: "veg" },
+        { name: "Sweet Potato with Chicken", calories: 400, protein: 30, carbs: 55, fats: 8, time: "Post-cardio", type: "nonveg" },
+        { name: "Brown Rice with Veggies", calories: 320, protein: 8, carbs: 70, fats: 4, time: "Pre-cardio", type: "veg" },
+        { name: "Poha (Flattened Rice)", calories: 280, protein: 6, carbs: 55, fats: 5, time: "Pre-cardio", type: "veg" },
+        { name: "Fruit Smoothie", calories: 250, protein: 8, carbs: 55, fats: 2, time: "Pre-cardio", type: "veg" },
+        { name: "Whole Wheat Chapati with Dal", calories: 300, protein: 12, carbs: 50, fats: 6, time: "Pre-cardio", type: "veg" },
+        { name: "Rice Cakes with Honey", calories: 150, protein: 3, carbs: 35, fats: 1, time: "Pre-cardio", type: "veg" },
+        { name: "Banana Oat Smoothie", calories: 300, protein: 10, carbs: 60, fats: 4, time: "Pre-cardio", type: "veg" },
+        { name: "Cereal with Milk", calories: 280, protein: 10, carbs: 50, fats: 5, time: "Pre-cardio", type: "veg" },
+        { name: "Dried Fruit Mix", calories: 200, protein: 4, carbs: 45, fats: 2, time: "Pre-cardio", type: "veg" },
+        // Add these to energy array
+{ name: "Dates and Walnut Energy Bites", calories: 200, protein: 5, carbs: 38, fats: 8, time: "Pre-cardio", type: "veg" },
+{ name: "Coconut Rice", calories: 320, protein: 6, carbs: 52, fats: 12, time: "Pre-cardio", type: "veg" },
+{ name: "Fruit and Nut Bar", calories: 220, protein: 6, carbs: 38, fats: 8, time: "Pre-cardio", type: "veg" },
+{ name: "Apple Cinnamon Oatmeal", calories: 280, protein: 8, carbs: 52, fats: 5, time: "Pre-cardio", type: "veg" },
+{ name: "Sweet Potato Chips", calories: 180, protein: 3, carbs: 42, fats: 2, time: "Pre-cardio", type: "veg" }
     ],
     
-    // Recovery meals (after hard workouts) - 15 options
+    // Recovery meals (after hard workouts) - Indian options
     recovery: [
-        { name: "Salmon with Quinoa", calories: 480, protein: 38, carbs: 45, fats: 18, time: "Post-workout" },
-        { name: "Chicken and Vegetable Soup", calories: 280, protein: 30, carbs: 25, fats: 8, time: "Post-workout" },
-        { name: "Greek Yogurt Parfait", calories: 320, protein: 25, carbs: 35, fats: 10, time: "Post-workout" },
-        { name: "Beef Stir-fry", calories: 420, protein: 40, carbs: 30, fats: 18, time: "Post-workout" },
-        { name: "Tuna Pasta Salad", calories: 380, protein: 32, carbs: 45, fats: 12, time: "Post-workout" },
-        { name: "Turkey and Rice Bowl", calories: 420, protein: 38, carbs: 50, fats: 10, time: "Post-workout" },
-        { name: "Egg and Avocado Toast", calories: 350, protein: 20, carbs: 30, fats: 18, time: "Post-workout" },
-        { name: "Protein Pancakes", calories: 380, protein: 35, carbs: 40, fats: 10, time: "Post-workout" },
-        { name: "Chicken Burrito Bowl", calories: 480, protein: 40, carbs: 55, fats: 12, time: "Post-workout" },
-        { name: "Lentil and Quinoa Bowl", calories: 380, protein: 20, carbs: 60, fats: 8, time: "Post-workout" },
-        { name: "Baked Salmon", calories: 400, protein: 38, carbs: 0, fats: 22, time: "Post-workout" },
-        { name: "Sweet Potato and Eggs", calories: 350, protein: 18, carbs: 40, fats: 14, time: "Post-workout" },
-        { name: "Chicken Stir-fry", calories: 380, protein: 35, carbs: 30, fats: 12, time: "Post-workout" },
-        { name: "Cottage Cheese Bowl", calories: 250, protein: 28, carbs: 15, fats: 8, time: "Post-workout" },
-        { name: "Beef and Broccoli", calories: 380, protein: 35, carbs: 20, fats: 18, time: "Post-workout" }
+        { name: "Salmon with Quinoa", calories: 480, protein: 38, carbs: 45, fats: 18, time: "Post-workout", type: "nonveg" },
+        { name: "Chicken Soup", calories: 280, protein: 30, carbs: 25, fats: 8, time: "Post-workout", type: "nonveg" },
+        { name: "Greek Yogurt Parfait", calories: 320, protein: 25, carbs: 35, fats: 10, time: "Post-workout", type: "veg" },
+        { name: "Paneer Bhurji with Roti", calories: 380, protein: 22, carbs: 40, fats: 18, time: "Post-workout", type: "veg" },
+        { name: "Fish Curry with Rice", calories: 420, protein: 35, carbs: 45, fats: 16, time: "Post-workout", type: "nonveg" },
+        { name: "Egg and Avocado Toast", calories: 350, protein: 20, carbs: 30, fats: 18, time: "Post-workout", type: "nonveg" },
+        { name: "Protein Pancakes", calories: 380, protein: 35, carbs: 40, fats: 10, time: "Post-workout", type: "veg" },
+        { name: "Chicken Biryani", calories: 480, protein: 35, carbs: 60, fats: 14, time: "Post-workout", type: "nonveg" },
+        { name: "Dal Khichdi", calories: 320, protein: 15, carbs: 55, fats: 6, time: "Post-workout", type: "veg" },
+        { name: "Sweet Potato and Eggs", calories: 350, protein: 18, carbs: 40, fats: 14, time: "Post-workout", type: "nonveg" },
+        { name: "Chicken Stir-fry", calories: 380, protein: 35, carbs: 30, fats: 12, time: "Post-workout", type: "nonveg" },
+        { name: "Cottage Cheese Bowl", calories: 250, protein: 28, carbs: 15, fats: 8, time: "Post-workout", type: "veg" },
+        { name: "Vegetable Pulao with Raita", calories: 350, protein: 12, carbs: 55, fats: 8, time: "Post-workout", type: "veg" },
+        { name: "Tofu Stir-fry", calories: 320, protein: 25, carbs: 25, fats: 14, time: "Post-workout", type: "veg" },
+        { name: "Masala Omelette with Toast", calories: 320, protein: 22, carbs: 25, fats: 16, time: "Post-workout", type: "nonveg" },
+        // Add these to energy array
+{ name: "Dates and Walnut Energy Bites", calories: 200, protein: 5, carbs: 38, fats: 8, time: "Pre-cardio", type: "veg" },
+{ name: "Coconut Rice", calories: 320, protein: 6, carbs: 52, fats: 12, time: "Pre-cardio", type: "veg" },
+{ name: "Fruit and Nut Bar", calories: 220, protein: 6, carbs: 38, fats: 8, time: "Pre-cardio", type: "veg" },
+{ name: "Apple Cinnamon Oatmeal", calories: 280, protein: 8, carbs: 52, fats: 5, time: "Pre-cardio", type: "veg" },
+{ name: "Sweet Potato Chips", calories: 180, protein: 3, carbs: 42, fats: 2, time: "Pre-cardio", type: "veg" }
     ]
 };
+
+
 
 // Generate meal recommendations based on the 5-day schedule
 function generateMealRecommendations() {
