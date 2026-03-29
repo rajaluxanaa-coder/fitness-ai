@@ -1911,7 +1911,29 @@ def video_library():
     return render_template('video_library.html', user=user)
 
     
-
+@app.route('/update-age', methods=['POST'])
+def update_age():
+    try:
+        data = request.json
+        user_id = session['user_id']
+        new_age = data.get('age')
+        
+        if not new_age:
+            return jsonify({'success': False, 'error': 'Age not provided'})
+        
+        if new_age < 13 or new_age > 120:
+            return jsonify({'success': False, 'error': 'Age must be between 13 and 120'})
+        
+        user = User.query.get(user_id)
+        if user:
+            user.age = new_age
+            db.session.commit()
+            return jsonify({'success': True})
+        
+        return jsonify({'success': False, 'error': 'User not found'})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
 
 
 # Your existing code at the bottom should look like this:

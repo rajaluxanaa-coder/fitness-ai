@@ -1210,6 +1210,12 @@ body.dark-mode .generate-btn {
             </div>
 
             <div class="form-group">
+    <label><i class="fas fa-calendar-alt"></i> Age</label>
+    <input type="number" id="currentAge" step="1" min="13" max="120" placeholder="Enter your age" value="{{ user.age }}">
+    <small style="color: #6b7280;">Update your age for better recommendations</small>
+</div>
+
+            <div class="form-group">
                 <label for="notes">Notes (Optional)</label>
                 <input type="text" id="notes" placeholder="How was your workout?">
             </div>
@@ -1545,6 +1551,21 @@ function updateProgress() {
     // Update weight if provided
     if (currentWeight) {
         document.getElementById('currentWeight').innerText = currentWeight + ' kg';
+
+
+    // 👇 ADD THIS BLOCK (after the weight update block)
+    if (currentAge && currentAge !== '') {
+        const ageNum = parseInt(currentAge);
+        if (ageNum >= 13 && ageNum <= 120) {
+            fetch('/update-age', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({age: ageNum})
+            });
+            const ageDisplay = document.getElementById('userAge');
+            if (ageDisplay) ageDisplay.innerText = ageNum;
+        }
+    }
 
         // 👇 ALSO UPDATE PROGRESS SECTION WEIGHT 👇
     const progressWeight = document.getElementById('progressCurrentWeight');
@@ -2533,6 +2554,40 @@ function generateMealRecommendations() {
     `;
 }
           
+
+// Update age function
+async function updateAge() {
+    const newAge = document.getElementById('currentAge').value;
+    
+    if (!newAge) return;
+    
+    if (newAge < 13 || newAge > 120) {
+        alert('Age must be between 13 and 120');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/update-age', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({age: newAge})
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            console.log('Age updated to:', newAge);
+            // Update age display on page
+            const ageDisplay = document.getElementById('userAge');
+            if (ageDisplay) ageDisplay.innerText = newAge;
+        }
+    } catch (error) {
+        console.error('Error updating age:', error);
+    }
+}
+
+
+
 // Refresh meal recommendations
 function refreshMealRecommendations() {
     generateMealRecommendations();

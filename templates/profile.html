@@ -1319,7 +1319,20 @@ input:checked + .slider:before {
     {{ user.fitness_level|capitalize }} • 
     <span id="userLevel">Level <span id="levelValue">1</span></span>
 </p>
-            </div>
+            <p style="margin-top: 0.5rem;">
+    <i class="fas fa-calendar-alt"></i> Age: <span id="userAge">{{ user.age }}</span> years
+</p>
+
+<div style="margin-top: 0.5rem;">
+    <span class="age-badge" style="background: #6b46c1; color: white; padding: 0.25rem 0.75rem; border-radius: 2rem; font-size: 0.75rem;">
+        {% if user.age < 20 %}🧑‍🎓 Teen (13-19)
+        {% elif user.age < 30 %}🏃 Young Adult (20-29)
+        {% elif user.age < 40 %}💪 Adult (30-39)
+        {% elif user.age < 50 %}🧘 Mid-Life (40-49)
+        {% else %}🌿 Senior (50+){% endif %}
+    </span>
+</div>
+</div>
 
             <div class="quick-actions">
                 <button onclick="window.location.href='/log-workout-page'">
