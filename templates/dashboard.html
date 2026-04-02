@@ -1503,6 +1503,7 @@ function updateBMIAfterProgress() {
 
     // Update Progress Function - FIXED
 function updateProgress() {
+    const currentAge = document.getElementById('currentAge').value;
     const currentHeight= document.getElementById('currentHeight').value;
     const currentWeight = document.getElementById('currentWeightInput').value;
     const goalWeight = document.getElementById('goalWeightInput').value;
@@ -2565,6 +2566,8 @@ async function updateAge() {
         alert('Age must be between 13 and 120');
         return;
     }
+
+    console.log("Updating age to:", newAge);
     
     try {
         const response = await fetch('/update-age', {
@@ -2574,15 +2577,21 @@ async function updateAge() {
         });
         
         const data = await response.json();
+        console.log("Response:",data);
         
         if (data.success) {
             console.log('Age updated to:', newAge);
             // Update age display on page
             const ageDisplay = document.getElementById('userAge');
             if (ageDisplay) ageDisplay.innerText = newAge;
+            alert('Age updated successfully !');
+        }else{
+            alert('Failed to update age: '+(data.error || 'Unknown error'));
         }
+
     } catch (error) {
         console.error('Error updating age:', error);
+        alert('Error updating age');
     }
 }
 
