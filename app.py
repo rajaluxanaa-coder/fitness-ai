@@ -1105,35 +1105,7 @@ def get_achievements():
     # Determine earned badges based on REAL data
     achievements = []
 
-    #In your get-achievements route
-    level_badges = {
-        1: {"name": "🥉 Beginner", "xp": 0},
-        2: {"name": "🌟 Starter", "xp": 100},
-        3: {"name": "💪 Rookie", "xp": 200},
-        4: {"name": "🔥 Rising Star", "xp": 300},
-        5: {"name": "⚡ Warrior", "xp": 400},
-        6: {"name": "🏋️ Iron", "xp": 500},
-        7: {"name": "🥈 Bronze", "xp": 600},
-        8: {"name": "🔩 Steel", "xp": 700},
-        9: {"name": "🏆 Silver", "xp": 800},
-        10: {"name": "💎 Gold", "xp": 900},
-        11: {"name": "👑 Platinum", "xp": 1000},
-        12: {"name": "⭐ Diamond", "xp": 1100},
-        13: {"name": "🦅 Eagle", "xp": 1200},
-        14: {"name": "🔥 Legend", "xp": 1300},
-        15: {"name": "🏆 Grand Master", "xp": 1400}
-    }
-
-    # 👇 ADD LEVEL BADGE FIRST 👇
-    if level in level_badges:
-        badge = level_badges[level]
-        achievements.append({
-            'name': badge['name'],
-            'icon': badge['icon'],
-            'description': badge['description'],
-            'date': f'Level {level}',
-            'earned': True
-        })
+    
     
     # First Workout
     if workout_count >= 1:
