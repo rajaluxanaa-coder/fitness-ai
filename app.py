@@ -594,18 +594,37 @@ Make every day different and unique."""
 
 @app.route('/update-progress', methods=['POST'])
 def update_progress():
-    data = request.json
-    progress = UserProgress(
-        user_id=session['user_id'],
-        current_weight=data['current_weight'],
-        date=datetime.now().date(),
-        notes=data.get('notes', '')
-    )
-    
-    db.session.add(progress)
-    db.session.commit()
-    
-    return jsonify({'success': True})
+    try:
+        data = request.json
+        user_id = session['user_id']
+        
+        # Update weight if provided
+        if data.get('current_weight'):
+            user = User.query.get(user_id)
+            user.weight = data['current_weight']
+            db.session.commit()
+        
+        # Add workout log if provided
+        if data.get('workouts_completed') and int(data.get('workouts_completed')) > 0:
+            workout = WorkoutLog(
+                user_id=user_id,
+                date=datetime.now().date(),
+                workout_name="Progress Update",
+                duration=int(data.get('minutes', 0)),
+                calories_burned=int(data.get('calories_burned', 0))
+            )
+            db.session.add(workout)
+            db.session.commit()
+        
+        return jsonify({'success': True})
+        
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)})
+
+
+
+        
 
 @app.route('/logout')
 def logout():

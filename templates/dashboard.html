@@ -1239,14 +1239,18 @@ async function loadUserStats() {
         const data = await response.json();
         console.log("Stats data received:",data);
 
+
+
+        document.getElementById('workoutsDone').innerText = data.workouts || 0;
+        document.getElementById('caloriesBurned').innerText = (data.calories || 0).toLocaleString();
+        document.getElementById('totalMinutes').innerText = data.minutes || 0;
+
         // Also save to localStorage for quick access (optional)
         localStorage.setItem('workoutsDone', data.workouts || 0);
         localStorage.setItem('caloriesBurned', data.calories || 0);
         localStorage.setItem('totalMinutes', data.minutes || 0);
         
-        document.getElementById('workoutsDone').innerText = data.workouts || 0;
-        document.getElementById('caloriesBurned').innerText = (data.calories || 0).toLocaleString();
-        document.getElementById('totalMinutes').innerText = data.minutes || 0;
+    
         
         
     } catch (error) {
@@ -1626,8 +1630,8 @@ function updateProgress() {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
-            current_weight: currentWeight,
-            notes: notes
+            workouts_completed: workoutsCompleted,
+            current_weight: currentWeight
         })
     })
     .then(response => response.json())
@@ -2604,6 +2608,7 @@ function refreshMealRecommendations() {
 
 // Wait for page to fully load
 document.addEventListener('DOMContentLoaded', function() {
+    loadUserStats();
     // Call meal recommendations after page loads
     generateMealRecommendations();
 });
