@@ -1125,15 +1125,15 @@ def get_achievements():
     }
 
     # 👇 ADD LEVEL BADGE FIRST 👇
-if level in level_badges:
-    badge = level_badges[level]
-    achievements.append({
-        'name': badge['name'],
-        'icon': badge['icon'],
-        'description': badge['description'],
-        'date': f'Level {level}',
-        'earned': True
-    })
+    if level in level_badges:
+        badge = level_badges[level]
+        achievements.append({
+            'name': badge['name'],
+            'icon': badge['icon'],
+            'description': badge['description'],
+            'date': f'Level {level}',
+            'earned': True
+        })
     
     # First Workout
     if workout_count >= 1:
