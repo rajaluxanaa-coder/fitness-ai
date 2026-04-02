@@ -1207,7 +1207,7 @@ def get_achievements():
         })
 
 
-    // In your get-achievements route
+    #In your get-achievements route
     level_badges = {
         1: {"name": "🥉 Beginner", "xp": 0},
         2: {"name": "🌟 Starter", "xp": 100},
