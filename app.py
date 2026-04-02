@@ -624,7 +624,7 @@ def update_progress():
 
 
 
-        
+
 
 @app.route('/logout')
 def logout():
@@ -1205,6 +1205,26 @@ def get_achievements():
             'date': 'Achieved',
             'earned': True
         })
+
+
+    // In your get-achievements route
+    level_badges = {
+        1: {"name": "🥉 Beginner", "xp": 0},
+        2: {"name": "🌟 Starter", "xp": 100},
+        3: {"name": "💪 Rookie", "xp": 200},
+        4: {"name": "🔥 Rising Star", "xp": 300},
+        5: {"name": "⚡ Warrior", "xp": 400},
+        6: {"name": "🏋️ Iron", "xp": 500},
+        7: {"name": "🥈 Bronze", "xp": 600},
+        8: {"name": "🔩 Steel", "xp": 700},
+        9: {"name": "🏆 Silver", "xp": 800},
+        10: {"name": "💎 Gold", "xp": 900},
+        11: {"name": "👑 Platinum", "xp": 1000},
+        12: {"name": "⭐ Diamond", "xp": 1100},
+        13: {"name": "🦅 Eagle", "xp": 1200},
+        14: {"name": "🔥 Legend", "xp": 1300},
+        15: {"name": "🏆 Grand Master", "xp": 1400}
+        }
     
     return jsonify({
         'level': level,
@@ -1822,9 +1842,9 @@ def get_user_level():
     total_xp = len(workouts) * 10 + len(meals) * 5
     
     # Calculate level (every 100 XP = 1 level)
-    level = (total_xp // 100) + 1  # Start at level 1
+    level = min((total_xp // 100) + 1 ,15) # Start at level 1
     current_level_xp = total_xp % 100
-    next_level_xp = 100 - current_level_xp
+    next_level_xp = 100 - current_level_xp if level < 15 else 0
     
     # Calculate level progress percentage
     progress_percent = (current_level_xp / 100) * 100
@@ -1835,6 +1855,7 @@ def get_user_level():
         'next_level_xp': next_level_xp,
         'progress': progress_percent,
         'total_xp': total_xp,
+        'max_level':15,
         'workouts': len(workouts),
         'meals': len(meals)
     })
