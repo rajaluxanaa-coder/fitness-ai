@@ -639,7 +639,7 @@ body.dark-mode .chart-card canvas {
 
             <!-- Add this hidden input near the top of the form -->
             <input type="hidden" id="userWeight" value="{{ user.weight }}">
-            
+
             <div class="form-group">
                 <label><i class="fas fa-calendar"></i> Date</label>
                 <input type="date" id="workoutDate" class="date-input" value="{{ now.date() }}" required>
@@ -769,13 +769,21 @@ async function logWorkout(event) {
     
         
 // Auto-calculation of calories
+// Auto-calculation of calories
 function calculateCalories() {
+    console.log("calculateCalories called"); // Debug
+    
     // Get values
     const workoutType = document.getElementById('workoutType').value;
     const duration = parseInt(document.getElementById('duration').value) || 0;
+    
     // Get user weight from hidden input
     const userWeightInput = document.getElementById('userWeight');
     const userWeight = userWeightInput ? parseFloat(userWeightInput.value) : 70;
+    
+    console.log("Workout Type:", workoutType);
+    console.log("Duration:", duration);
+    console.log("User Weight:", userWeight);
     
     // MET values based on workout type
     const metValues = {
@@ -792,26 +800,30 @@ function calculateCalories() {
     // Get MET value for selected workout type
     const met = metValues[workoutType] || 5.0;
     
-    // Calculate calories: MET × weight(kg) × duration(hours)
     let calories = 0;
-    if (duration > 0 && weight > 0) {
+    if (duration > 0 && userWeight > 0 && workoutType) {
         calories = met * userWeight * (duration / 60);
         calories = Math.round(calories);
     }
+    
+    console.log("Calculated calories:", calories);
     
     // Update calories input field
     const caloriesInput = document.getElementById('calories');
     if (caloriesInput) {
         caloriesInput.value = calories;
+        console.log("Calories input updated to:", calories);
     }
     
     // Show calculation info
     const calcInfo = document.getElementById('calorieCalcInfo');
     if (calcInfo && workoutType && duration > 0) {
-        calcInfo.innerHTML = `📊 Calculated: ${met} MET × ${weight}kg × ${duration}min = ${calories} calories`;
+        calcInfo.innerHTML = `📊 Calculated: ${met} MET × ${userWeight}kg × ${duration}min = ${calories} calories`;
         calcInfo.style.display = 'block';
     }
 }
+    
+    
 
 // Add event listeners when page loads
 document.addEventListener('DOMContentLoaded', function() {
