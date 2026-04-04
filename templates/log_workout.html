@@ -636,6 +636,10 @@ body.dark-mode .chart-card canvas {
         
         <!-- Main Form -->
         <form id="workoutForm" onsubmit="logWorkout(event)">
+
+            <!-- Add this hidden input near the top of the form -->
+            <input type="hidden" id="userWeight" value="{{ user.weight }}">
+            
             <div class="form-group">
                 <label><i class="fas fa-calendar"></i> Date</label>
                 <input type="date" id="workoutDate" class="date-input" value="{{ now.date() }}" required>
@@ -663,7 +667,9 @@ body.dark-mode .chart-card canvas {
             
             <div class="form-group">
                 <label><i class="fas fa-fire"></i> Calories Burned</label>
-                <input type="number" id="calories" min="0" value="300" required>
+                <input type="number" id="calories" min="0" required>
+                <small id="calorieCalcInfo" style="display: none; color: #6b46c1; margin-top: 0.25rem;"></small>
+                <small style="color: #6b7280;">Auto-calculated based on workout type, duration, and your weight ({{ user.weight }} kg)</small>
             </div>
             
             <div class="form-group">
@@ -762,14 +768,71 @@ async function logWorkout(event) {
 }
     
         
-        
+// Auto-calculation of calories
+function calculateCalories() {
+    // Get values
+    const workoutType = document.getElementById('workoutType').value;
+    const duration = parseInt(document.getElementById('duration').value) || 0;
+    // Get user weight from hidden input
+    const userWeightInput = document.getElementById('userWeight');
+    const userWeight = userWeightInput ? parseFloat(userWeightInput.value) : 70;
+    
+    // MET values based on workout type
+    const metValues = {
+        'Upper Body': 5.0,
+        'Lower Body': 6.0,
+        'Cardio': 7.0,
+        'Full Body': 8.0,
+        'Core': 4.0,
+        'Yoga': 3.0,
+        'HIIT': 10.0,
+        'Strength': 5.5
+    };
+    
+    // Get MET value for selected workout type
+    const met = metValues[workoutType] || 5.0;
+    
+    // Calculate calories: MET × weight(kg) × duration(hours)
+    let calories = 0;
+    if (duration > 0 && weight > 0) {
+        calories = met * userWeight * (duration / 60);
+        calories = Math.round(calories);
+    }
+    
+    // Update calories input field
+    const caloriesInput = document.getElementById('calories');
+    if (caloriesInput) {
+        caloriesInput.value = calories;
+    }
+    
+    // Show calculation info
+    const calcInfo = document.getElementById('calorieCalcInfo');
+    if (calcInfo && workoutType && duration > 0) {
+        calcInfo.innerHTML = `📊 Calculated: ${met} MET × ${weight}kg × ${duration}min = ${calories} calories`;
+        calcInfo.style.display = 'block';
+    }
+}
 
-        // Set today's date as default
-        document.addEventListener('DOMContentLoaded', function() {
-            applyDarkMode();
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('workoutDate').value = today;
-        });
-    </script>
+// Add event listeners when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    applyDarkMode();
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('workoutDate').value = today;
+
+    const workoutTypeSelect = document.getElementById('workoutType');
+    const durationInput = document.getElementById('duration');
+    
+    if (workoutTypeSelect) {
+        workoutTypeSelect.addEventListener('change', calculateCalories);
+    }
+    if (durationInput) {
+        durationInput.addEventListener('input', calculateCalories);
+    }
+    
+    // Initial calculation
+    calculateCalories();
+});
+
+</script>
 </body>
 </html>
