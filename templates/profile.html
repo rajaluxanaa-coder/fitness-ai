@@ -1512,10 +1512,26 @@ input:checked + .slider:before {
             updateWaterDisplay();
         }
 
+        function checkAndResetDailyWater() {
+            const lastDate = localStorage.getItem('waterTrackerDate');
+            const today = new Date().toDateString();
+            
+            if (lastDate !== today) {
+                // New day - reset water intake to 0
+                waterIntake = 0;
+                localStorage.setItem('waterIntake', waterIntake);
+                localStorage.setItem('waterTrackerDate', today);
+                updateWaterDisplay();
+                console.log("Water intake reset for new day");
+            }
+        }
+
         function updateWaterDisplay() {
             const percentage = (waterIntake / waterGoal) * 100;
             document.getElementById('waterAmount').innerText = waterIntake.toFixed(1) + 'L';
             document.getElementById('waterFill').style.width = percentage + '%';
+
+            localStorage.setItem('waterIntake', waterIntake);
         }
 
         // Weather
@@ -2115,9 +2131,19 @@ function translatePage() {
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
 
+             // Load saved water intake
+            const savedIntake = localStorage.getItem('waterIntake');
+            if (savedIntake !== null) {
+                waterIntake = parseFloat(savedIntake);
+            }
+            
+            // Check if it's a new day (reset if needed)
+            checkAndResetDailyWater();
+            
+            updateWaterDisplay();
 
             console.log("DOMContentLoaded - Page loaded");  // ← ADD THIS
-    console.log("Current language:", localStorage.getItem('language'));  // ← ADD THIS
+            console.log("Current language:", localStorage.getItem('language'));  // ← ADD THIS
                         // Then apply dark mode from localStorage
 
             applyDarkMode();
