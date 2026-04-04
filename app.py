@@ -1292,6 +1292,7 @@ def get_challenges():
 def log_workout_page():
     if 'user_id' not in session:
         return redirect(url_for('index'))
+    user=User.query.get(session['user_id'])
     return render_template('log_workout.html', now=datetime.now())
 
 @app.route('/log-meal-page')
