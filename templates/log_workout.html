@@ -826,25 +826,42 @@ function calculateCalories() {
     
 
 // Add event listeners when page loads
+// Single DOMContentLoaded event
 document.addEventListener('DOMContentLoaded', function() {
-    applyDarkMode();
+    console.log("DOMContentLoaded fired");
+    
+    // Apply dark mode
+    if (typeof applyDarkMode === 'function') {
+        applyDarkMode();
+    }
+    
+    // Set today's date
     const today = new Date().toISOString().split('T')[0];
-    document.getElementById('workoutDate').value = today;
-
+    const dateInput = document.getElementById('workoutDate');
+    if (dateInput) {
+        dateInput.value = today;
+    }
+    
+    // Get elements
     const workoutTypeSelect = document.getElementById('workoutType');
     const durationInput = document.getElementById('duration');
+    const caloriesInput = document.getElementById('calories');
     
+    console.log("Elements found - workoutType:", !!workoutTypeSelect, "duration:", !!durationInput, "calories:", !!caloriesInput);
+    
+    // Add event listeners
     if (workoutTypeSelect) {
         workoutTypeSelect.addEventListener('change', calculateCalories);
+        console.log("Added change listener to workoutType");
     }
     if (durationInput) {
         durationInput.addEventListener('input', calculateCalories);
+        console.log("Added input listener to duration");
     }
     
     // Initial calculation
     calculateCalories();
 });
-
 </script>
 </body>
 </html>
