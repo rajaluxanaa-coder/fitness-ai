@@ -994,6 +994,28 @@ body.dark-mode .chart-card canvas {
             </div>
             <input type="time" id="mealReminder" class="setting-time" value="12:00" onchange="saveSettings()">
         </div>
+
+        <div class="setting-item">
+            <div class="setting-info">
+                <div class="setting-label">Streak Alerts</div>
+                <div class="setting-desc">Warn before losing your streak</div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="streakAlertsToggle" checked onchange="toggleStreakAlerts()">
+                <span class="slider round"></span>
+            </label>
+        </div>
+
+        <div class="setting-item">
+            <div class="setting-info">
+                <div class="setting-label">Achievement Alerts</div>
+                <div class="setting-desc">Celebrate when you earn badges</div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="achievementAlertsToggle" checked onchange="toggleAchievementAlerts()">
+                <span class="slider round"></span>
+            </label>
+        </div>
     </div>
     
     <div class="settings-section">
@@ -1559,11 +1581,48 @@ input:checked + .slider:before {
         }
 
         // Achievements
-        async function loadAchievements() {
-            const response = await fetch('/get-achievements');
-            const achievements = await response.json();
+        // Store previous achievement count (declare outside function)
+let previousAchievementCount = 0;
+
+async function loadAchievements() {
+    try {
+        const response = await fetch('/get-achievements');
+        const data = await response.json();
+        
+        // Get the achievements array from response
+        const achievements = data.achievements || data;
+        
+        // Get current achievement count (only earned ones)
+        const currentCount = achievements.filter(a => a.earned !== false).length || 0;
+        
+        // Check for new achievements and send notification
+        const achievementAlertsEnabled = localStorage.getItem('achievementAlertsEnabled') !== 'false';
+        
+        if (achievementAlertsEnabled && currentCount > previousAchievementCount && Notification.permission === 'granted') {
+            // Find newly earned achievements
+            const newAchievements = achievements.filter(a => a.earned !== false);
+            const latest = newAchievements[newAchievements.length - 1];
             
-            const grid = document.getElementById('achievementsGrid');
+            if (latest && previousAchievementCount > 0) {
+                const notification = new Notification('🏆 New Achievement Unlocked!', {
+                    body: `${latest.icon} ${latest.name} - ${latest.description}`,
+                    icon: 'https://img.freepik.com/free-vector/trophy-icon_1284-43041.jpg'
+                });
+                
+                notification.onclick = function() {
+                    window.focus();
+                    window.location.href = '/achievements';
+                    notification.close();
+                };
+            }
+        }
+        
+        // Update previous count for next time
+        previousAchievementCount = currentCount;
+        
+        // Display achievements in grid (your existing display code)
+        const grid = document.getElementById('achievementsGrid');
+        if (grid) {
             grid.innerHTML = '';
             
             achievements.forEach(a => {
@@ -1571,11 +1630,16 @@ input:checked + .slider:before {
                     <div style="text-align: center; padding: 1rem; background: #fef3c7; border-radius: 0.5rem;">
                         <div style="font-size: 2rem;">${a.icon}</div>
                         <h4>${a.name}</h4>
-                        <p style="font-size: 0.875rem;">${a.description}</p>
+<p style="font-size: 0.875rem;">${a.description}</p>
                     </div>
                 `;
             });
         }
+        
+    } catch (error) {
+        console.error('Error loading achievements:', error);
+    }
+}
 
         // Recent Workouts
         async function loadRecentWorkouts() {
@@ -2125,7 +2189,78 @@ function translatePage() {
     console.log(`Translated ${translatedCount} elements`);
 }
     
+
+// Send streak warning (1 hour before day ends)
+function checkAndSendStreakAlert() {
+    const streakAlertsEnabled = localStorage.getItem('streakAlertsEnabled') !== 'false';
     
+    if (!streakAlertsEnabled) return;
+    
+    const streak = parseInt(document.getElementById('streakCount')?.innerText) || 0;
+    
+    // Check if user has worked out today
+    checkWorkoutToday().then(hasWorkoutToday => {
+        if (streak > 0 && !hasWorkoutToday && Notification.permission === 'granted') {
+            const now = new Date();
+            const hour = now.getHours();
+            
+            // Send alert only between 8 PM and 10 PM (20:00 - 22:00)
+            if (hour >= 20 && hour <= 22) {
+                const notification = new Notification('⚠️ Streak Alert!', {
+                    body: `You have a ${streak}-day streak! Don't lose it. Complete a workout today! 🔥`,
+                    icon: 'https://img.freepik.com/free-vector/warning-icon_1284-43041.jpg',
+                    requireInteraction: true
+                });
+                
+                notification.onclick = function() {
+                    window.focus();
+                    window.location.href = '/log-workout-page';
+                    notification.close();
+                };
+            }
+        }
+    });
+}
+
+// Check streak alert every hour
+setInterval(() => {
+    checkAndSendStreakAlert();
+}, 3600000); // Every hour
+
+// Toggle streak alerts
+function toggleStreakAlerts() {
+    const enabled = document.getElementById('streakAlertsToggle').checked;
+    localStorage.setItem('streakAlertsEnabled', enabled);
+}
+
+// Toggle achievement alerts
+function toggleAchievementAlerts() {
+    const enabled = document.getElementById('achievementAlertsToggle').checked;
+    localStorage.setItem('achievementAlertsEnabled', enabled);
+}
+
+// Load alert settings on page load
+function loadAlertSettings() {
+    const streakToggle = document.getElementById('streakAlertsToggle');
+    if (streakToggle) {
+        streakToggle.checked = localStorage.getItem('streakAlertsEnabled') !== 'false';
+    }
+    
+    const achievementToggle = document.getElementById('achievementAlertsToggle');
+    if (achievementToggle) {
+        achievementToggle.checked = localStorage.getItem('achievementAlertsEnabled') !== 'false';
+    }
+}
+
+// Toggle achievement alerts
+
+// Load achievement alert setting on page load
+function loadAchievementAlertSetting() {
+    const toggle = document.getElementById('achievementAlertsToggle');
+    if (toggle) {
+        toggle.checked = localStorage.getItem('achievementAlertsEnabled') !== 'false';
+    }
+}
 
 
         // Initialize
@@ -2162,6 +2297,9 @@ function translatePage() {
             
             updateActiveLanguageButton();
             updateLanguageIndicator();
+
+            loadAlertSettings();
+            loadAchievementAlertSetting();
         
             
             // Refresh weather every 30 minutes
