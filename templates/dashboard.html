@@ -1508,7 +1508,7 @@ function updateBMIAfterProgress() {
     // Update Progress Function - FIXED
 function updateProgress() {
     const currentAge = document.getElementById('currentAge').value;
-    const currentHeight= document.getElementById('currentHeight').value;
+    const currentHeight = document.getElementById('currentHeight').value;
     const currentWeight = document.getElementById('currentWeightInput').value;
     const goalWeight = document.getElementById('goalWeightInput').value;
     const workoutsCompleted = document.getElementById('workoutsCompleted').value;
@@ -1521,44 +1521,17 @@ function updateProgress() {
     let calories = parseInt(document.getElementById('caloriesBurned').innerText.replace(',', '')) || 0;
     let totalMinutes = parseInt(document.getElementById('totalMinutes').innerText) || 0;
 
-
-    // UPDATE HEIGHT IF PROVIDED ← ADD THIS BLOCK
+    // UPDATE HEIGHT
     if (currentHeight && currentHeight > 100 && currentHeight < 250) {
         document.getElementById('bmiHeight').innerText = currentHeight;
-        
-        // Save to database
         fetch('/update-height', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({height: currentHeight})
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (!data.success) {
-                console.log('Height update failed');
-            }
         });
     }
 
-    // Update goal weight 👈 ADD THIS BLOCK
-    if (goalWeight && goalWeight > 20 && goalWeight < 300) {
-        document.getElementById('goalWeight').innerText = goalWeight + ' kg';
-        
-        // Save to database
-        fetch('/update-goal-weight', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({goal_weight: goalWeight})
-        });
-    }
-
-
-    // Update weight if provided
-    if (currentWeight) {
-        document.getElementById('currentWeight').innerText = currentWeight + ' kg';
-
-
-    // 👇 ADD THIS BLOCK (after the weight update block)
+    // UPDATE AGE
     if (currentAge && currentAge !== '') {
         const ageNum = parseInt(currentAge);
         if (ageNum >= 13 && ageNum <= 120) {
@@ -1572,28 +1545,44 @@ function updateProgress() {
         }
     }
 
-        // 👇 ALSO UPDATE PROGRESS SECTION WEIGHT 👇
-    const progressWeight = document.getElementById('progressCurrentWeight');
-    if (progressWeight) {
-        progressWeight.innerText = currentWeight + ' kg';
+    // UPDATE GOAL WEIGHT
+    if (goalWeight && goalWeight > 20 && goalWeight < 300) {
+        document.getElementById('goalWeight').innerText = goalWeight + ' kg';
+        fetch('/update-goal-weight', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({goal_weight: goalWeight})
+        });
     }
 
+    // UPDATE CURRENT WEIGHT
+    if (currentWeight) {
+        // Update displays
+        document.getElementById('currentWeight').innerText = currentWeight + ' kg';
+        const progressWeight = document.getElementById('progressCurrentWeight');
+        if (progressWeight) {
+            progressWeight.innerText = currentWeight + ' kg';
+        }
+        
         localStorage.setItem('currentWeight', currentWeight);
-
         document.getElementById('bmiWeight').innerText = currentWeight;
         calculateBMI();
         
-        // Calculate progress percentage
-        const startWeight = parseFloat(document.getElementById('startWeight').innerText) || 0;
-        const goalWeight = parseFloat(document.getElementById('goalWeight').innerText) || 0;
+        // 👇 USE SAVED START WEIGHT (never changes) 👇
+        const savedStartWeight = parseFloat(localStorage.getItem('initialStartWeight')) || 0;
+        const goalWeightNum = parseFloat(document.getElementById('goalWeight').innerText) || 0;
+        const currentWeightNum = parseFloat(currentWeight);
         
         let progressPercent = 0;
-        if (goalWeight > startWeight) {
+        
+        if (goalWeightNum > savedStartWeight) {
             // Weight gain goal
-            progressPercent = ((currentWeight - startWeight) / (goalWeight - startWeight)) * 100;
-        } else {
+            progressPercent = ((currentWeightNum - savedStartWeight) / (goalWeightNum - savedStartWeight)) * 100;
+        } else if (goalWeightNum < savedStartWeight && savedStartWeight > 0) {
             // Weight loss goal
-            progressPercent = ((startWeight - currentWeight) / (startWeight - goalWeight)) * 100;
+            progressPercent = ((savedStartWeight - currentWeightNum) / (savedStartWeight - goalWeightNum)) * 100;
+        } else if (goalWeightNum === savedStartWeight && savedStartWeight > 0) {
+            progressPercent = 100;
         }
         
         progressPercent = Math.min(100, Math.max(0, Math.round(progressPercent)));
@@ -1602,21 +1591,21 @@ function updateProgress() {
         localStorage.setItem('progressPercent', progressPercent);
     }
 
-    // Update workouts if provided
+    // UPDATE WORKOUTS
     if (workoutsCompleted && workoutsCompleted > 0) {
         workoutsDone += parseInt(workoutsCompleted);
         document.getElementById('workoutsDone').innerText = workoutsDone;
         localStorage.setItem('workoutsDone', workoutsDone);
     }
 
-    // Update calories if provided
+    // UPDATE CALORIES
     if (caloriesBurned && caloriesBurned > 0) {
         calories += parseInt(caloriesBurned);
         document.getElementById('caloriesBurned').innerText = calories.toLocaleString();
         localStorage.setItem('caloriesBurned', calories);
     }
 
-    // Update minutes if provided
+    // UPDATE MINUTES
     if (minutes && minutes > 0) {
         totalMinutes += parseInt(minutes);
         document.getElementById('totalMinutes').innerText = totalMinutes;
@@ -1625,7 +1614,7 @@ function updateProgress() {
 
     calculateBMI();
 
-    // Send to server
+    // SEND TO SERVER
     fetch('/update-progress', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
@@ -1652,6 +1641,15 @@ function updateProgress() {
 }
 
 
+
+
+
+
+    
+        
+        
+        
+        
 
 
     // Close modals when clicking outside
@@ -1707,59 +1705,8 @@ function editHeight() {
 
 
 
-    // Load saved data on page load
-    document.addEventListener('DOMContentLoaded', function() {
+    
 
-        loadUserStats();
-
-        // Load saved stats from localStorage
-
-        // Apply dark mode on page load
-    const savedDarkMode = localStorage.getItem('darkMode');
-    if (savedDarkMode === 'enabled') {
-        document.body.classList.add('dark-mode');
-    }
-
-        //const savedWorkouts = localStorage.getItem('workoutsDone');
-        //const savedCalories = localStorage.getItem('caloriesBurned');
-        //const savedMinutes = localStorage.getItem('totalMinutes');
-        //const savedWeight = localStorage.getItem('currentWeight');
-        
-        //if (savedWorkouts) document.getElementById('workoutsDone').innerText = savedWorkouts;
-        //if (savedCalories) document.getElementById('caloriesBurned').innerText = savedCalories;
-        //if (savedMinutes) document.getElementById('totalMinutes').innerText = savedMinutes;
-        //if (savedWeight) {
-        //    document.getElementById('currentWeight').innerText = savedWeight + ' kg';
-        //}
-        
-        // Calculate progress percentage
-        const startWeight = parseFloat(document.getElementById('startWeight').innerText) || 0;
-        const currentWeight = parseFloat(document.getElementById('currentWeight').innerText) || 0;
-        const goalWeight = parseFloat(document.getElementById('goalWeight').innerText) || 0;
-        
-        if (startWeight > goalWeight && currentWeight > 0) {
-            // Weight loss goal
-            const progress = ((startWeight - currentWeight) / (startWeight - goalWeight)) * 100;
-            const progressPercent = Math.min(100, Math.max(0, Math.round(progress)));
-            document.getElementById('progressPercentage').innerText = progressPercent + '%';
-            document.getElementById('progressFill').style.width = progressPercent + '%';
-        }
-
-        
-        calculateBMI();
-        updateQuickTip();
-
-        // 👇 ADD THESE LINES 👇
-    // Set initial height value in progress modal if exists
-    const heightInput = document.getElementById('currentHeight');
-    if (heightInput && !heightInput.value) {
-        const currentHeight = document.getElementById('bmiHeight').innerText;
-        if (currentHeight && currentHeight !== '--') {
-            heightInput.value = currentHeight;
-        }
-    }
-
-    });
 </script>
 
 
@@ -2608,8 +2555,56 @@ function refreshMealRecommendations() {
 
 // Wait for page to fully load
 document.addEventListener('DOMContentLoaded', function() {
+    // ===== START WEIGHT STORAGE =====
+    // Store initial start weight (ONCE, never changes)
+    if (!localStorage.getItem('initialStartWeight')) {
+        const startWeightText = document.getElementById('startWeight').innerText;
+        localStorage.setItem('initialStartWeight', startWeightText);
+        console.log("Initial start weight saved:", startWeightText);
+    } else {
+        // Always display the saved start weight
+        const savedStartWeight = localStorage.getItem('initialStartWeight');
+        document.getElementById('startWeight').innerText = savedStartWeight;
+    }
+    
+    // ===== LOAD USER STATS =====
     loadUserStats();
-    // Call meal recommendations after page loads
+    
+    // ===== DARK MODE =====
+    const savedDarkMode = localStorage.getItem('darkMode');
+    if (savedDarkMode === 'enabled') {
+        document.body.classList.add('dark-mode');
+    }
+    
+    // ===== CALCULATE PROGRESS PERCENTAGE =====
+    const startWeight = parseFloat(document.getElementById('startWeight').innerText) || 0;
+    const currentWeight = parseFloat(document.getElementById('currentWeight').innerText) || 0;
+    const goalWeight = parseFloat(document.getElementById('goalWeight').innerText) || 0;
+    
+    if (startWeight > goalWeight && currentWeight > 0) {
+        // Weight loss goal
+        const progress = ((startWeight - currentWeight) / (startWeight - goalWeight)) * 100;
+        const progressPercent = Math.min(100, Math.max(0, Math.round(progress)));
+        document.getElementById('progressPercentage').innerText = progressPercent + '%';
+        document.getElementById('progressFill').style.width = progressPercent + '%';
+    }
+    
+    // ===== BMI CALCULATION =====
+    calculateBMI();
+    
+    // ===== QUICK TIPS =====
+    updateQuickTip();
+    
+    // ===== HEIGHT INPUT INITIALIZATION =====
+    const heightInput = document.getElementById('currentHeight');
+    if (heightInput && !heightInput.value) {
+        const currentHeight = document.getElementById('bmiHeight').innerText;
+        if (currentHeight && currentHeight !== '--') {
+            heightInput.value = currentHeight;
+        }
+    }
+    
+    // ===== MEAL RECOMMENDATIONS =====
     generateMealRecommendations();
 });
 </script>
