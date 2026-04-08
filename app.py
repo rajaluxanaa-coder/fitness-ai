@@ -1960,6 +1960,11 @@ def update_age():
         return jsonify({'success': False, 'error': str(e)})
 
 
+@app.route('/')
+def health_check():
+    return "OK", 200
+
+    
 # Your existing code at the bottom should look like this:
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
